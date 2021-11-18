@@ -21,10 +21,35 @@ export class InvoiceController {
     constructor(private deliveryService: InvoiceService) {
 
     }
-   /* @Post('/')
-    
-    @UseInterceptors(FilesInterceptor('files'))
+
+   
+   @Get('/')
+   @UseGuards(AuthGuard('jwt'))
+   @Roles(Role.ADMIN)
+    async getInvoices(@Req() req) {
+     
+      return await this.deliveryService.getInvoices(req);
+    } 
+    @Get('/:id')
+    @UseGuards(AuthGuard('jwt'))
+    @ApiParam({name: 'id', required: true})
+    async getInvoiceData(@Param() params,@Req() req) {
+     
+      return await this.deliveryService.getInvoiceData(params.id,req);
+    }
+    @Put('/update/:id')
+    @UseGuards(AuthGuard('jwt'))
+    @UseInterceptors(
+      FilesInterceptor('image', 20, {
+        storage: diskStorage({
+          destination: './public/uploads',
+          filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+      }),
+    )
     @ApiConsumes('multipart/form-data')
+    @ApiParam({name: 'id', required: true})
     @ApiBody({
       schema: {
         type: 'object',
@@ -49,7 +74,7 @@ export class InvoiceController {
           deliverChargeType: {type:'boolean'},
           invoiceStatus: {type:'string'},
           activeStatus :{type:'boolean'},
-          files: {
+          image: {
             
             type: 'array',
             items: {
@@ -61,23 +86,6 @@ export class InvoiceController {
         },
       },
     })
-   
-    async testParams(@UploadedFiles() files: Array<Express.Multer.File>,@Req() req) {
-     return  {body:req.body,files: files};
-      //return await this.deliveryService.createnewInvoice(file,req);
-    }*/
-    @Put('/update/:id')
-    @UseInterceptors(
-      FilesInterceptor('image', 20, {
-        storage: diskStorage({
-          destination: './public/uploads',
-          filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-      }),
-    )
-    @ApiConsumes('multipart/form-data')
-    @ApiParam({name: 'id', required: true})
     async updateInvoice(@Param() params,@UploadedFiles() files,@Req() req) {
       const response = [];
       files.forEach(file => {
@@ -89,17 +97,7 @@ export class InvoiceController {
       });
       return await this.deliveryService.updateInvoice(params.id,response,req);
     }
-    @Get('/')
-    async getTemplates(@Req() req) {
-     
-      return await this.deliveryService.getInvoices(req);
-    } 
-    @Get('/:id')
-    @ApiParam({name: 'id', required: true})
-    async getInvoiceData(@Param() params,@Req() req) {
-     
-      return await this.deliveryService.getInvoiceData(params.id,req);
-    }
+    
  
  @Post('/add')
   @UseInterceptors(
@@ -111,6 +109,42 @@ export class InvoiceController {
       fileFilter: imageFileFilter,
     }),
   )
+  @ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          fromAddress: {type:'string'},
+          fromZipcode: {type:'string'},
+          fromLat: {type:'string'},
+          fromLng: {type:'string'},
+          fromPhone: {type:'string'},
+          toAddress: {type:'string'},
+          toZipcode: {type:'string'},
+          toLat: {type:'string'},
+          toLng: {type:'string'},
+          toPhone: {type:'string'},
+          goods: {type:'string'},
+          numberofPack: {type:'string'},
+          weightPack: {type:'string'},
+          pickupType: {type:'string'},
+          pickupDate: {type:'string'},
+          pickupTime: {type:'string'},
+          cor: {type:'string'},
+          deliverChargeType: {type:'boolean'},
+          invoiceStatus: {type:'string'},
+          activeStatus :{type:'boolean'},
+          image: {
+            
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            },
+                      },
+          
+        },
+      },
+    })
   @ApiConsumes('multipart/form-data')
   async addInvoice(@UploadedFiles() files,@Req() res) {
     const response = [];
