@@ -12,7 +12,9 @@ import { EditSecurityDto } from './dto/edit-security';
 @Controller('security')
 @ApiTags('Customers')
 @ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
+
 export class SecurityController {
     constructor(private securityService: SecurityService) { }
   
