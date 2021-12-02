@@ -35,8 +35,7 @@ export class AuthMiddleware  implements NestMiddleware {
     }
     
     const users:any = await this.authService.verifyToken(accessToken);
-    
-      user = await this.userService.findOneByEmail(users.email);
+      user = await this.userService.findOneId(users._id);
      if(!user)
       throw new ForbiddenException('Please register or sign in.');
     

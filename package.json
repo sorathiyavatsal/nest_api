@@ -36,6 +36,7 @@
     "dotenv": "^8.2.0",
     "express-device": "^0.4.2",
     "geoip-lite": "^1.4.2",
+    "geopoint": "^1.0.1",
     "handlebars": "^4.7.7",
     "mongoose": "^5.9.4",
     "nest-access-control": "^2.0.2",
