@@ -1,38 +1,37 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Category } from './category.model';
+import { Settings } from './settings.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateCategoryDto } from './dto/create-category';
-import { EditCategoryDto } from './dto/edit-category';
+import { CreateSettingsDto } from './dto/create-settings';
+import { EditSettingsDto } from './dto/edit-settings';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from './../core/middleware/send-email.middleware';
 import { UseRoles } from 'nest-access-control';
 @Injectable()
-export class CategoryService {
+export class SettingsService {
     constructor(
         private configService:ConfigService,
         private sendEmailMiddleware: SendEmailMiddleware,
-        @InjectModel('Category') private CategoryModel: Model<Category>
+        @InjectModel('Settings') private SettingsModel: Model<Settings>
     ){
 
     }
     
-    async getAllCategory(user:any)
+    async getAllCustomers(user:any)
     {
-      return  this.CategoryModel.find({});  
+      return  this.SettingsModel.find({});  
     }
     async getCategoryDetail (id:any)
     {
-      return  this.CategoryModel.findById(id);  
+      return  this.SettingsModel.findById(id);  
     }  
-    async updateCategory(id:string,securityDto:any,user:any)
+    async updateCategory(id:string,securityDto:CreateSettingsDto,user:any)
     {
-           return this.CategoryModel.findOne({_id:id}).then((data)=>{
-            data.name=securityDto.name
-            data.activeStatus= securityDto.activeStatus
-            data.modifiedBy = user._id
-           
+        return this.SettingsModel.findOne({_id:id}).then((data)=>{
+            data.column_value = securityDto.column_value;
+            data.column_key =securityDto.column_key;
+            data.modifiedBy = user._id;
             data.save();
             return data.toObject({ versionKey: false });
         },error=>{
@@ -41,17 +40,15 @@ export class CategoryService {
             return new BadRequestException(msg);
         });
     }
-    async createCategory(securityDto:any,user:any)
+    async createCategory(securityDto:CreateSettingsDto,user:any)
     {
         
-        const newUser = new this.CategoryModel({
-            
-            image: securityDto.image,
-            name: securityDto.name,
+        const newUser = new this.SettingsModel({
+            column_value:securityDto.column_value,
+            column_key:securityDto.column_key,
             createdBy:user._id,
-            modifiedBy : user._id,
-            activeStatus: securityDto.activeStatus
-           
+            modifiedBy : user._id
+          
         });
         return await newUser.save().then((user:any) => {
             
@@ -61,5 +58,8 @@ export class CategoryService {
             if(error.errmsg) msg=error.errmsg
             return new BadRequestException(msg);
         });
+    }
+    async deleteSettings(id:string): Promise<any> {
+        return await this.SettingsModel.findByIdAndRemove(id);
     }
 }

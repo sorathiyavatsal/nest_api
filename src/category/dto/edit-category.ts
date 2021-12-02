@@ -16,6 +16,10 @@ export class EditCategoryDto {
     @IsNotEmpty()
     @ApiProperty()
     image: string;
-
+   
+    @IsBoolean()
+    @IsNotEmpty()
+    @ApiProperty()
+    activeStatus: boolean;
     
 }

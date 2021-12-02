@@ -38,6 +38,7 @@ import { SecurityModule } from 'src/security/security.module';
     }),
     SecurityModule,
     InvoiceModule,
+   
     ConfigModule
   ],
   providers: [AuthService, JwtStrategy, SendEmailMiddleware,ApiKeyStrategy ],

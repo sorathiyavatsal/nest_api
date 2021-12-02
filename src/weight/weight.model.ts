@@ -2,43 +2,47 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 let Schema = mongoose.Schema,
  ObjectId = Schema.ObjectId;
-export WeightSchema = new mongoose.Schema({
-    0_1: {
+
+export const  WeightsSchema = new mongoose.Schema({
+    category: {
         type: String,
         required: false
     },
-    1_2: {
-        type: String,
+    from_weight: {
+        type: Number,
         required: false
     },
-    2_3: {
-        type: String,
+    to_weight: {
+        type: Number,
         required: false
     },
-    3_5: {
-        type: String,
-        required: false
+    activeStatus:
+    {
+        type:Boolean,
+        default:true
     },
-    greatethen_5: {
-        type: String,
-        required: false
+    createdBy: {
+        type: ObjectId,
+        ref: 'Users'
     },
-    greaterthanorequalto_10: {
-        type: String,
-        required: false
-    },
+    modifiedBy: {
+        type: ObjectId,
+        ref: 'Users'
+    }
     
 }, { timestamps: true });
 
-export interface Security extends mongoose.Document {
+export interface Weights extends mongoose.Document {
     _id: string;
-    0_1: string,
-    1_2:string;
-    3_5:string,
-    greatethen_5:string,
-    greaterthanorequalto_10:string,
+    category: string,
+    from_weight:number;
+    to_weight:number,
+    activeStatus:boolean
     updatedAt:Date,
     createdAt:Date,
+    createdBy:string,
+    modifiedBy:string
+    
     
     
 }

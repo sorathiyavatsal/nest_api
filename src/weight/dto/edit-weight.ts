@@ -1,31 +1,24 @@
-import { IsString, IsEmail, IsNotEmpty, IsBoolean } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsEmail, IsNotEmpty, IsBoolean,IsNumber } from 'class-validator';
+import { ApiProperty,ApiParam } from '@nestjs/swagger';
 
-export class EditWeightDto {
+export class EditWeightsDto {
+   
+   
     @IsString()
     @ApiProperty()
-    0_1: string;
+    category: string;
   
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    1_2: string;
+    from_weight: number;
 
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    2_3: string;
+    to_weight: number;
 
-    @IsString()
+    @IsBoolean()
+    @IsNotEmpty()
     @ApiProperty()
-    3_5: string;
-
-    @IsString()
-    @ApiProperty()
-    greaterthan_5: string;
-
-
-    @IsString()
-    @ApiProperty()
-    greaterthanorequalto_10: string;
-
+    activeStatus: boolean;
     
 }

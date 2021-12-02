@@ -22,22 +22,48 @@ export class InvoiceController {
 
     }
 
-   
+    
    @Get('/')
+   @ApiBearerAuth()
    @UseGuards(AuthGuard('jwt'))
-   @Roles(Role.ADMIN)
     async getInvoices(@Req() req) {
      
       return await this.deliveryService.getInvoices(req);
     } 
+
     @Get('/:id')
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @ApiParam({name: 'id', required: true})
     async getInvoiceData(@Param() params,@Req() req) {
      
       return await this.deliveryService.getInvoiceData(params.id,req);
     }
+    @Get('/location/:id')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @ApiParam({name: 'id', required: true})
+    async getInvoiceLocationData(@Param() params,@Req() req) {
+     
+      return await this.deliveryService.getInvoiceData(params.id,req);
+    }
+    @Put('/update/location/:id')
+    @ApiParam({name: 'id', required: true})
+    async updateLocationInvoice(@Param() params,@UploadedFiles() files,@Req() req) {
+      const response = [];
+      if(files && files.length>0){
+        files.forEach(file => {
+        const fileReponse = {
+          originalname: file.originalname,
+          filename: file.filename,
+        };
+        response.push(fileReponse);
+      });
+    }
+      return await this.deliveryService.updateLocationInvoice(params.id,response,req);
+    }
     @Put('/update/:id')
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @UseInterceptors(
       FilesInterceptor('image', 20, {
@@ -50,6 +76,7 @@ export class InvoiceController {
     )
     @ApiConsumes('multipart/form-data')
     @ApiParam({name: 'id', required: true})
+    @ApiOperation({summary:'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP'})
     @ApiBody({
       schema: {
         type: 'object',
@@ -81,20 +108,22 @@ export class InvoiceController {
               type: 'string',
               format: 'binary',
             },
-                      },
+        },
           
         },
       },
     })
     async updateInvoice(@Param() params,@UploadedFiles() files,@Req() req) {
       const response = [];
-      files.forEach(file => {
+      if(files && files.length>0){
+        files.forEach(file => {
         const fileReponse = {
           originalname: file.originalname,
           filename: file.filename,
         };
         response.push(fileReponse);
       });
+    }
       return await this.deliveryService.updateInvoice(params.id,response,req);
     }
     
@@ -145,9 +174,11 @@ export class InvoiceController {
         },
       },
     })
+  @ApiOperation({summary:'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP'})
   @ApiConsumes('multipart/form-data')
   async addInvoice(@UploadedFiles() files,@Req() res) {
     const response = [];
+    if(files && files.length>0){
     files.forEach(file => {
       const fileReponse = {
         originalname: file.originalname,
@@ -155,6 +186,7 @@ export class InvoiceController {
       };
       response.push(fileReponse);
     });
+   }
     
     return await this.deliveryService.createnewInvoice(response,res);
   }

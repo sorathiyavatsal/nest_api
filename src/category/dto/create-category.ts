@@ -12,5 +12,10 @@ export class CreateCategoryDto {
     @ApiProperty()
     image: string;
 
+    @IsBoolean()
+    @IsNotEmpty()
+    @ApiProperty()
+    activeStatus: boolean;
+
     
 }

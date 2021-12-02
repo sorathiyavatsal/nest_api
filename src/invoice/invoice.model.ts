@@ -70,9 +70,9 @@ export const InvoiceSchema = new mongoose.Schema({
         
     },
     cor: {
-        type: String,
+        type: String
        
-        required: true
+        
     },
     deliverChargeType: {
         type: Boolean,
@@ -90,6 +90,26 @@ export const InvoiceSchema = new mongoose.Schema({
     {
         type:Object,
         default:[]
+    },
+    loc:
+    {
+        type: {
+            type: String, 
+            enum: ['Point'], 
+            
+          },
+          coordinates: {
+            type: [Number],
+            
+          }
+    },
+    distenance:{
+        type:Number,
+        default:1
+    },
+    price:{
+        type:Number,
+        default:10
     },
     activeStatus: {
         type: Boolean,
@@ -119,6 +139,7 @@ export interface Invoice extends mongoose.Document {
     toLat: string,
     toLng:boolean,
     toPhone: string,
+    loc:any,
     goodsPhotos:object,
     goods: string,
     numberofPack: number,
@@ -126,6 +147,7 @@ export interface Invoice extends mongoose.Document {
     pickupType: string,
     pickupDate: Date,
     pickupTime: Date,
+    distance:number,
     cor: string,
     deliverChargeType: Boolean,
     invoiceStatus: string,

@@ -1,34 +1,28 @@
-import { IsString, IsEmail, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsBoolean,IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class EditPackagesDto {
+    
     @IsString()
     @ApiProperty()
-    1: string;
+    category: string;
   
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    2: string;
+    from_pack: number;
 
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    3: string;
+    to_pack: number;
 
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    4: string;
-
-    @IsString()
+    rate: Number;
+    
+    @IsBoolean()
+    @IsNotEmpty()
     @ApiProperty()
-    5: string;
-
-    @IsString()
-    @ApiProperty()
-    greatethen_5: string;
-
-    @IsString()
-    @ApiProperty()
-    greaterthanorequalto_10: string;
+    activeStatus: boolean;
 
     
 }

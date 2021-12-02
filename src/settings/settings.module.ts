@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SettingsController } from './settings.controller';
-import { SettingsService } from './settings.service';
+import { SettingsService } from './setting.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SettingsSchema } from './settings.model';
 import { ConfigModule } from '../core/config/config.module';
@@ -8,7 +8,7 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'settings', schema: SettingsSchema }
+      { name: 'Settings', schema: SettingsSchema }
       
     ]),
     ConfigModule
