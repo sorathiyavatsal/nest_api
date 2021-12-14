@@ -15,7 +15,7 @@ export class SendEmailMiddleware {
 //   {
     client.messages
     .create({
-       body: 'Your verification code for byecom '+code,
+       body: 'Your verification code for byecom '+code+" \n 23XiUiRVHsd",
        from: this.configService.get('TWILIO_WHATSAPP'),
        to: 'whatsapp:'+validPhone
      })
@@ -24,7 +24,7 @@ export class SendEmailMiddleware {
     // else{
         client.messages
         .create({
-           body: 'Your verification code for byecom '+code,
+           body: 'Your verification code for byecom '+code+" \n 23XiUiRVHsd",
            from: this.configService.get('TWILIO_PHONE'),
            to: validPhone
          })

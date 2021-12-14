@@ -33,8 +33,11 @@ export class WeightsService {
     async updateWeights(id:string,weightDto:EditWeightsDto,user:any)
     {
         return this.WeightsModel.findOne({_id:id}).then((data)=>{
-            data =weightDto
             
+            data.category=weightDto.category;
+            data.from_weight=weightDto.from_weight;
+            data.to_weight=weightDto.to_weight;
+            data.rate=weightDto.rate;
             data.modifiedBy = user._id
             data.save();
             return data.toObject({ versionKey: false });
@@ -49,7 +52,7 @@ export class WeightsService {
         const data:any= weightDto;
         data.createdBy = user._id;
         data.modifiedBy  = user._id;
-        const newUser = new this.WeightsModel(weightDto
+        const newUser = new this.WeightsModel(data
            );
         return await newUser.save().then((user:any) => {
             

@@ -6,15 +6,19 @@ export class EditWeightsDto {
    
     @IsString()
     @ApiProperty()
-    category: string;
+    category: number;
   
     @IsNumber()
     @ApiProperty()
     from_weight: number;
-
+   
     @IsNumber()
     @ApiProperty()
     to_weight: number;
+
+    @IsNumber()
+    @ApiProperty()
+    rate: number;
 
     @IsBoolean()
     @IsNotEmpty()

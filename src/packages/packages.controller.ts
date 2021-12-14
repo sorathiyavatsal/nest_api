@@ -1,6 +1,6 @@
 import { Controller, SetMetadata, Request,Get, Post, Delete, Body, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { PackageService} from "./packages.service"
-import { ApiTags, ApiProperty, ApiBearerAuth,ApiParam,ApiConsumes,  ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth,ApiParam,ApiConsumes,  ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../auth/user.model";
 import { userInfo } from 'os';
@@ -16,8 +16,8 @@ import { extname } from 'path';
 @Controller('packages')
 @ApiTags('Packages')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
+@ApiSecurity('api_key')
+
 
 export class PackagesController {
     constructor(private PackagesService: PackageService) { }
@@ -34,13 +34,15 @@ export class PackagesController {
    
     return await this.PackagesService.getPackgesDetail(params.id);
   }
-
+  @UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @Post('/add-packages')
   async addPackages(@Body()  createPackagesDto: CreatePackagesDto,@Request() request) {
    
     return await this.PackagesService.createPackages(createPackagesDto,request.user);
   }
-
+  @UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
   @Put('/update-packages/:id')
   async updatePackages(@Param() params,@Body()  editPackagesDto: EditPackagesDto,@Request() request:any) {
@@ -48,7 +50,8 @@ export class PackagesController {
     return await this.PackagesService.updatePackages(params.id,editPackagesDto,request.user);
   }
   
- 
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
   @Delete('/delete-packages/:id')
   async deleteCategory(@Param('id') id: string) {

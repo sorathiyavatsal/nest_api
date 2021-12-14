@@ -1,4 +1,4 @@
-import { InvoiceModule } from '../invoice/invoice.module';
+import { DeliveryFleetModule } from '../delivery_fleet/deliveryfleet.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './user.model';
@@ -37,7 +37,7 @@ import { SecurityModule } from 'src/security/security.module';
       inject: [ConfigService],
     }),
     SecurityModule,
-    InvoiceModule,
+    DeliveryFleetModule,
    
     ConfigModule
   ],

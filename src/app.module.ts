@@ -20,6 +20,8 @@ import { TemplatesModule } from './templates/templates.module';
 import { SecurityModule } from './security/security.module';
 import { CategoryModule } from './category/category.module';
 import { WeightsModule } from './weight/weight.module';
+import { RoleModule } from './role/role.module';
+import { ProfileModule } from './profile/profile.module';
 import { PackagesModule } from './packages/packages.module';
 import { PackagingsModule } from './packaging/packaging.module';
 import { HolidaysModule } from './holiday/holiday.module';
@@ -28,7 +30,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/roles.guard';
 import { join } from 'path';
 import { AuthMiddleware } from './auth/auth.middleware';
-import { InvoiceModule } from './invoice/invoice.module';
+import { DeliveryFleetModule } from './delivery_fleet/deliveryfleet.module';
 import { MulterModule } from '@nestjs/platform-express';
 @Module({
   imports: [
@@ -63,10 +65,12 @@ import { MulterModule } from '@nestjs/platform-express';
     AuthModule,
     WinstonModule,
     UsersModule,
+    RoleModule,
+    ProfileModule,
     TemplatesModule,
     SecurityModule,
     WeightsModule,
-    InvoiceModule,
+    DeliveryFleetModule,
     CategoryModule,
     WeightsModule,
     PackagesModule,
