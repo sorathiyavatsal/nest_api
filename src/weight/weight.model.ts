@@ -5,14 +5,19 @@ let Schema = mongoose.Schema,
 
 export const  WeightsSchema = new mongoose.Schema({
     category: {
-        type: String,
-        required: false
+        type: ObjectId,
+        required: true
     },
     from_weight: {
         type: Number,
         required: false
     },
     to_weight: {
+        type: Number,
+        required: false
+    },
+
+    rate: {
         type: Number,
         required: false
     },
@@ -37,6 +42,7 @@ export interface Weights extends mongoose.Document {
     category: string,
     from_weight:number;
     to_weight:number,
+    rate:number,
     activeStatus:boolean
     updatedAt:Date,
     createdAt:Date,

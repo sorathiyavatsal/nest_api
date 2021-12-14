@@ -56,6 +56,10 @@ export const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    verifyStatus: {
+        type: Boolean,
+        default: false
+    },
     liveStatus: {
         type: Boolean,
         default: false

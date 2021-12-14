@@ -4,8 +4,8 @@ let Schema = mongoose.Schema,
  ObjectId = Schema.ObjectId;
 export const PackagingsSchema = new mongoose.Schema({
     category: {
-        type: String,
-        required: false
+        type: ObjectId,
+        required: true
     },
     rate: {
         type: Number,

@@ -7,6 +7,7 @@ import { userInfo } from 'os';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
+import { profileStatusDto } from './dto/useravailable';
 
 @Controller('users')
 @ApiTags('Profile')
@@ -31,9 +32,24 @@ export class UsersController {
 
 @ApiOperation({ summary: 'user profile' })
 @ApiParam({name: 'id', required: true})
- @Get('/profile/:id')
+@Get('/profile/:id')
   async userProfile(@Param() params) {
    
     return await this.userService.findOneId(params.id);
+  }
+  
+@ApiOperation({ summary: 'delivery boy status update' })
+@ApiParam({name: 'id', required: true})
+@Put('/delivery-boy/update/status/:id')
+  async deliveryBoyUpdateStatus(@Param() params,@Body() profileStatus:profileStatusDto,@Req() req) {
+   
+    return await this.userService.updateStatus(params.id,profileStatus,req.user);
+  }
+@ApiOperation({ summary: 'Admin Approved/Rejected Accounts' })
+@ApiParam({name: 'id', required: true})
+@Put('/admin/update/status/:id')
+  async adminUpdateStatus(@Param() params,@Body() profileStatus:profileStatusDto,@Req() req) {
+   
+    return await this.userService.activeAccount(params.id,profileStatus,req.user);
   }
 }

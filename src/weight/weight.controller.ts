@@ -1,6 +1,6 @@
 import { Controller, SetMetadata, Request,Get, Post, Body, Delete, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { WeightsService} from "./weight.service"
-import { ApiTags, ApiProperty, ApiBearerAuth,ApiParam,ApiConsumes,  ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth,ApiParam,ApiConsumes,  ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../auth/user.model";
 import { userInfo } from 'os';
@@ -16,8 +16,8 @@ import { extname } from 'path';
 @Controller('weight')
 @ApiTags('Weights')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
+@ApiSecurity('api_key')
+
 
 export class WeightsController {
     constructor(private WeightsService: WeightsService) { }
@@ -33,19 +33,24 @@ export class WeightsController {
    
     return await this.WeightsService.getWeightsDetail(params.id);
   }
+  @UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @Post('/add-weights')
 
   async addWeights(@Body()  createWeightsDto: CreateWeightsDto,@Request() request) {
    
-    return await this.WeightsService.createWeights(createWeightsDto,request.user);
+    return await this.WeightsService.createWeights(createWeightsDto,request.user.user);
   }
+  @UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
   @Put('/update-weights/:id')
   async updateWeights(@Param() params,@Body()  editWeightsDto: EditWeightsDto,@Request() request:any) {
    
     return await this.WeightsService.updateWeights(params.id,editWeightsDto,request.user);
   }
-
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
   @Delete('/delete-weights/:id')
   async deleteCategory(@Param('id') id: string) {

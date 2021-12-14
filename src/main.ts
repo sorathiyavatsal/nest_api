@@ -5,15 +5,15 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { HttpExceptionFilter } from './core/filters/http.filter';
 import { FallbackExceptionFilter } from './core/filters/fallback.filter';
 import { join } from 'path';
-
+import { resolve } from 'path';
+const express = require('express')
 async function bootstrap() {
   
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
   const reflector = app.get<Reflector>(Reflector);
   app.useGlobalGuards();
-  app.useStaticAssets(join(__dirname, 'public'));
+  app.use('/public', express.static(join(__dirname, '..', 'public'))); 
   app.enableCors();
-  
   app.setGlobalPrefix('api');
   app.useGlobalFilters(
     new FallbackExceptionFilter(),

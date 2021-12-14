@@ -2,21 +2,12 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 let Schema = mongoose.Schema,
  ObjectId = Schema.ObjectId;
-export const  CategorySchema = new mongoose.Schema({
-   
-    image: {
-        type: Object,
-      
-    },
-    name: {
+export const RoleSchema = new mongoose.Schema({
+    role: {
         type: String,
-        unique: true,
-        required: true
-    },
-    rate: {
-        type: Number,
         required: false
     },
+    
     activeStatus:
     {
         type:Boolean,
@@ -31,14 +22,13 @@ export const  CategorySchema = new mongoose.Schema({
         ref: 'Users'
     }
     
+    
 }, { timestamps: true });
 
-export interface Category extends mongoose.Document {
+export interface Role extends mongoose.Document {
     _id: string;
-    name: string;
-    rate: number;
-    image:object,
-    activeStatus:boolean
+    role: string,
+    activeStatus:boolean,
     updatedAt:Date,
     createdAt:Date,
     createdBy:string,

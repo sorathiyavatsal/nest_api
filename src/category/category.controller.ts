@@ -12,12 +12,12 @@ import {FileInterceptor,FilesInterceptor,FileFieldsInterceptor} from '@nestjs/pl
 import { ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-
+const path = require('path')
 @Controller('category')
 @ApiTags('Category')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
+@ApiSecurity('api_key')
+
 
 export class CategoryController {
     constructor(private securityService: CategoryService) { }
@@ -26,17 +26,28 @@ export class CategoryController {
   async getCategories(@Request() request) {
    return await this.securityService.getAllCategory(request.user);
   }
+  @Get('/active-categories')
+  async getActiveCategories(@Request() request) {
+   return await this.securityService.getActiveCategory(request.user);
+  }
   @ApiParam({name: 'id', required: true})
   @Get('/categories/:id')
   async getCategoryDetail(@Param() params,@Request() request:any) {
     console.log("weclome"+params.id)
     return await this.securityService.getCategoryDetail(params.id);
   }
+@UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
       storage: diskStorage({
-        destination: './public/uploads/category'
+        destination: './public/uploads/category',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split("/");
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now()+ '.' +extension)
+        }
         
       })
     }),
@@ -74,12 +85,19 @@ export class CategoryController {
     }
     return await this.securityService.createCategory(request.body,request.user);
   }
+@UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
   @Put('/update/:id')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
       storage: diskStorage({
-        destination: './public/uploads/category'
+        destination: './public/uploads/category',
+         filename: function (req, file, cb) {
+          let extArray = file.mimetype.split("/");
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now()+ '.' +extension)
+        }
         
       })
     }),
@@ -116,6 +134,8 @@ export class CategoryController {
     }
     return await this.securityService.updateCategory(params.id,request.body,request.user);
   }
+@UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
   @Get('/delete-categories/:id')
   async deleteCategories(@Param() params,@Body()  editSecurityDto: EditCategoryDto,@Request() request:any) {
@@ -123,3 +143,12 @@ export class CategoryController {
     return await this.securityService.updateCategory(params.id,editSecurityDto,request.user);
   }
 }
+export const editFileName = (req, file, callback) => {
+  const name = file.originalname.split('.')[0];
+  const fileExtName = extname(file.originalname);
+  const randomName = Array(4)
+    .fill(null)
+    .map(() => Math.round(Math.random() * 16).toString(16))
+    .join('');
+  callback(null, `${name}-${randomName}.${path.extname(file.originalname)}`);
+};

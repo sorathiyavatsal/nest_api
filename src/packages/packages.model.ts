@@ -4,8 +4,8 @@ let Schema = mongoose.Schema,
  ObjectId = Schema.ObjectId;
 export const PackagesSchema = new mongoose.Schema({
     category: {
-        type: String,
-        required: false
+        type: ObjectId,
+        required: true
     },
     from_pack: {
         type: Number,

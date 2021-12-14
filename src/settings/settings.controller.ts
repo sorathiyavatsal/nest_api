@@ -16,8 +16,7 @@ import { extname } from 'path';
 @Controller('settings')
 @ApiTags('Settings')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
+@ApiSecurity('api_key')
 
 export class SettingsController {
     constructor(private securityService: SettingsService) { }
@@ -33,7 +32,9 @@ export class SettingsController {
    
     return await this.securityService.getCategoryDetail(params.id);
   }
-  @Post('/add')
+@UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
+@Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
       storage: diskStorage({
@@ -46,6 +47,9 @@ export class SettingsController {
    
     return await this.securityService.createCategory(createSecurityDto,request.user);
   }
+@UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
+
   @ApiParam({name: 'id', required: true})
   @Put('/update/:id')
   @ApiBody({
@@ -72,8 +76,10 @@ export class SettingsController {
    
     return await this.securityService.updateCategory(params.id,editSecurityDto,request.user);
   }
-  @ApiParam({name: 'id', required: true})
-  @Delete('/delete/:id')
+@UseGuards(AuthGuard('jwt'))
+@Roles(Role.ADMIN)
+@ApiParam({name: 'id', required: true})
+@Delete('/delete/:id')
   async deleteCategories(@Param() params,@Request() request:any) {
    return await this.securityService.deleteSettings(params.id);
   }
