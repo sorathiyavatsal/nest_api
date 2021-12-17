@@ -16,13 +16,14 @@ import { ConfigService } from '../core/config/config.service';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 import { ApiKeyStrategy  } from './auth-header-api-key.strategy';
 import { SecurityModule } from 'src/security/security.module';
-
+import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
       { name: 'UserVerification', schema: UserVerificationSchema },
-      { name: 'UserLogin', schema: UserLoginSchema }
+      { name: 'UserLogin', schema: UserLoginSchema },
+      { name: 'DeliveryFleet',schema:DeliveryFleetSchema}
       
     ]),
     PassportModule.register({ defaultStrategy: 'jwt', session: true }),

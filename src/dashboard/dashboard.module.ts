@@ -1,9 +1,11 @@
+import { DashboardService } from './dashboard.service';
+import { DashboardController } from './dashboard.controller';
 import { HolidaysSchema } from '../holiday/holiday.model';
 import { Module } from '@nestjs/common';
-import { DeliveryFleetController } from './deliveryfleet.controller';
-import { DeliveryFleetService } from './deliveryfleet.service';
+import { DeliveryFleetController } from '../delivery_fleet/deliveryfleet.controller';
+import { DeliveryFleetService } from '../delivery_fleet/deliveryfleet.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DeliveryFleetSchema } from './deliveryfleet.model';
+import { DeliveryFleetSchema } from '../delivery_fleet/deliveryfleet.model';
 import { WeightsSchema } from '../weight/weight.model';
 import { CategorySchema } from '../category/category.model';
 import { PackagesSchema } from '../packages/packages.model';
@@ -12,7 +14,7 @@ import { PackagingsSchema } from '../packaging/packaging.model';
 import { ConfigModule } from '../core/config/config.module';
 import { HolidaysModule } from 'src/holiday/holiday.module';
 import { UserSchema } from 'src/auth/user.model';
-import { DeliveryLocationSchema } from './deliveryLocation.model';
+import { DeliveryLocationSchema } from '../delivery_fleet/deliveryLocation.model';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 import { UserVerificationSchema } from 'src/core/models/userVerification.model';
 @Module({
@@ -32,8 +34,9 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
     ConfigModule,
     HolidaysModule
   ],
-  controllers: [DeliveryFleetController],
-  providers: [DeliveryFleetService, SendEmailMiddleware],
-  exports:[DeliveryFleetService]
+  controllers: [DashboardController],
+  providers: [DashboardService,SendEmailMiddleware],
+  exports:[DashboardService]
 })
-export class DeliveryFleetModule {}
+export class DashboardModule {}
+

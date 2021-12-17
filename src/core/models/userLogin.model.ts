@@ -51,7 +51,7 @@ export const UserLoginSchema = new mongoose.Schema({
    
 
 }, { timestamps: true });
-UserLoginSchema.index({ content: "text" });
+
 export interface UserLogin extends mongoose.Document {
     _id: string;
     browser: string;

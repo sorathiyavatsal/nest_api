@@ -19,6 +19,11 @@ export const UserVerificationSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    deliveryId:
+    {
+        type: ObjectId,
+        ref: 'Deliveryfleets'
+    },
     createdBy: {
         type: ObjectId,
         ref: 'Users'

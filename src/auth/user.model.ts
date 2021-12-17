@@ -52,6 +52,17 @@ export const UserSchema = new mongoose.Schema({
     fullName: {
         type: String
     },
+    loc:{
+        type: {
+            type: String, 
+            enum: ['Point'], 
+            
+          },
+          coordinates: {
+            type: [Number],
+            
+          }
+    },
     activeStatus: {
         type: Boolean,
         default: false
@@ -105,7 +116,7 @@ UserSchema.methods.checkPassword = function (attempt, callback) {
         callback(null, isMatch);
     });
 };
-
+UserSchema.index({ loc: "2dsphere" });
 export interface User extends mongoose.Document {
     _id: string;
     email: string;

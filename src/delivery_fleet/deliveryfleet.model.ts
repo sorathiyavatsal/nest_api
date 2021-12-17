@@ -3,6 +3,13 @@ import * as bcrypt from 'bcrypt';
 let Schema = mongoose.Schema,
  ObjectId = Schema.ObjectId;
 export const DeliveryFleetSchema = new mongoose.Schema({
+    fromName: {
+        type: String,
+        required: true
+    },
+    fromLandMark: {
+        type: String
+    },
     fromAddress: {
         type: String,
         required: true
@@ -22,6 +29,13 @@ export const DeliveryFleetSchema = new mongoose.Schema({
     fromPhone: {
         type: String,
         required: true
+    },
+    toName: {
+        type: String,
+        required: true
+    },
+    toLandMark: {
+        type: String
     },
     toAddress: {
         type: String,
@@ -43,8 +57,30 @@ export const DeliveryFleetSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    fromLoc:{
+        type: {
+            type: String, 
+            enum: ['Point'], 
+            
+          },
+          coordinates: {
+            type: [Number],
+            
+          }
+    },
+    toLoc:{
+        type: {
+            type: String, 
+            enum: ['Point'], 
+            
+          },
+          coordinates: {
+            type: [Number],
+            
+          }
+    },
     goods: {
-        type: String,
+        type: ObjectId,
         required: true
     },
     numberofPack: {
@@ -81,7 +117,7 @@ export const DeliveryFleetSchema = new mongoose.Schema({
     },
     invoiceStatus: {
         type: String,
-        enum : ['progress','pending','complete','dispatched','delivered','cancelled','faliure'],
+        enum : ['progress','pending','complete','dispatched','delivered','cancelled','faliure','accepted','pickup'],
         default: 'pending'
     },
    
@@ -102,6 +138,10 @@ export const DeliveryFleetSchema = new mongoose.Schema({
             
           }
     },
+    deliveryBoy:{
+        type:ObjectId,
+        ref:"Users"
+    },
     distance:{
         type:Number,
         default:1
@@ -114,6 +154,10 @@ export const DeliveryFleetSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    userId: {
+        type: ObjectId,
+        ref: 'Users'
+    },
     createdBy: {
         type: ObjectId,
         ref: 'Users'
@@ -125,9 +169,13 @@ export const DeliveryFleetSchema = new mongoose.Schema({
    
 
 }, { timestamps: true });
-
+DeliveryFleetSchema.index({ loc: "2dsphere" });
+DeliveryFleetSchema.index({ fromLoc: "2dsphere" });
+DeliveryFleetSchema.index({ toLoc: "2dsphere" });
 export interface DeliveryFleet extends mongoose.Document {
     _id: string;
+    fromName: string;
+    fromLandMark: string;
     fromAddress: string;
     fromZipcode: string;
     fromLat: string,
@@ -135,6 +183,10 @@ export interface DeliveryFleet extends mongoose.Document {
     fromPhone: string,
     toAddress: string;
     toZipcode: string;
+    toName: string;
+    toLandMark: string;
+    fromLoc: object;
+    toLoc: object;
     toLat: string,
     toLng:boolean,
     toPhone: string,
@@ -147,6 +199,7 @@ export interface DeliveryFleet extends mongoose.Document {
     pickupDate: Date,
     pickupTime: Date,
     distance:number,
+    userId: string,
     cor: string,
     deliverChargeType: string,
     invoiceStatus: string,

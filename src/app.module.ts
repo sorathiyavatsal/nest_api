@@ -32,6 +32,8 @@ import { join } from 'path';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { DeliveryFleetModule } from './delivery_fleet/deliveryfleet.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { AdminModule } from './admin/admin.module';
 @Module({
   imports: [
     MulterModule.register({
@@ -76,7 +78,9 @@ import { MulterModule } from '@nestjs/platform-express';
     PackagesModule,
     PackagingsModule,
     HolidaysModule,
-    SettingsyModule
+    SettingsyModule,
+    DashboardModule,
+    AdminModule
   ],
   controllers: [],
   providers: [

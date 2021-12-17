@@ -9,6 +9,18 @@ export class CreateProfileDto {
     @IsString()
     @ApiProperty()
     gender: string;
+    
+    @IsString()
+    @ApiProperty()
+    fullName: string;
+
+    @IsString()
+    @ApiProperty()
+    store_license: string; 
+   
+    @IsString()
+    @ApiProperty()
+    services_area: object;
 
     @IsDate()
     @ApiProperty()
