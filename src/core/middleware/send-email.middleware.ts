@@ -15,7 +15,7 @@ export class SendEmailMiddleware {
 //   {
     client.messages
     .create({
-       body: 'Your verification code for byecom '+code+" \n 23XiUiRVHsd",
+       body: 'Your verification code for byecom '+code,
        from: this.configService.get('TWILIO_WHATSAPP'),
        to: 'whatsapp:'+validPhone
      })
@@ -30,6 +30,30 @@ export class SendEmailMiddleware {
          })
         .then(message => console.log("sms "+validPhone,message.sid));
     //}
+  }
+  async  sensSMSdelivery(phone:string,message:string)
+    {
+        const accountSid = this.configService.get('TWILIO_ACCOUNT_SID');
+        const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
+        const client = require('twilio')(accountSid, authToken); 
+    let validPhone=await this.addCountrycode(phone);   
+
+    client.messages
+    .create({
+       body: message,
+       from: this.configService.get('TWILIO_WHATSAPP'),
+       to: 'whatsapp:'+validPhone
+     })
+    .then(message => console.log("whatsapp" +validPhone,message.sid,validPhone)); 
+   
+        client.messages
+        .create({
+           body: message+" \n 23XiUiRVHsd",
+           from: this.configService.get('TWILIO_PHONE'),
+           to: validPhone
+         })
+        .then(message => console.log("sms "+validPhone,message.sid));
+    
   }
   async addCountrycode(phone)
    {

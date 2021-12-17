@@ -1,5 +1,5 @@
 import { Holidays } from '../holiday/holiday.model';
-import { Injectable, BadRequestException} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { DeliveryFleet } from './deliveryfleet.model';
 import { Weights } from '../weight/weight.model';
 import { Category } from '../category/category.model';
@@ -15,666 +15,443 @@ import { DeliveryChargesDto } from './dto/deliverycharges';
 import { Buffer } from 'buffer'
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 import { throws } from 'assert';
-import {User} from "../auth/user.model";
+import { User } from "../auth/user.model";
+import { UserVerification } from 'src/core/models/userVerification.model';
+import { DeliveryLocation } from './deliveryLocation.model';
+import { identity } from 'rxjs';
 const GeoPoint = require('geopoint');
 @Injectable()
 export class DeliveryFleetService {
+    settings:any=[];
     constructor(
-     @InjectModel('DeliveryFleet') private deliveryfleetModel: Model<DeliveryFleet>,
-     @InjectModel('Weights') private WeightsModel: Model<Weights>,
-     @InjectModel('Category') private CategoryModel: Model<Category>,
-     @InjectModel('Packages') private PackagesModel: Model<Packages>,
-     @InjectModel('Packagings') private PackagingsModel: Model<Packagings>,
-     @InjectModel('Holidays') private holidaysModel: Model<Holidays>,
-     @InjectModel('Settings') private SettingsModel: Model<Settings>,
-     @InjectModel('User') private UserModel: Model<User>,
-       ){
-   
-       }
-    async  createnewDeliveryFleet(files:any,req:any)
-    {
-        let  today = new Date();
+        private sendSms:SendEmailMiddleware,
+        @InjectModel('UserVerification') private userVerificationModel: Model<UserVerification>,
+        @InjectModel('DeliveryFleet') private deliveryfleetModel: Model<DeliveryFleet>,
+        @InjectModel('Weights') private WeightsModel: Model<Weights>,
+        @InjectModel('Category') private CategoryModel: Model<Category>,
+        @InjectModel('Packages') private PackagesModel: Model<Packages>,
+        @InjectModel('Packagings') private PackagingsModel: Model<Packagings>,
+        @InjectModel('Holidays') private holidaysModel: Model<Holidays>,
+        @InjectModel('Settings') private SettingsModel: Model<Settings>,
+        @InjectModel('User') private UserModel: Model<User>,
+        @InjectModel('DeliveryLocation') private LocationModel :  Model<DeliveryLocation>
+    ){
+      
+    }
+    async createnewDeliveryFleet(files: any, req: any) {
+        let today = new Date();
         today.setHours(23);
         today.setMinutes(59);
         today.setSeconds(59);
-        let holidays=await this.holidaysModel.find({ $or:[
-            {fromDate:{$gte:new Date(req.body.pickupDate),$lt:new Date(req.body.pickupDate)}},
-            {fromDate:{$gte:new Date(req.body.pickupDate),$lt:new Date(today)}}
-        
-            ]})
-        if(holidays.length>0)
-        {
-            return new BadRequestException(req.body.pickupDate+" is holiday");
+        let holidays = await this.holidaysModel.find({
+            $or: [
+                { fromDate: { $gte: new Date(req.body.pickupDate), $lt: new Date(req.body.pickupDate) } },
+                { fromDate: { $gte: new Date(req.body.pickupDate), $lt: new Date(today) } }
+
+            ]
+        })
+        if (holidays.length > 0) {
+            return new BadRequestException(req.body.pickupDate + " is holiday");
         }
-        let dto =req.body;
-        let userid:string;
-        if(req.user && req.user.user._id)
-        {
-            userid=req.user.user._id;
-            dto.createdBy =  userid;
+        let dto = req.body;
+        let userid: string;
+        if (req.user && req.user.user._id) {
+            userid = req.user.user._id;
+            dto.createdBy = userid;
             dto.modifiedBy = userid;
         }
-        if(files && files.length>0)
-        {
+        if (files && files.length > 0) {
             dto.goodsPhotos = files;
         }
-        if(dto.loc && dto.loc.type!="Point")
-        {
-          
-        delete req.body.loc
+        if (dto.loc && dto.loc.type != "Point") {
+
+            delete req.body.loc
         }
-       
+        dto.toLoc=
+        {
+            type:"Point",
+            coordinates:[dto.toLat,dto.toLng]
+        }
+        dto.FromLoc=
+        {
+            type:"Point",
+            coordinates:[dto.fromLat,dto.fromLng]
+        }
         const invoiceData = new this.deliveryfleetModel(dto)
-        
-        return await invoiceData.save().then((newInvoice:any) => {
-        if(!newInvoice)
-        {
-            return new BadRequestException("Invalid Invoice");
-        }
-        
-        else if(newInvoice && newInvoice.createdBy && newInvoice.createdBy!='')
-        {
-            
-            return {invoice:newInvoice,redirect:false};
-        }
-        else
-        {
-            
-            return {invoice:newInvoice,redirect:true};
-        }
-    });
+
+        return await invoiceData.save().then((newInvoice: any) => {
+            if (!newInvoice) {
+                return new BadRequestException("Invalid Invoice");
+            }
+
+            else if (newInvoice && newInvoice.createdBy && newInvoice.createdBy != '') {
+
+                return { invoice: newInvoice, redirect: false };
+            }
+            else {
+
+                return { invoice: newInvoice, redirect: true };
+            }
+        });
     }
-    async getDeliveyDistance(order:any)
-    {
+    async getDeliveyDistance(order: any) {
         let point1 = new GeoPoint(order.fromLat, order.fromLng);
         let point2 = new GeoPoint(order.toLat, order.toLng);
         let distance = point1.distanceTo(point2, true)//output in kilometers
         return distance;
     }
-    async updateLocationDeliveryFleet(id:any,dto:any,req:any)
-    {
-        let  today = new Date();
+    async updateLocationDeliveryFleet(id: any, dto: any, req: any, user:any) {
+        let today = new Date();
         today.setHours(23);
         today.setMinutes(59);
         today.setSeconds(59);
-        let holidays=await this.holidaysModel.find({ $or:[
-            {fromDate:{$gte:new Date(req.body.pickupDate),$lt:new Date(req.body.pickupDate)}},
-            {fromDate:{$gte:new Date(req.body.pickupDate),$lt:new Date(today)}}
-        
-            ]})
-        if(holidays.length>0)
-        {
-            return new BadRequestException(req.body.pickupDate+" is holiday");
+        let holidays = await this.holidaysModel.find({
+            $or: [
+                { fromDate: { $gte: new Date(req.body.pickupDate), $lt: new Date(req.body.pickupDate) } },
+                { fromDate: { $gte: new Date(req.body.pickupDate), $lt: new Date(today) } }
+
+            ]
+        })
+        if (holidays.length > 0) {
+            return new BadRequestException(req.body.pickupDate + " is holiday");
         }
-        
-        let userid:string;
-        if(req.user && req.user.user._id)
-        {
-            userid=req.user.user._id;
-            dto.createdBy =  userid;
+
+        let userid: string;
+        if (req.user && req.user.user._id) {
+            userid = req.user.user._id;
+            dto.createdBy = userid;
             dto.modifiedBy = userid;
         }
-        if(dto.loc && dto.loc.type!="Point")
-        {
-          
-          delete dto.loc
+        if (dto.loc && dto.loc.type != "Point") {
+
+            delete dto.loc
+            return new BadRequestException("Invalid Location");
         }
-        await this.deliveryfleetModel.update({_id:id},{$set:dto});
-        return this.deliveryfleetModel.findOne({_id:id}).then((data:any)=>{
+        else
+        {
+            await this.LocationModel.update({deliveryId:id,userId:user._id},{$set:dto.loc})
+            await this.UserModel.update({_id:user._id},{$set:dto.loc})
+        }
+        await this.deliveryfleetModel.update({ _id: id }, { $set: dto });
+        return this.deliveryfleetModel.findOne({ _id: id }).then((data: any) => {
             return data.toObject({ versionKey: false });
-        },error=>{
-            return new BadRequestException("Invalid Invoice");
+        }, error => {
+            return new BadRequestException("Invalid Location");
         })
     }
-    async updateDeliveryFleetPayment(id:any,dto:any,req:any)
+    async settingsData()
     {
-        let deliveryBoy:any=await this.UserModel.findOne({role:"DELIVERY",activeStatus:true})
-        return this.deliveryfleetModel.findOne({_id:id}).then((data:any)=>{
-          data.deliverChargeType=dto.deliverChargeType;
-          data.save();
-          return {deliveryFleet:data,deliveryBoy:deliveryBoy}
-        },error=>{
-            return new BadRequestException("Invalid Invoice");
-        })
-       
+     return this.SettingsModel.find({});
     }
-    async updateDeliveryStatus(id:any,dto:any,req:any)
-    {
-       return this.deliveryfleetModel.findOne({_id:id}).then((data:any)=>{
-          data.invoiceStatus=dto.invoiceStatus;
-          data.save();
-          return data.toObject({ versionKey: false });
-        },error=>{
-            return new BadRequestException("Invalid Invoice");
-        })
-       
-    }
-    async updateDeliveryFleet(id:any,files:any,req:any)
-    {
-        let dto =req.body;
-        let userid:string;
-        if(req.user && req.user.user._id)
+    async findDeliveryBoy(id:string) {
+        let delivery:any=this.deliveryfleetModel.findOne({ _id: id });
+        if(!delivery)
         {
-            userid=req.user.user._id;
-            dto.createdBy =  userid;
+            return new BadRequestException("Invalid Delivery Fleet");
+        }
+        let settings=await this.settingsData();
+        let maxDis:any=4;
+        let minDis:any=2;
+        let max_dis_data:any=this.settings.find((s:any)=>(s.column_key=="max_distance_find"))
+        if(max_dis_data)
+        {
+            maxDis = max_dis_data.column_value;
+            if(parseInt(maxDis))
+            maxDis=maxDis*1000;
+        }
+        let min_dis_data:any=this.settings.find((s:any)=>(s.column_key=="max_distance_find"))
+        if(min_dis_data)
+        {
+            minDis = min_dis_data.column_value;
+            if(parseInt(minDis))
+            minDis=minDis*1000;
+        }
+        let deliveryBoy: any = await this.UserModel.find(
+            { role: "DELIVERY", activeStatus: true, verifyStatus:true,
+            loc:
+            {
+                $near: { 
+                    $geometry: {
+                        type: "Point" ,
+                        coordinates: [ delivery.fromLat , delivery.fromLng ]
+                    },
+                    $maxDistance: minDis,
+                    $minDistance: maxDis
+                }
+            }
+        })
+    }
+    async updateDeliveryFleetBoy(id: any, req: any, user: any) {
+        let delivery:any=this.deliveryfleetModel.findOne({ _id: id }).populate("userId")
+        if(!delivery)
+        {
+            return new BadRequestException("Invalid Delivery Fleet");
+        }
+        let dto=req.body;
+        let updateObj:any={deliveryBoy:user._id,invoiceStatus:'accepted'};
+        if(dto.loc && dto.loc.type=="Point")
+        updateObj.loc=dto.loc;
+        await this.deliveryfleetModel.update({_id:id},{$set:updateObj});
+        //let smsData:any=await this.loginVerificationSmsOtp(delivery.userId)
+        let message:string='Byecom delivery accept your delivery  fleet order';
+        this.sendSms.sensSMSdelivery(delivery.userId.phoneNumber,message)
+        return {msg:'Trip is started successfully'}
+        
+    }
+    async loginVerificationSmsOtp(userId,id:string,template:string='deliverystartsms') {
+        await this.userVerificationModel.deleteMany({verificationType:template,deliverId:id})
+        let verifiedTemplate = template;
+        const newTokenVerifyEmail = new this.userVerificationModel({
+          verificationType: 'sms',
+          verifiedTemplate: verifiedTemplate,
+          deliveryId:id,
+          createdBy: userId,
+          createdUser: userId,
+          modifiedBy: userId,
+          otp: Math.floor(1000 + Math.random() * 9000),
+        });
+        newTokenVerifyEmail.save();
+        return newTokenVerifyEmail;
+      }
+    async updateDeliveryFleetPayment(id: any, dto: any, req: any) {
+        let deliveryBoy:any= await this.findDeliveryBoy(id)
+        return this.deliveryfleetModel.findOne({ _id: id }).then((data: any) => {
+            data.deliverChargeType = dto.deliverChargeType;
+            data.save();
+            return { deliveryFleet: data, deliveryBoy: deliveryBoy }
+        }, error => {
+            return new BadRequestException("Invalid Invoice");
+        })
+
+    }
+    async updateDeliveryStatus(id: any, dto: any, req: any) {
+        let smsData:any={};
+        let message:string='Byecom delivery';
+        let data:any=await this.deliveryfleetModel.findOne({ _id: id }).populate("userId")          
+        if(!data)
+        return new BadRequestException("Invalid Delivery Request");
+    
+            if(dto.invoiceStatus=="progress")
+            {
+                let verification:any=await this.userVerificationModel.findOne({otp:dto.otp,deliveryId:id,verifiedTemplate:'deliveryProgress'})
+                if(verification && !verification.verifiedStatus)
+                {
+                     message=message+" boy start from pickup location";
+                     this.sendSms.sensSMSdelivery(data.userId.phoneNumber,message);
+                }
+                else{
+                    return new BadRequestException("Invalid Otp");
+                }
+            }
+            else if(dto.invoiceStatus=="delivered")
+            {
+                let verification:any=await this.userVerificationModel.findOne({otp:dto.otp,deliveryId:id,verifiedTemplate:'deliveryDelivered'})
+                if(verification && !verification.verifiedStatus)
+                {
+                     message=message+" boy deliver the package to drop location";
+                     this.sendSms.sensSMSdelivery(data.userId.phoneNumber,message);
+                }
+                else{
+                    return new BadRequestException("Invalid Otp");
+                }
+            }
+            else if(data.invoiceStatus=="declined")
+            {
+
+            }
+            else if(data.invoiceStatus=="cancelled")
+            {
+
+            }
+            else if(data.invoiceStatus=="pickup")
+            {
+                
+                let code:any=await this.loginVerificationSmsOtp(id,data.userId._id,'deliveryProgress')
+                code= code.otp;
+                this.sendSms.sensSMSdelivery(data.fromPhone,message)
+            }
+            else if(data.invoiceStatus=="delivered")
+            {
+                
+                let code:any=await this.loginVerificationSmsOtp(id,data.userId._id,'deliveryDelivered')
+                code= code.otp;
+                this.sendSms.sensSMSdelivery(data.toPhone,message)
+            }
+            else{
+                return new BadRequestException("Invalid Delivery Fleet Request Status");
+            }
+            
+            let updateObj:any=dto
+            if(dto.loc && dto.loc.type=="Point")
+            {
+                updateObj.loc=dto.loc;
+                data.loc=dto.loc;
+            }
+            
+            this.deliveryfleetModel.update({_id:id},{$set:dto})
+            data.invoiceStatus = dto.invoiceStatus;
+           return data;
+     }
+    async updateDeliveryFleet(id: any, files: any, req: any) {
+        let dto = req.body;
+        let userid: string;
+        if (req.user && req.user.user._id) {
+            userid = req.user.user._id;
+            dto.createdBy = userid;
             dto.modifiedBy = userid;
         }
-        if(files && files.length>0)
-        {
+        if (files && files.length > 0) {
             dto.goodsPhotos = files;
         }
-        if(dto.loc)
-        {
-          
-        delete req.body.loc
+        if (dto.loc) {
+
+            delete req.body.loc
         }
-        await this.deliveryfleetModel.update({_id:id},{$set:dto});
-        return this.deliveryfleetModel.findOne({_id:id}).then((data:any)=>{
-          return data.toObject({ versionKey: false });
-        },error=>{
+        if(dto.toLat && dto.toLng)
+        {
+            dto.toLoc=
+            {
+                type:"Point",
+                coordinates:[dto.toLat,dto.toLng]
+            }
+        }
+        if(dto.fromLat && dto.fromLng)
+        {
+            dto.FromLoc=
+            {
+                type:"Point",
+                coordinates:[dto.fromLat,dto.fromLng]
+            }
+        }
+        await this.deliveryfleetModel.update({ _id: id }, { $set: dto });
+        return this.deliveryfleetModel.findOne({ _id: id }).then((data: any) => {
+            return data.toObject({ versionKey: false });
+        }, error => {
             return new BadRequestException("Invalid Invoice");
         })
-       
+
     }
 
 
-    async getDeliveryFleet(user:any)
-    {
-        let where:any={}
-        if(user.role=="merchant")
-         where.createdBy=user._id;
+    async getDeliveryFleet(user: any) {
+        let where: any = {}
+        if (user.role == "merchant")
+            where.createdBy = user._id;
         return this.deliveryfleetModel.find(where);
     }
 
-
-    async getDeliveryFleetData(id:any,req:any)
-    {
-        let invoice:any=await this.deliveryfleetModel.findOne({_id:id});
+    async getDeliveryFleetLocationData(id: any, req: any, user:any) {
+        let invoice: any = await this.deliveryfleetModel.findOne({ _id: id })
+         .populate("deliveryBoy")
+         .populate("createdBy");
+        let location:any;
+        if(invoice && invoice.deliveryBoy && invoice.deliveryBoy._id)
+        location= await this.LocationModel.find({deliveryId:id,userId:invoice.deliveryBoy._id})
+        else
+        location= await this.LocationModel.find({deliveryId:id})
+        return {deliveryFleet:invoice,locations:location}
+    }
+    async getDeliveryFleetData(id: any, req: any) {
+        let invoice: any = await this.deliveryfleetModel.findOne({ _id: id });
         return invoice.toObject({ versionKey: false });
     }
-   
-    async getDeliveryCharges( Dto: DeliveryChargesDto){
-       
+
+    async getDeliveryCharges(Dto: DeliveryChargesDto) {
+
         let dto_category = Dto.category
         let dto_weight = Dto.weight
         let dto_packages = Dto.packages
         let distenance = Dto.distenance;
         let weather = Dto.weather;
         let traffic = Dto.traffic;
-        
-        var weight_price=15;
-        var packages_price=15;
-        var packaging_price=15;
-        let weather_price=12;
-        let traffic_price=0;
-        
         let settings = await this.SettingsModel.find({});
-        let category  = await this.CategoryModel.findOne({_id:dto_category});
-
+        let weight_price = 15;
+        let packages_price = 15;
+        let packaging_price = 7;
+        let weather_price = 12;
+        let traffic_price = 10;
+        let addMP= 1;
+        let addKM=300;
+        let default_km=2;
+        let meterPrice=0;
+        let weight_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_weight_price"))
+        if(weight_price_setting)
+        {
+            weight_price = weight_price_setting.column_value;
+        }
+        let packages_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_package_price"))
+        if(packages_price_setting)
+        {
+            packages_price = packages_price_setting.column_value;
+        }
+        let packing_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_packing_price"))
+        if(packing_price_setting)
+        {
+            packaging_price = packing_price_setting.column_value;
+        }
+        let weather_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_weather_price"))
+        if(packing_price_setting)
+        {
+            weather_price = packing_price_setting.column_value;
+        }
+        let traffic_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_traffic_price"))
+        if(traffic_price_setting)
+        {
+            traffic_price = traffic_price_setting.column_value;
+        }
+        let addtion_meter_price_setting:any=this.settings.find((s:any)=>(s.column_key=="additional_km_price"))
+        if(traffic_price_setting)
+        {
+            addMP = addtion_meter_price_setting.column_value;
+        }
+        let additional_km_setting:any=this.settings.find((s:any)=>(s.column_key=="additional_km"))
+        if(additional_km_setting)
+        {
+            addKM = traffic_price_setting.column_value;
+        }
+        let default_km_setting:any=this.settings.find((s:any)=>(s.column_key=="default_km"))
+        if(default_km_setting)
+        {
+            addKM = default_km_setting.column_value;
+        }
+        
         //weight
-        let weight  = await this.WeightsModel.findOne({category:dto_category,from_weight:{$gte:dto_weight},to_weight:{$lte:dto_weight}})
-        if(weight && weight_price){
-             weight_price= weight.rate;
+        let weight = await this.WeightsModel.findOne({$and:[{"category": dto_category},{from_weight: { $gte: dto_weight }},{to_weight: { $lte: dto_weight }}] })
+        if (weight) {
+        
+            weight_price = (dto_weight*weight.rate)+weight_price;
+            console.log("wewe")
         }
 
-       //packages
-        let packages  = await this.PackagesModel.findOne({category:dto_category,from_pack:{$gte:dto_packages},to_pack:{$lte:dto_packages}})
-        if(packages && packages_price) packages_price= packages.rate;                          
-        
+        //packages
+        let packages = await this.PackagesModel.findOne({ category: dto_category, from_pack: { $gte: dto_packages }, to_pack: { $lte: dto_packages } })
+        if (packages && packages_price) 
+        {
+            packages_price = (dto_packages*packages.rate)+packages_price;
+        }
+
         //packaging
-        let packaging  = await this.PackagingsModel.findOne({category:dto_category});
-        if(packaging) packaging_price= packaging.rate;
+        let packaging = await this.PackagingsModel.findOne({ category: dto_category });
+        if (packaging) 
+        {
+            packaging_price = dto_packages*packaging.rate;
+        }
+        if(distenance>default_km)
+        {
+            let addDis=distenance-2;
+            let met=(addDis/1000)/addKM;
+            meterPrice= met*addMP;
 
+        }
+        let price:any= meterPrice+weight_price + packages_price + packaging_price;
+        if(weather)
+        price=price+weather_price;
+        if(traffic)
+        price=price+traffic_price;
 
+        return price.toFixed(2)
 
-        return weight_price+packages_price+packaging_price+weather_price+traffic_price;
-
-
-        /*
-        var packager_amount = 0 ;
-        var  weight_amount = 15;
-        var  packaging_amount = 0;
-        var  distance_amount = 0;
         
-        
-//packages amount
-        if(category == 1){
-            if(packages == 1){
-                packager_amount = 0
-            }
 
-            else if(packages == 2){
-                packager_amount = 0.25
-            }
-
-            else if(packages == 3){
-                packager_amount = 0.25
-            }
-
-            else if(packages == 4){
-                packager_amount = 0.25
-            }
-
-            else if(packages == 5){
-                packager_amount = 0.25
-            }
-
-            else if(packages >= 5){
-                packager_amount = 0.50
-            }
-
-            else if(packages <= 10){
-                packager_amount = 0.50
-            }  
-        }
-
-        else if(category == 2){
-            if(packages == 1){
-                packager_amount = 0
-            }
-
-            else if(packages == 2){
-                packager_amount = 1
-            }
-
-            else if(packages == 3){
-                packager_amount = 1
-            }
-
-            else if(packages == 4){
-                packager_amount = 1
-            }
-
-            else if(packages == 5){
-                packager_amount = 1
-            }
-
-            else if(packages >= 5){
-                packager_amount = 2
-            }
-
-            else if(packages <= 10){
-                packager_amount = 2
-            }
-        }
-
-        else if(category == 3){
-            if(packages == 1){
-                packager_amount = 0
-            }
-
-            else if(packages == 2){
-                packager_amount = 1
-            }
-
-            else if(packages == 3){
-                packager_amount = 1
-            }
-
-            else if(packages == 4){
-                packager_amount = 1
-            }
-
-            else if(packages == 5){
-                packager_amount = 1
-            }
-
-            else if(packages >= 5){
-                packager_amount = 2
-            }
-
-            else if(packages <= 10){
-                packager_amount = 2
-            }
-        }
-
-        else if(category == 4){
-            if(packages == 1){
-                packager_amount = 0
-            }
-
-            else if(packages == 2){
-                packager_amount = 1.50
-            }
-
-            else if(packages == 3){
-                packager_amount = 1.50
-            }
-
-            else if(packages == 4){
-                packager_amount = 1.50
-            }
-
-            else if(packages == 5){
-                packager_amount = 1.50
-            }
-
-            else if(packages >= 5){
-                packager_amount = 3
-            }
-
-            else if(packages <= 10){
-                packager_amount = 3
-            }
-        }
-
-        else if(category == 5){
-            if(packages == 1){
-                packager_amount = 0
-            }
-
-            else if(packages == 2){
-                packager_amount = 5
-            }
-
-            else if(packages == 3){
-                packager_amount = 5
-            }
-
-            else if(packages == 4){
-                packager_amount = 5
-            }
-
-            else if(packages == 5){
-                packager_amount = 5
-            }
-
-            else if(packages >= 5){
-                packager_amount = 10
-            }
-
-            else if(packages <= 10){
-                packager_amount = 10
-            }
-        }
-
-        else if(category == 6){
-            if(packages == 1){
-                packager_amount = 0
-            }
-
-            else if(packages == 2){
-                packager_amount = 0.50
-            }
-
-            else if(packages == 3){
-                packager_amount = 0.50
-            }
-
-            else if(packages == 4){
-                packager_amount = 0.50
-            }
-
-            else if(packages == 5){
-                packager_amount = 0.50
-            }
-
-            else if(packages >= 5){
-                packager_amount = 1
-            }
-
-            else if(packages <= 10){
-                packager_amount = 1
-            }
-        }
-
-        else if(category == 7){
-            if(packages == 1){
-                packager_amount = 0
-            }
-
-            else if(packages == 2){
-                packager_amount = 1.50
-            }
-
-            else if(packages == 3){
-                packager_amount = 1.50
-            }
-
-            else if(packages == 4){
-                packager_amount = 1.50
-            }
-
-            else if(packages == 5){
-                packager_amount = 1.50
-            }
-
-            else if(packages >= 5){
-                packager_amount = 3
-            }
-
-            else if(packages <= 10){
-                packager_amount = 3
-            }
-        }
-        
-        //weight amount
-
-        if(category == 1){
-            if(weight <= 1){
-                weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 0.50
-            }
-
-            else if(weight > 2 && weight <=3){
-                weight_amount = 15 + 0.50
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 + 0.50
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 1
-            }
-
-            else if(weight <= 10 ){
-                 weight_amount = 15 + 1
-            }
-            
-        }
-
-        else if(category == 2){
-
-            if(weight <= 1){
-                 weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 1
-            }
-
-            else if(weight > 2 && weight <=3){
-                 weight_amount = 15 + 1
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 +1
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight <= 10 ){
-                 weight_amount = 15 + 2
-            }
-        }
-
-        else if(category == 3){
-            
-            if(weight <= 1){
-                 weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight > 2 && weight <=3){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 3
-            }
-
-            else if(weight <= 10 ){
-                 weight_amount = 15 + 3
-            }
-        }
-
-        else if(category == 4){
-
-            if(weight <= 1){
-                 weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight > 2 && weight <=3){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 3
-            }
-
-            else if(weight <= 10 ){
-                 weight_amount = 15 + 3
-            }
-        }
-
-        else if(category == 5){
-            
-            if(weight <= 1){
-                 weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 10
-            }
-
-            else if(weight > 2 && weight <=3){
-                 weight_amount = 15 + 10
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 + 10
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 20
-            }
-
-            else if(weight <= 10 ){
-                 weight_amount = 15 + 20
-            }
-        }
-
-        else if(category == 6){
-            
-            if(weight<= 1){
-                 weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 1
-            }
-
-            else if(weight > 2 && weight <=3){
-                 weight_amount = 15 + 1
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 + 1
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight <= 10 ){
-                weight_amount = 15 + 2
-            }
-        }
-
-        else if(category == 7){
-            
-            if(weight <= 1){
-                 weight_amount = 15
-            }
-
-            else if(weight > 1 && weight <=2){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight > 2 && weight <=3){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight > 3 && weight <=5){
-                 weight_amount = 15 + 2
-            }
-
-            else if(weight >= 5 ){
-                 weight_amount = 15 + 3
-            }
-
-            else if(weight <= 10 ){
-                 weight_amount = 15 + 3
-            }
-        }
-
-        //packaging amount
-
-        if(category == 1){
-            packaging_amount = 3  
-        }
-
-        else if(category == 2){
-            packaging_amount = 7.50 
-        }
-
-        else if(category == 3){
-            packaging_amount = 10
-        }
-
-        else if(category == 4){
-            packaging_amount = 10
-        }
-
-        else if(category == 5){
-            packaging_amount = 10
-        }
-
-        else if(category == 6){
-            packaging_amount = 10
-        }
-
-        else if(category == 7){
-            packaging_amount = 10
-        }
-
-        let total_amount = packager_amount + weight_amount + packaging_amount ;
-
-        let delivery_fleet = {'packages_amount':packager_amount,'weight_amount':weight_amount,'packaging_amount':packaging_amount,'total_fee':total_amount};
-        let input_datas = {'category':category,'weight':weight,'packages':packages};
-        return {input_datas,delivery_fleet};
-*/
-   
     }
 }

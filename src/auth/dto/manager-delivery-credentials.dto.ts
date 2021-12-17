@@ -15,4 +15,8 @@ export class MangerDeliveryCredentialsDto {
     @IsString()
     @ApiProperty()
     phoneNumber: string;
+
+    @IsString()
+    @ApiProperty()
+    deliveryId: string;
 }

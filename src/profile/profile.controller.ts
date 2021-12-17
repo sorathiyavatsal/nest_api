@@ -1,6 +1,6 @@
-import { Controller, SetMetadata, Request,Get, Post, Delete, Body, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { ProfileService} from "./profile.service"
-import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth,ApiParam,ApiConsumes,  ApiOperation } from '@nestjs/swagger';
+import { Controller, SetMetadata, UploadedFiles,Request, Get, Post, Delete, Body, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { ProfileService } from "./profile.service"
+import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../auth/user.model";
 import { userInfo } from 'os';
@@ -8,7 +8,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { CreateProfileDto } from './dto/create-profile';
 import { EditProfileDto } from './dto/edit-profile';
-import {FileInterceptor,FilesInterceptor,FileFieldsInterceptor} from '@nestjs/platform-express'
+import { FileInterceptor, FilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'
 import { ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -20,42 +20,244 @@ import { extname } from 'path';
 
 
 export class ProfileController {
-    constructor(private ProfileService: ProfileService) { }
-  
+  constructor(private ProfileService: ProfileService) { }
+
   @Get('/get-all-profile')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('ADMIN')
   async getProfile(@Request() request) {
-    
+
     return await this.ProfileService.getAllProfile(request.user);
   }
 
-  @ApiParam({name: 'id', required: true})
+  @UseGuards(AuthGuard('jwt'))
+  @ApiParam({ name: 'id', required: true })
   @Get('/profile/:id')
-  async getProfileDetail(@Param() params,@Request() request:any) {
-   
+  async getProfileDetail(@Param() params, @Request() request: any) {
+
     return await this.ProfileService.getProfileDetail(params.id);
   }
+@UseGuards(AuthGuard('jwt'))
+@Post('/add')
+@UseInterceptors(FileFieldsInterceptor(
+  [ {name: 'profile_photo', maxCount: 1},
+    {name: 'store_license_image', maxCount: 5},
+    {name: 'vehicle_image', maxCount: 5},
+    {name: 'store_no_image', maxCount: 5},
+    {name: 'aadhar_card_image', maxCount: 2},
+    {name: 'driving_card_image', maxCount: 2},
+    {name: 'pan_card_image', maxCount: 2},
+  ],
+  {
+    storage: diskStorage({
+    destination: './public/uploads/profile',
+    filename: function (req, file, cb) {
+      let extArray = file.mimetype.split("/");
+      let extension = extArray[extArray.length - 1];
+      cb(null, file.fieldname + '-' + Date.now()+ '.' +extension)
+    }
+   })
+  }
+) 
 
-  @UseGuards(AuthGuard('jwt'))
- @Roles(Role.ADMIN)
-  @Post('/add-profile')
-  async addProfile(@Body()  createProfileDto: CreateProfileDto,@Request() request) {
-   
-    return await this.ProfileService.createProfile(createProfileDto,request.user);
-  }
-  @UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
-  @ApiParam({name: 'id', required: true})
-  @Put('/update-profile/:id')
-  async updateProfile(@Param() params,@Body()  editprofileDto: EditProfileDto,@Request() request:any) {
-   
-    return await this.ProfileService.updateProfile(params.id,editprofileDto,request.user);
-  }
   
-  @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
-  @ApiParam({name: 'id', required: true})
-  @Delete('/delete-profile/:id')
-  async deleteProfile(@Param('id') id: string) {
-    return await this.ProfileService.deleteProfile(id);
+)
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      userId: { type: 'string' },
+        gender: { type: 'string' },
+        dob: { type: 'string' },
+        shop_name: { type: 'string' },
+        shop_address: { type: 'string' },
+        sell_items: { type: 'object' },
+        adharcard_no: { type: 'string' },
+        pancard_no: { type: 'string' },
+        gst_no: { type: 'string' },
+        bank_details: { type: 'object' },
+        driving_card: { type: 'string' },
+        vehicle_no: { type: 'string' },
+        store_license: { type: 'string' },
+        services_area: { type: 'string' },
+        profile_photo: {
+          
+          type: 'string',
+          
+          format: 'binary',
+          
+        },
+        store_license_image: {
+
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          }
+        },
+        vehicle_image: {
+
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          }
+        },
+        store_no_image: {
+
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          }
+        },
+        aadhar_card_image: {
+
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          }
+        },
+        driving_card_image: {
+
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          }
+        },
+        pan_card_image: {
+
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          }
+        }
+      
+    },
+  },
+})
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({summary:'Merchant/Delivery boy add onboarding data'})
+  async addProfile(@UploadedFiles() file,@Request() request) {
+  
+   return await this.ProfileService.createProfile(file,request.body,request.user);
   }
+  @UseGuards(AuthGuard('jwt'))
+  @ApiParam({name: 'id', required: true})
+  @Put('/update')
+  @UseInterceptors(FileFieldsInterceptor(
+    [ {name: 'profile_photo', maxCount: 1},
+      {name: 'store_license_image', maxCount: 5},
+      {name: 'vehicle_image', maxCount: 5},
+      {name: 'store_no_image', maxCount: 5},
+      {name: 'aadhar_card_image', maxCount: 2},
+      {name: 'driving_card_image', maxCount: 2},
+      {name: 'pan_card_image', maxCount: 2},
+    ],
+    {
+      storage: diskStorage({
+      destination: './public/uploads/profile',
+      filename: function (req, file, cb) {
+        let extArray = file.mimetype.split("/");
+        let extension = extArray[extArray.length - 1];
+        cb(null, file.fieldname + '-' + Date.now()+ '.' +extension)
+      }
+     })
+    }
+  ) 
+  
+    
+  )
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+          gender: { type: 'string' },
+          dob: { type: 'string' },
+          shop_name: { type: 'string' },
+          shop_address: { type: 'string' },
+          sell_items: { type: 'object' },
+          adharcard_no: { type: 'string' },
+          pancard_no: { type: 'string' },
+          gst_no: { type: 'string' },
+          bank_details: { type: 'object' },
+          driving_card: { type: 'string' },
+          vehicle_no: { type: 'string' },
+          store_license: { type: 'string' },
+          services_area: { type: 'string' },
+          profile_photo: {
+            
+            type: 'string',
+            
+            format: 'binary',
+            
+          },
+          store_license_image: {
+  
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
+          },
+          vehicle_image: {
+  
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
+          },
+          store_no_image: {
+  
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
+          },
+          aadhar_card_image: {
+  
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
+          },
+          driving_card_image: {
+  
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
+          },
+          pan_card_image: {
+  
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
+          }
+        
+      },
+    },
+  })
+    @ApiConsumes('multipart/form-data')
+    @ApiOperation({summary:'Merchant/Delivery boy add onboarding data'})
+    async updateProfile(@Param() params,@UploadedFiles() file,@Request() request) {
+    
+     return await this.ProfileService.updateProfile(params.id,file,request.body,request.user);
+    } 
 }
+export const imageFileFilter = (req, file, callback) => {
+  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+    return callback(new Error('Only image files are allowed!'), false);
+  }
+  callback(null, true);
+};

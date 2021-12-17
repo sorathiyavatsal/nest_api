@@ -11,7 +11,12 @@ export const ProfileSchema = new mongoose.Schema({
     userId:{
         type:ObjectId,
         required:true,
-        unique:true
+        unique:true,
+        ref: 'Users'
+    },
+    fullName: {
+        type: String,
+        required: false
     },
     gender: {
         type: String,
@@ -31,22 +36,30 @@ export const ProfileSchema = new mongoose.Schema({
         required: false
     },
     sell_items: {
-        type: String,
-        enum : ['grocery','books','foods','elecronics'],
+        type: Object,
+        
     },
 
     adharcard_no: {
-        type:Object,
+        type:String,
     },
 
     pancard_no: {
-        type:Object,
+        type:String,
     },
 
     gst_no: {
-        type:Object,
+        type:String,
     },
-
+    driving_card: {
+        type:String,
+    },
+    vehicle_no: {
+        type:String,
+    },
+    vehicle_type:{
+        type:String
+    },
     bank_details :[{
         
             bank_account_no: {type: Number,required: false},
@@ -58,8 +71,28 @@ export const ProfileSchema = new mongoose.Schema({
             ifsc_code: {type: String,required: false}
         }],
 
+    store_license_image:{
+        type:Object
+    },
+    vehicle_image:{
+        type:Object
+    },
+    store_no_image:{
+        type:Object
+    },
+    aadhar_card_image:{
+        type:Object
+    },
+    driving_card_image:{
+        type:Object
+    },
+    pan_card_image:{
+        type:Object
+    },
     
-
+    services_area:{
+        type:Object
+    },
     createdBy: {
         type: ObjectId,
         ref: 'Users'
@@ -77,13 +110,16 @@ export interface Profile extends mongoose.Document {
     profile_photo: object,
     gender: string,
     dob: Date,
+    fullName: string,
     shop_name: string,
     shop_address: string,
     sell_items: string,
     adharcard_no: string,
     pancard_no: string,
     gst_no: string,
+    store_license: string,
     bank_details:object,
+    services_area: object,
     activeStatus:boolean,
     updatedAt:Date,
     createdAt:Date,

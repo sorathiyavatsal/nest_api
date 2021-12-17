@@ -10,6 +10,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { UserCredentialsDto } from './dto/user-credentials.dto';
 import { UserVerification } from 'src/core/models/userVerification.model';
 import { UserLogin } from 'src/core/models/userLogin.model';
+import { DeliveryFleet } from 'src/delivery_fleet/deliveryfleet.model';
 import { ForgotPasswordCredentialsDto } from './dto/forgotpassword-credentials.dto';
 import { ResetPasswordCredentialsDto } from './dto/resetpassword-credentials.dto';
 import { EmailVerifyCredentialsDto } from './dto/emailVerify-credentials.dto';
@@ -31,6 +32,7 @@ const DeviceDetector = require('node-device-detector');
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel('DeliveryFleet') private deliveryfleetModel: Model<DeliveryFleet>,
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('UserLogin') private UserLoginModel: Model<UserLogin>,
     @InjectModel('UserVerification')
@@ -40,7 +42,9 @@ export class AuthService {
     private sendEmailMiddleware: SendEmailMiddleware,
     private configService: ConfigService,
     private securityService: SecurityService,
-  ) {}
+  ) {
+    
+  }
   async validateApiKey(key: any) {
     return await this.securityService.validateApiKey(key);
   }
@@ -48,14 +52,14 @@ export class AuthService {
     if (Object.values(Role).includes(key)) return true;
     else return false;
   }
-  async createmobileUser(userCredentialsDto: MangerDeliveryCredentialsDto,req:any) {
+  async createmobileUser(userCredentialsDto: MangerDeliveryCredentialsDto, req: any) {
     if (!userCredentialsDto.verifyType) {
       return new BadRequestException('Verification type is required');
     }
     let userToAttempt = await this.findOneByPhone(userCredentialsDto.phoneNumber);
     if (userToAttempt) {
-      let userotp:any =  await this.loginVerificationSmsOtp(userToAttempt);
-      return {user:userToAttempt,message:'Verification sent to mobile'};
+      let userotp: any = await this.loginVerificationSmsOtp(userToAttempt);
+      return { user: userToAttempt, message: 'Verification sent to mobile' };
     }
     let findroles = this.findRole(userCredentialsDto.role);
     if (!findroles) userCredentialsDto.role = 'USER';
@@ -63,7 +67,14 @@ export class AuthService {
     let today = new Date().toISOString().substr(0, 10);
     let todayDate = today.replace(/-/g, '');
     let reDigit = usersCount.length;
-
+    if(userCredentialsDto.deliveryId)
+    {
+       this.deliveryfleetModel.update({_id:userCredentialsDto.deliveryId},{$set:{
+         userId:userToAttempt._id,
+         createdBy:userToAttempt._id,
+         modifiedBy:userToAttempt._id
+       }});
+    }
     let userId = todayDate + usersCount;
     const newUser = new this.userModel({
       userId: userId,
@@ -96,26 +107,25 @@ export class AuthService {
       return user.toObject({ versionKey: false });
     });
   }
-  async loginVerificationSmsOtp(user:any)
-  {
-      let verifiedTemplate = 'loginsms';
-      const newTokenVerifyEmail = new this.userVerificationModel({
-        verificationType: 'sms',
-        verifiedTemplate: verifiedTemplate,
-        createdBy: user._id,
-        createdUser: user._id,
-        modifiedBy: user._id,
-        otp: Math.floor(100000 + Math.random() * 900000),
-      });
-      newTokenVerifyEmail.save();
+  async loginVerificationSmsOtp(user: any) {
+    let verifiedTemplate = 'loginsms';
+    const newTokenVerifyEmail = new this.userVerificationModel({
+      verificationType: 'sms',
+      verifiedTemplate: verifiedTemplate,
+      createdBy: user._id,
+      createdUser: user._id,
+      modifiedBy: user._id,
+      otp: Math.floor(1000 + Math.random() * 9000),
+    });
+    newTokenVerifyEmail.save();
 
-      this.sendEmailMiddleware.sensSMS(
-        user.phoneNumber,
-        newTokenVerifyEmail.otp,
-        user.role,
-      );
+    this.sendEmailMiddleware.sensSMS(
+      user.phoneNumber,
+      newTokenVerifyEmail.otp,
+      user.role,
+    );
 
-      return newTokenVerifyEmail;
+    return newTokenVerifyEmail;
   }
   async createUser(userCredentialsDto: UserCredentialsDto) {
     let userToAttempt = await this.findOneByEmail(userCredentialsDto.email);
@@ -172,9 +182,8 @@ export class AuthService {
       return new BadRequestException('Email already exist!');
     }
   }
-  async userLoginToken(user:any,request:any)
-  {
-    let userLoginData:any=this.userDeviceData(request)
+  async userLoginToken(user: any, request: any) {
+    let userLoginData: any = this.userDeviceData(request)
     const payload: any = {
       token: this.createJwtPayload(user),
     };
@@ -187,27 +196,26 @@ export class AuthService {
     this.saveLoginRequest(userLoginData);
     return payload
   }
-  async userDeviceData(request:any)
-  {
+  async userDeviceData(request: any) {
     let geo: any = request.ip;
     const detector = new DeviceDetector();
-    const userAgent = 
+    const userAgent =
       'Mozilla/5.0 (Linux; Android 5.0; NX505J Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.78 Mobile Safari/537.36';
     const results = detector.detect(userAgent);
-    
 
-const resultOs = detector.parseOs(userAgent);
-const resultClient = detector.parseClient(userAgent);
-const resultDeviceType = detector.parseDeviceType(userAgent, resultOs, resultClient, {});
-const result:any= Object.assign({os:resultOs}, {client:resultClient}, {device: resultDeviceType});
-let userLoginData: any = {
-  device: result.device,
-  ipAddress: geo,
-  result: result.device,
-  browser: request.headers['user-agent'],
-};
-console.log(userLoginData)
-return userLoginData;
+
+    const resultOs = detector.parseOs(userAgent);
+    const resultClient = detector.parseClient(userAgent);
+    const resultDeviceType = detector.parseDeviceType(userAgent, resultOs, resultClient, {});
+    const result: any = Object.assign({ os: resultOs }, { client: resultClient }, { device: resultDeviceType });
+    let userLoginData: any = {
+      device: result.device,
+      ipAddress: geo,
+      result: result.device,
+      browser: request.headers['user-agent'],
+    };
+    console.log(userLoginData)
+    return userLoginData;
   }
   async validateUserByPassword(
     authCredentialsDto: AuthCredentialsDto,
@@ -216,7 +224,7 @@ return userLoginData;
     let userToAttempt: any = await this.findOneByEmail(
       authCredentialsDto.email,
     );
-    let userLoginData:any=this.userDeviceData(request)
+    let userLoginData: any = this.userDeviceData(request)
     if (!userToAttempt) {
       userLoginData.attemptStatus = false;
       userLoginData.attemptError = 'Email not found !';
@@ -401,57 +409,55 @@ return userLoginData;
     }
   }
   async profileUpdate(
-    userId:any,accountSetupDto: AccountSetupDto,request:any
+    userId: any, accountSetupDto: AccountSetupDto, request: any
   ) {
-    
-    if(accountSetupDto.email && accountSetupDto.email!='')
-    {
+
+    if (accountSetupDto.email && accountSetupDto.email != '') {
       let existUser = await this.findOneByEmail(accountSetupDto.email)
-      if(existUser)
-      return new BadRequestException(
-        'Email already exist!'
-      );
+      if (existUser)
+        return new BadRequestException(
+          'Email already exist!'
+        );
     }
-    let user:any=await this.findOneById(userId)
+    let user: any = await this.findOneById(userId)
     if (!user) throw new BadRequestException('User not found !');
-    if(accountSetupDto.email && accountSetupDto.email!='')
-          {
-            user.email= accountSetupDto.email
-          }
-          user.fullName = accountSetupDto.fullName;
-    let userToken:any=await this.userLoginToken(user,request)
+    if (accountSetupDto.email && accountSetupDto.email != '') {
+      user.email = accountSetupDto.email
+    }
+    user.fullName = accountSetupDto.fullName;
+    let userToken: any = await this.userLoginToken(user, request)
     let userData = this.userModel
-                .findByIdAndUpdate(user._id,user)
-                .exec();
-    
-          let userLoginData:any=this.userDeviceData(request);
-        
-          userLoginData.userId = user._id;
-          userLoginData.createdBy = user._id;
-          userLoginData.modifiedBy = user._id;
-          userLoginData.attemptStatus = true;
-          userLoginData.attemptError = '';
-          userLoginData.loginTime = new Date();
-          this.saveLoginRequest(userLoginData);
-          return {user:user,token:userToken.token,message:'Welcome Back!'}
-       
-     
+      .findByIdAndUpdate(user._id, user)
+      .exec();
+
+    let userLoginData: any = this.userDeviceData(request);
+
+    userLoginData.userId = user._id;
+    userLoginData.createdBy = user._id;
+    userLoginData.modifiedBy = user._id;
+    userLoginData.attemptStatus = true;
+    userLoginData.attemptError = '';
+    userLoginData.loginTime = new Date();
+    this.saveLoginRequest(userLoginData);
+    return { user: user, token: userToken.token, message: 'Welcome Back!' }
+
+
   }
   async verifyOtpBySms(
     emailVerifyCredentialsDto: OtpVerifyCredentialsDto,
-    res:any
+    res: any
   ) {
     try {
-      let userToAttempt,errorMsgNotFound,successMsg: any;
-      
-        userToAttempt = await this.userModel.findOne({
-          phoneNumber: emailVerifyCredentialsDto.phone,
-        });
-        errorMsgNotFound='Phone number not found !'
-        successMsg='Phone verification is successfully!';
-      
+      let userToAttempt, errorMsgNotFound, successMsg: any;
+
+      userToAttempt = await this.userModel.findOne({
+        phoneNumber: emailVerifyCredentialsDto.phone,
+      });
+      errorMsgNotFound = 'Phone number not found !'
+      successMsg = 'Phone verification is successfully!';
+
       if (!userToAttempt) throw new BadRequestException(errorMsgNotFound);
-      let userToken:any=await this.userLoginToken(userToAttempt,res)
+      let userToken: any = await this.userLoginToken(userToAttempt, res)
       return this.userVerificationModel
         .findOne({
           createdUser: userToAttempt._id,
@@ -462,22 +468,20 @@ return userLoginData;
           data => {
             if (data) {
               let userData = this.userModel
-                .findByIdAndUpdate(userToAttempt._id,{ emailVerified: true, phoneVerified: true  })
+                .findByIdAndUpdate(userToAttempt._id, { emailVerified: true, phoneVerified: true })
                 .exec();
               data.verifiedStatus = true;
               data.verifiedTime = new Date();
               data.save();
-       if(userToAttempt.fullName && userToAttempt.fullName!='')
-       {
-         
-          return {user:data,token:userToken,message:'Welcome Back!'}
-       }
-       else
-       {
-         
-         return {user:data,message:"Set up your byecom account!"}
-       }
-              
+              if (userToAttempt.fullName && userToAttempt.fullName != '') {
+
+                return { user: data, token: userToken, message: 'Welcome Back!' }
+              }
+              else {
+
+                return { user: data, message: "Set up your byecom account!" }
+              }
+
             } else {
               return new BadRequestException('Verification code is invalid!');
             }
@@ -494,21 +498,20 @@ return userLoginData;
     emailVerifyCredentialsDto: any,
   ) {
     try {
-      let userToAttempt,errorMsgNotFound,successMsg: any;
-      if (emailVerifyCredentialsDto.email){
+      let userToAttempt, errorMsgNotFound, successMsg: any;
+      if (emailVerifyCredentialsDto.email) {
         userToAttempt = await this.userModel.findOne({
           email: emailVerifyCredentialsDto.email,
         });
-        errorMsgNotFound='Email not found !'
-        successMsg='Email verification is successfully!';
+        errorMsgNotFound = 'Email not found !'
+        successMsg = 'Email verification is successfully!';
       }
-      else
-      {
+      else {
         userToAttempt = await this.userModel.findOne({
           phoneNumber: emailVerifyCredentialsDto.phone,
         });
-        errorMsgNotFound='Phone number not found !'
-        successMsg='Phone verification is successfully!';
+        errorMsgNotFound = 'Phone number not found !'
+        successMsg = 'Phone verification is successfully!';
       }
       if (!userToAttempt) throw new BadRequestException(errorMsgNotFound);
 
@@ -527,7 +530,7 @@ return userLoginData;
               data.verifiedStatus = true;
               data.verifiedTime = new Date();
               data.save();
-              return { data:data,msg: successMsg };
+              return { data: data, msg: successMsg };
             } else {
               return new BadRequestException('Verification code is invalid!');
             }

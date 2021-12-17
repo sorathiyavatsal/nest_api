@@ -16,7 +16,9 @@ import { userInfo } from 'os';
 @ApiTags('Authentification')
 @ApiSecurity('api_key')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {
+    
+   }
 
  
   @ApiOperation({ summary: 'Login' })

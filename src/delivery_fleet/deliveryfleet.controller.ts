@@ -2,10 +2,7 @@ import { Controller, SetMetadata, UploadedFiles, Request, Get, Post, Body, Put, 
 import { DeliveryFleetService } from "./deliveryfleet.service"
 import { ApiTags, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from "../auth/user.model";
-import { userInfo } from 'os';
 import { Roles } from '../auth/roles.decorator';
-import { Role } from '../auth/role.enum';
 import { CreateDeliveryFleetDto } from './dto/create-deliveryfleet';
 import { EditDeliveryFleetDto } from './dto/edit-deliveryfleet';
 import { DeliveryChargesDto } from './dto/deliverycharges';
@@ -27,7 +24,7 @@ export class DeliveryFleetController {
 
   }
 
-  @Post('/delivery-fee')
+  @Post('/fleet-process/delivery-fee')
 
   async getDeliveryCharges(@Body() Dto: DeliveryChargesDto) {
 
@@ -35,11 +32,11 @@ export class DeliveryFleetController {
   }
 
 
-  @Post("/find-distance")
-  async getDeliveryDistance(@Body() Dto: DeliveryDistanceDto) {
+  // @Post("/find-distance")
+  // async getDeliveryDistance(@Body() Dto: DeliveryDistanceDto) {
 
-    return await this.deliveryService.getDeliveyDistance(Dto);
-  }
+  //   return await this.deliveryService.getDeliveyDistance(Dto);
+  // }
 
   @Get('/')
   @ApiBearerAuth()
@@ -63,14 +60,21 @@ export class DeliveryFleetController {
   @ApiParam({ name: 'id', required: true })
   async getDeliveryFleetLocationData(@Param() params, @Req() req) {
 
-    return await this.deliveryService.getDeliveryFleetData(params.id, req);
+    return await this.deliveryService.getDeliveryFleetLocationData(params.id, req, req.user);
+  }
+  @Get('/accept/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiParam({ name: 'id', required: true })
+  async updateDeliveryFleetBoy(@Param() params, @Req() req) {
+
+    return await this.deliveryService.updateDeliveryFleetBoy(params.id, req, req.user);
   }
   @Put('/update/payment/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async updateDeliveryFleetPayment(@Param() params, @Body()  dto:DeliveryPaymentUpdateDto,@Req() req) {
-
-    return await this.deliveryService.updateDeliveryFleetPayment(params.id,dto,req.user);
+     return await this.deliveryService.updateDeliveryFleetPayment(params.id,dto,req.user);
   }
   @Put('/update/status/:id')
   @ApiBearerAuth()
@@ -81,10 +85,12 @@ export class DeliveryFleetController {
     return await this.deliveryService.updateDeliveryStatus(params.id,dto,req.user);
   }
   @Put('/update/location/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'id', required: true })
   async updateLocationDeliveryFleet(@Param() params, @Body()  dto:DeliveryDistanceUpdateDto,@Req() req) {
     
-    return await this.deliveryService.updateLocationDeliveryFleet(params.id,dto,req);
+    return await this.deliveryService.updateLocationDeliveryFleet(params.id,dto,req,req.user);
   }
   @Put('/update/:id')
   @ApiBearerAuth()
@@ -104,7 +110,7 @@ export class DeliveryFleetController {
   )
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', required: true })
-  @ApiOperation({ summary: 'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP' })
+  @ApiOperation({ summary: 'Update Delivery Fleet' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -208,7 +214,7 @@ export class DeliveryFleetController {
       },
     },
   })
-  @ApiOperation({ summary: 'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP' })
+  @ApiOperation({ summary: 'Add Delivery Fleet' })
   @ApiConsumes('multipart/form-data')
   async addInvoice(@UploadedFiles() files, @Req() res) {
   
