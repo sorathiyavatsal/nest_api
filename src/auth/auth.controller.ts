@@ -29,15 +29,15 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Add user' })
   @Post('/adduser')
-  async signUp(@Body() authCredentialsDto: UserCredentialsDto) {
-    return await this.authService.createUser(authCredentialsDto);
+  async signUp(@Body() authCredentialsDto: UserCredentialsDto,@Req() req) {
+    return await this.authService.createUser(authCredentialsDto,req);
   }
   
   @ApiOperation({ summary: 'Forgot password' })
   @Post('/forgotpass')
-  async forgotPassword(@Body(ValidationPipe) forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto) {
+  async forgotPassword(@Body(ValidationPipe) forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto,@Req() req) {
     
-    return await this.authService.forgotPassword(forgotPasswordCredentialsDto);
+    return await this.authService.forgotPassword(forgotPasswordCredentialsDto,req);
   }
   @ApiOperation({ summary: 'Reset password' })
   @Post('/resetpass')

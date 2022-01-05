@@ -10,7 +10,10 @@ export class EditCategoryDto {
     @ApiProperty()
     name: string;
   
-    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    svgImage: string;
 
     @IsString()
     @IsNotEmpty()

@@ -7,5 +7,13 @@ export class DeliveryStatusDto {
     @IsNotEmpty()
     @ApiProperty()
     invoiceStatus: string;
+    @IsNumber()
+    @IsNotEmpty()
+    @ApiProperty({required:false,description:'OTP is need when status is progress and complete'})
+    otp: string;
+    @IsNumber()
+    @IsNotEmpty()
+    @ApiProperty({description:' you can pass when trip is complete',required:false})
+    totalHrs: string;
 
 }

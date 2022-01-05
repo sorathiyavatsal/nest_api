@@ -2,18 +2,16 @@ import { IsString,  IsEmail, IsNotEmpty, IsBoolean, IsNumber,  IsDateString, IsD
 import { ApiProperty,ApiParam} from '@nestjs/swagger';
 
 
-export class DeliveryDistanceDto {
+export class locationUpdateDto {
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    fromLat: number;
+    lat: number;
 
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    fromLng: number;
-
-    
+    lng: number;
 
    
 

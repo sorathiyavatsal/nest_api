@@ -20,6 +20,7 @@ import { UserVerification } from 'src/core/models/userVerification.model';
 import { DeliveryLocation } from './deliveryLocation.model';
 import { identity } from 'rxjs';
 const GeoPoint = require('geopoint');
+let  ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class DeliveryFleetService {
     settings:any=[];
@@ -33,7 +34,7 @@ export class DeliveryFleetService {
         @InjectModel('Packagings') private PackagingsModel: Model<Packagings>,
         @InjectModel('Holidays') private holidaysModel: Model<Holidays>,
         @InjectModel('Settings') private SettingsModel: Model<Settings>,
-        @InjectModel('User') private UserModel: Model<User>,
+        @InjectModel('Users') private UserModel: Model<User>,
         @InjectModel('DeliveryLocation') private LocationModel :  Model<DeliveryLocation>
     ){
       
@@ -94,11 +95,35 @@ export class DeliveryFleetService {
             }
         });
     }
-    async getDeliveyDistance(order: any) {
-        let point1 = new GeoPoint(order.fromLat, order.fromLng);
-        let point2 = new GeoPoint(order.toLat, order.toLng);
-        let distance = point1.distanceTo(point2, true)//output in kilometers
-        return distance;
+    async getDeliveyBoyNear(order: any) {
+        
+        let settings=await this.settingsData();
+        let maxDis:any=10;
+        let minDis:any=0;
+       
+        let max_dis_data:any=settings.find((s:any)=>(s.column_key=="max_distance_find"))
+        if(max_dis_data)
+        {
+            maxDis = max_dis_data.column_value;
+            
+        }
+        let min_dis_data:any=settings.find((s:any)=>(s.column_key=="min_distance_find"))
+        if(min_dis_data)
+        {
+            minDis = min_dis_data.column_value;
+            
+        }
+        let deliveryBoy: any = await this.UserModel.find(
+            {role:'DELIVERY',
+            loc:
+            {
+                $geoWithin: { 
+                    $centerSphere: [ [ parseInt(order.fromLat) , parseInt(order.fromLng) ],maxDis/3959]
+                    }
+                
+            }
+        })
+        return {boys:deliveryBoy,dto:order,max:maxDis};
     }
     async updateLocationDeliveryFleet(id: any, dto: any, req: any, user:any) {
         let today = new Date();
@@ -116,12 +141,9 @@ export class DeliveryFleetService {
             return new BadRequestException(req.body.pickupDate + " is holiday");
         }
 
-        let userid: string;
-        if (req.user && req.user.user._id) {
-            userid = req.user.user._id;
-            dto.createdBy = userid;
-            dto.modifiedBy = userid;
-        }
+        let userid: string=user;
+        dto.modifiedBy = userid;
+       
         if (dto.loc && dto.loc.type != "Point") {
 
             delete dto.loc
@@ -129,10 +151,10 @@ export class DeliveryFleetService {
         }
         else
         {
-            await this.LocationModel.update({deliveryId:id,userId:user._id},{$set:dto.loc})
-            await this.UserModel.update({_id:user._id},{$set:dto.loc})
+            await this.LocationModel.findOneAndUpdate({deliveryId:id,userId:user._id},{$set:dto.loc},{$upsert:true})
+            await this.UserModel.findOneAndUpdate({_id:user._id},{$set:dto.loc},{$upsert:true})
         }
-        await this.deliveryfleetModel.update({ _id: id }, { $set: dto });
+        await this.deliveryfleetModel.findOneAndUpdate({ _id: id }, { $set: dto }, {$upsert:true});
         return this.deliveryfleetModel.findOne({ _id: id }).then((data: any) => {
             return data.toObject({ versionKey: false });
         }, error => {
@@ -144,7 +166,7 @@ export class DeliveryFleetService {
      return this.SettingsModel.find({});
     }
     async findDeliveryBoy(id:string) {
-        let delivery:any=this.deliveryfleetModel.findOne({ _id: id });
+        let delivery:any=this.deliveryfleetModel.findById(id);
         if(!delivery)
         {
             return new BadRequestException("Invalid Delivery Fleet");
@@ -173,28 +195,30 @@ export class DeliveryFleetService {
                 $near: { 
                     $geometry: {
                         type: "Point" ,
-                        coordinates: [ delivery.fromLat , delivery.fromLng ]
+                        coordinates: [ parseInt(delivery.fromLat) , parseInt(delivery.fromLng) ]
                     },
-                    $maxDistance: minDis,
-                    $minDistance: maxDis
+                    $maxDistance: maxDis
                 }
             }
         })
+        return deliveryBoy;
     }
     async updateDeliveryFleetBoy(id: any, req: any, user: any) {
-        let delivery:any=this.deliveryfleetModel.findOne({ _id: id }).populate("userId")
+        console.log(user)
+        let delivery:any=await this.deliveryfleetModel.findOne({ _id: id }).populate("userId")
         if(!delivery)
         {
             return new BadRequestException("Invalid Delivery Fleet");
         }
+        console.log(delivery)
         let dto=req.body;
-        let updateObj:any={deliveryBoy:user._id,invoiceStatus:'accepted'};
+        let updateObj:any={deliveryBoy:user.user._id,invoiceStatus:'accepted'};
         if(dto.loc && dto.loc.type=="Point")
         updateObj.loc=dto.loc;
-        await this.deliveryfleetModel.update({_id:id},{$set:updateObj});
+        await this.deliveryfleetModel.findOneAndUpdate({_id:id},{$set:updateObj},{upsert: true});
         //let smsData:any=await this.loginVerificationSmsOtp(delivery.userId)
         let message:string='Byecom delivery accept your delivery  fleet order';
-        this.sendSms.sensSMSdelivery(delivery.userId.phoneNumber,message)
+        this.sendSms.sensSMSdelivery(req,delivery.userId.phoneNumber,message)
         return {msg:'Trip is started successfully'}
         
     }
@@ -214,11 +238,14 @@ export class DeliveryFleetService {
         return newTokenVerifyEmail;
       }
     async updateDeliveryFleetPayment(id: any, dto: any, req: any) {
-        let deliveryBoy:any= await this.findDeliveryBoy(id)
-        return this.deliveryfleetModel.findOne({ _id: id }).then((data: any) => {
+       // let deliveryBoy:any= await this.findDeliveryBoy(id)
+        let firstdeliveryBoy:any =await this.UserModel.findOne({role:'DELIVERY'});
+        let deliveryBoyId:string=firstdeliveryBoy._id;
+        return this.deliveryfleetModel.findById( id ).then((data: any) => {
             data.deliverChargeType = dto.deliverChargeType;
+            data.deliveryBoy=deliveryBoyId;
             data.save();
-            return { deliveryFleet: data, deliveryBoy: deliveryBoy }
+            return { deliveryFleet: data, deliveryBoy: firstdeliveryBoy }
         }, error => {
             return new BadRequestException("Invalid Invoice");
         })
@@ -237,8 +264,9 @@ export class DeliveryFleetService {
                 if(verification && !verification.verifiedStatus)
                 {
                      message=message+" boy start from pickup location";
-                     this.sendSms.sensSMSdelivery(data.userId.phoneNumber,message);
-                }
+                     this.sendSms.sensSMSdelivery(req,data.userId.phoneNumber,message);
+                     this.userVerificationModel.update({otp:dto.otp,deliveryId:id,verifiedTemplate:'deliveryProgress'},{$set:{verifiedStatus:true}},{$upsert:true})
+                    }
                 else{
                     return new BadRequestException("Invalid Otp");
                 }
@@ -249,15 +277,17 @@ export class DeliveryFleetService {
                 if(verification && !verification.verifiedStatus)
                 {
                      message=message+" boy deliver the package to drop location";
-                     this.sendSms.sensSMSdelivery(data.userId.phoneNumber,message);
+                     this.sendSms.sensSMSdelivery(req,data.userId.phoneNumber,message);
+                     this.userVerificationModel.update({otp:dto.otp,deliveryId:id,verifiedTemplate:'deliveryDelivered'},{$set:{verifiedStatus:true}},{$upsert:true})
                 }
-                else{
+                else
+                {
                     return new BadRequestException("Invalid Otp");
                 }
             }
             else if(data.invoiceStatus=="declined")
             {
-
+              
             }
             else if(data.invoiceStatus=="cancelled")
             {
@@ -268,14 +298,16 @@ export class DeliveryFleetService {
                 
                 let code:any=await this.loginVerificationSmsOtp(id,data.userId._id,'deliveryProgress')
                 code= code.otp;
-                this.sendSms.sensSMSdelivery(data.fromPhone,message)
+                message=message+" boy delivery pickup otp "+code;
+                this.sendSms.sensSMSdelivery(req,data.fromPhone,message)
             }
             else if(data.invoiceStatus=="delivered")
             {
                 
                 let code:any=await this.loginVerificationSmsOtp(id,data.userId._id,'deliveryDelivered')
                 code= code.otp;
-                this.sendSms.sensSMSdelivery(data.toPhone,message)
+                message=message+" boy delivery delivered otp "+code;
+                this.sendSms.sensSMSdelivery(req,data.toPhone,message)
             }
             else{
                 return new BadRequestException("Invalid Delivery Fleet Request Status");
@@ -287,8 +319,9 @@ export class DeliveryFleetService {
                 updateObj.loc=dto.loc;
                 data.loc=dto.loc;
             }
-            
-            this.deliveryfleetModel.update({_id:id},{$set:dto})
+            if(dto.totalHrs)
+             data.totalHrs=dto.totalHrs
+            this.deliveryfleetModel.findOneAndUpdate({_id:id},{$set:dto},{upsert: true})
             data.invoiceStatus = dto.invoiceStatus;
            return data;
      }
@@ -312,7 +345,7 @@ export class DeliveryFleetService {
             dto.toLoc=
             {
                 type:"Point",
-                coordinates:[dto.toLat,dto.toLng]
+                coordinates:[dto.lat,dto.lng]
             }
         }
         if(dto.fromLat && dto.fromLng)
@@ -323,7 +356,7 @@ export class DeliveryFleetService {
                 coordinates:[dto.fromLat,dto.fromLng]
             }
         }
-        await this.deliveryfleetModel.update({ _id: id }, { $set: dto });
+        await this.deliveryfleetModel.findOneAndUpdate({ _id: id }, { $set: dto },{$upsert:true});
         return this.deliveryfleetModel.findOne({ _id: id }).then((data: any) => {
             return data.toObject({ versionKey: false });
         }, error => {
@@ -341,7 +374,7 @@ export class DeliveryFleetService {
     }
 
     async getDeliveryFleetLocationData(id: any, req: any, user:any) {
-        let invoice: any = await this.deliveryfleetModel.findOne({ _id: id })
+        let invoice: any = await this.deliveryfleetModel.findById(id)
          .populate("deliveryBoy")
          .populate("createdBy");
         let location:any;
@@ -374,6 +407,12 @@ export class DeliveryFleetService {
         let addKM=300;
         let default_km=2;
         let meterPrice=0;
+        let default_km_price=15;
+        let default_km_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_km_price"))
+        if(default_km_price_setting)
+        {
+            default_km_price = default_km_price_setting.column_value;
+        }
         let weight_price_setting:any=this.settings.find((s:any)=>(s.column_key=="default_weight_price"))
         if(weight_price_setting)
         {
@@ -416,42 +455,45 @@ export class DeliveryFleetService {
         }
         
         //weight
-        let weight = await this.WeightsModel.findOne({$and:[{"category": dto_category},{from_weight: { $gte: dto_weight }},{to_weight: { $lte: dto_weight }}] })
-        if (weight) {
-        
-            weight_price = (dto_weight*weight.rate)+weight_price;
-            console.log("wewe")
+        let weight = await this.WeightsModel.findOne({$and:[{"category": new ObjectId(dto_category)},{from_weight: { $gte: dto_weight }},{to_weight: { $lte: dto_weight }}] })
+        if (weight && dto_weight>1) {
+            
+            weight_price = (dto_weight*weight.rate);
+            
         }
 
         //packages
-        let packages = await this.PackagesModel.findOne({ category: dto_category, from_pack: { $gte: dto_packages }, to_pack: { $lte: dto_packages } })
-        if (packages && packages_price) 
+        let packages = await this.PackagesModel.findOne({ category: new ObjectId(dto_category), from_pack: { $gte: dto_packages }, to_pack: { $lte: dto_packages } })
+        if (packages && packages_price && dto_packages>1) 
         {
-            packages_price = (dto_packages*packages.rate)+packages_price;
+            packages_price = (dto_packages*packages.rate);
         }
 
         //packaging
-        let packaging = await this.PackagingsModel.findOne({ category: dto_category });
+        let packaging = await this.PackagingsModel.findOne({ category: new ObjectId(dto_category) });
         if (packaging) 
         {
-            packaging_price = dto_packages*packaging.rate;
+            packaging_price = packaging.rate;
         }
         if(distenance>default_km)
         {
-            let addDis=distenance-2;
-            let met=(addDis/1000)/addKM;
+            let addDis=distenance-default_km;
+            let met=(addDis*1000)/addKM;
             meterPrice= met*addMP;
 
         }
-        let price:any= meterPrice+weight_price + packages_price + packaging_price;
+        let price:any= default_km_price+meterPrice+weight_price + packages_price + packaging_price;
         if(weather)
+        {
         price=price+weather_price;
+        }
         if(traffic)
+        {
         price=price+traffic_price;
-
-        return price.toFixed(2)
-
+        }
         
+        return price.toFixed(2)
+    
 
     }
 }

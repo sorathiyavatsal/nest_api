@@ -6,6 +6,11 @@ export class CreateCategoryDto {
     @IsNotEmpty()
     @ApiProperty()
     name: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    svgImage: string;
   
     @IsString()
     @IsNotEmpty()

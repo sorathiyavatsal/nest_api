@@ -53,28 +53,34 @@ export class AuthService {
     else return false;
   }
   async createmobileUser(userCredentialsDto: MangerDeliveryCredentialsDto, req: any) {
+    
     if (!userCredentialsDto.verifyType) {
       return new BadRequestException('Verification type is required');
     }
     let userToAttempt = await this.findOneByPhone(userCredentialsDto.phoneNumber);
     if (userToAttempt) {
-      let userotp: any = await this.loginVerificationSmsOtp(userToAttempt);
+      
+      if(userCredentialsDto.deliveryId)
+    {
+       console.log(userCredentialsDto.deliveryId)
+     let updateUser:any= await this.deliveryfleetModel.findOneAndUpdate({_id:userCredentialsDto.deliveryId},{$set:{
+         userId:userToAttempt._id,
+         createdBy:userToAttempt._id,
+         modifiedBy:userToAttempt._id
+       }},{upsert: true});
+       console.log(updateUser)
+    }
+      let userotp: any = await this.loginVerificationSmsOtp(req,userToAttempt);
       return { user: userToAttempt, message: 'Verification sent to mobile' };
     }
     let findroles = this.findRole(userCredentialsDto.role);
     if (!findroles) userCredentialsDto.role = 'USER';
-    let usersCount = await this.userModel.estimatedDocumentCount();
+    let usersCount = await this.userModel.estimatedDocumentCount()+1;
     let today = new Date().toISOString().substr(0, 10);
     let todayDate = today.replace(/-/g, '');
     let reDigit = usersCount.length;
-    if(userCredentialsDto.deliveryId)
-    {
-       this.deliveryfleetModel.update({_id:userCredentialsDto.deliveryId},{$set:{
-         userId:userToAttempt._id,
-         createdBy:userToAttempt._id,
-         modifiedBy:userToAttempt._id
-       }});
-    }
+    
+   
     let userId = todayDate + usersCount;
     const newUser = new this.userModel({
       userId: userId,
@@ -93,11 +99,20 @@ export class AuthService {
         createdBy: user._id,
         createdUser: user._id,
         modifiedBy: user._id,
-        otp: Math.floor(100000 + Math.random() * 900000),
+        otp: Math.floor(1000 + Math.random() * 9000),
       });
       newTokenVerifyEmail.save();
-
+      if(userCredentialsDto.deliveryId)
+    {
+      console.log(userCredentialsDto.deliveryId)
+       this.deliveryfleetModel.findOneAndUpdate({_id:userCredentialsDto.deliveryId},{$set:{
+         userId:user._id,
+         createdBy:user._id,
+         modifiedBy:user._id
+       }},{upsert: true});
+    }
       this.sendEmailMiddleware.sensSMS(
+        req.headers['OsName'],
         user.phoneNumber,
         newTokenVerifyEmail.otp,
         user.role,
@@ -107,7 +122,7 @@ export class AuthService {
       return user.toObject({ versionKey: false });
     });
   }
-  async loginVerificationSmsOtp(user: any) {
+  async loginVerificationSmsOtp(req:any,user: any) {
     let verifiedTemplate = 'loginsms';
     const newTokenVerifyEmail = new this.userVerificationModel({
       verificationType: 'sms',
@@ -120,6 +135,7 @@ export class AuthService {
     newTokenVerifyEmail.save();
 
     this.sendEmailMiddleware.sensSMS(
+      req.headers['OsName'],
       user.phoneNumber,
       newTokenVerifyEmail.otp,
       user.role,
@@ -127,12 +143,12 @@ export class AuthService {
 
     return newTokenVerifyEmail;
   }
-  async createUser(userCredentialsDto: UserCredentialsDto) {
+  async createUser(userCredentialsDto: UserCredentialsDto,req:any) {
     let userToAttempt = await this.findOneByEmail(userCredentialsDto.email);
     if (!userToAttempt) {
       let findroles = this.findRole(userCredentialsDto.role);
       if (!findroles) userCredentialsDto.role = 'USER';
-      let usersCount = await this.userModel.estimatedDocumentCount();
+      let usersCount = await this.userModel.estimatedDocumentCount()+1;
       let today = new Date().toISOString().substr(0, 10);
       let todayDate = today.replace(/-/g, '');
       let reDigit = usersCount.length;
@@ -156,7 +172,7 @@ export class AuthService {
           createdBy: user._id,
           createdUser: user._id,
           modifiedBy: user._id,
-          otp: Math.floor(100000 + Math.random() * 900000),
+          otp: Math.floor(1000 + Math.random() * 9000),
         });
         newTokenVerifyEmail.save();
         if (user.verifyType == 'email') {
@@ -171,6 +187,7 @@ export class AuthService {
           this.sendEmailMiddleware.sendEmailAll(emailData);
         } else {
           this.sendEmailMiddleware.sensSMS(
+            req.headers.OsName,
             user.phoneNumber,
             newTokenVerifyEmail.otp,
             user.role,
@@ -284,6 +301,7 @@ export class AuthService {
   }
   async forgotPassword(
     forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto,
+    req:any,
   ) {
     let userToAttempt: any = await this.findOneByEmail(
       forgotPasswordCredentialsDto.email,
@@ -303,11 +321,12 @@ export class AuthService {
           createdBy: userToAttempt._id,
           createdUser: userToAttempt._id,
           modifiedBy: userToAttempt._id,
-          otp: Math.floor(100000 + Math.random() * 900000),
+          otp: Math.floor(1000 + Math.random() * 9000),
         });
         newTokenVerifyEmail.save();
         if (userToAttempt.verifyType != 'email') {
           this.sendEmailMiddleware.sensSMS(
+            req.headers.OsName,
             userToAttempt.phoneNumber,
             newTokenVerifyEmail.otp,
             userToAttempt.role,
@@ -473,7 +492,11 @@ export class AuthService {
               data.verifiedStatus = true;
               data.verifiedTime = new Date();
               data.save();
-              if (userToAttempt.fullName && userToAttempt.fullName != '') {
+              if(userToAttempt.role=="DELIVERY")
+              {
+                return { user: data, token: userToken, message: 'Welcome Back!' }
+              }
+              else if (userToAttempt.fullName && userToAttempt.fullName != '') {
 
                 return { user: data, token: userToken, message: 'Welcome Back!' }
               }

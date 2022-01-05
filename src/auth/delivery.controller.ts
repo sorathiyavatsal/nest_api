@@ -14,7 +14,7 @@ import { userInfo } from 'os';
 @ApiSecurity('api_key')
 export class DeliveryController {
     constructor(private authService: AuthService) { }
-@ApiOperation({ summary: 'Add Manager/Delivery Boy' })
+@ApiOperation({ description:'You can resend otp also same API',summary: 'Add Manager/Delivery Boy' })
   @Post('/adduser')
   async signupMobileUser(@Body() authCredentialsDto: MangerDeliveryCredentialsDto,@Req() req) {
     return await this.authService.createmobileUser(authCredentialsDto,req);

@@ -12,6 +12,19 @@ export class UsersService {
     ){
 
     }
+    async updateLocation(id:string,dto:any)
+    {
+        dto.loc=
+        {
+            type:"Point",
+            coordinates:[dto.lat,dto.lng]
+        }
+        await this.usersgetModel.findOneAndUpdate({_id:id},{$set:{loc:dto.loc}},{$upsert:true})
+        return await this.usersgetModel.findById(id).then(data=>{
+            
+            return data.toObject({ versionKey: false });
+        })
+    }
     async activeAccount(id:string,dto:any,user:any)
     {
         return await this.usersgetModel.findOne({userId:id}).then(data=>{

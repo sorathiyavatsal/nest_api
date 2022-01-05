@@ -25,7 +25,7 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
       { name: 'Category', schema: CategorySchema},
       { name: 'Packagings', schema: PackagingsSchema},
       { name: 'Settings', schema: SettingsSchema},
-      { name : 'User', schema:UserSchema},
+      { name : 'Users', schema:UserSchema},
       { name : 'UserVerification', schema:UserVerificationSchema},
       { name : 'DeliveryLocation', schema:DeliveryLocationSchema}
     ]),
