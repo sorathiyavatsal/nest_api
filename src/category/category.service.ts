@@ -57,7 +57,9 @@ export class CategoryService {
             data.name=securityDto.name
             data.activeStatus= securityDto.activeStatus
             data.modifiedBy = user._id
-           
+            data.svgImage = securityDto.svgImage
+            if(securityDto.image)
+            data.image = securityDto.image;
             data.save();
             return data.toObject({ versionKey: false });
         },error=>{
@@ -75,6 +77,7 @@ export class CategoryService {
             name: securityDto.name,
             createdBy:user._id,
             modifiedBy : user._id,
+            svgImage : securityDto.svgImage,
             activeStatus: securityDto.activeStatus
            
         });

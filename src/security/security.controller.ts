@@ -10,7 +10,7 @@ import { Role } from '../auth/role.enum';
 import { CreateSecurityDto } from './dto/create-security';
 import { EditSecurityDto } from './dto/edit-security';
 @Controller('security')
-@ApiTags('Customers')
+@ApiTags('REST API KEYS')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
@@ -18,18 +18,18 @@ import { EditSecurityDto } from './dto/edit-security';
 export class SecurityController {
     constructor(private securityService: SecurityService) { }
   
-  @Get('/get-all-customers')
+  @Get('/all-rest-api-keys')
   async getAllUsers(@Request() request) {
     
     return await this.securityService.getAllCustomers(request.user);
   }
-  @Post('/add-customer')
+  @Post('/add/rest-api-key')
   async addCustomer(@Body()  createSecurityDto: CreateSecurityDto,@Request() request) {
    
     return await this.securityService.createAPIUser(createSecurityDto,request.user);
   }
   @ApiParam({name: 'id', required: true})
-  @Put('/update-customer/:id')
+  @Put('/update/rest-api-key/:id')
   async updateCustomer(@Param() params,@Body()  editSecurityDto: EditSecurityDto,@Request() request:any) {
    
     return await this.securityService.updateAPIUser(params.id,editSecurityDto,request.user);

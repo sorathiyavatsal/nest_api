@@ -112,7 +112,7 @@ export const DeliveryFleetSchema = new mongoose.Schema({
     },
     deliverChargeType: {
         type: String,
-        enum : ['pay_now','pay_at_pickup','pay_from_drop_off'],
+        enum : ['1','2','3'],
        
     },
     invoiceStatus: {
@@ -141,6 +141,10 @@ export const DeliveryFleetSchema = new mongoose.Schema({
     deliveryBoy:{
         type:ObjectId,
         ref:"Users"
+    },
+    totalHrs:
+    {
+        type:Number
     },
     distance:{
         type:Number,
@@ -206,6 +210,7 @@ export interface DeliveryFleet extends mongoose.Document {
     activeStatus: Boolean,
     updatedAt:Date,
     createdAt:Date,
+    totalHrs:string,
     createdBy:string,
     modifiedBy:string
    

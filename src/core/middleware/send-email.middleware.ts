@@ -5,12 +5,14 @@ import { ConfigService } from '../../core/config/config.service';
 @Injectable()
 export class SendEmailMiddleware {
     constructor(private mailerService: MailerService, private configService: ConfigService) { }
-    async  sensSMS(phone:string,code:string,manager:any='',whatsapp=true)
+    async  sensSMS(osName:string='Apple',phone:string,code:string,manager:any='',whatsapp=true)
     {
         const accountSid = this.configService.get('TWILIO_ACCOUNT_SID');
         const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
         const client = require('twilio')(accountSid, authToken); 
-    let validPhone=await this.addCountrycode(phone);   
+    let validPhone=await this.addCountrycode(phone);
+    let autoCode:string="23XiUiRVHsd";
+    if(osName!="Apple") autoCode="dmnIsLrTu2D";   
 //   if(whatsapp==true && (manager=='MERCHANT' || manager=='DELIVERY' || manager=='MANAGER'))
 //   {
     client.messages
@@ -24,20 +26,21 @@ export class SendEmailMiddleware {
     // else{
         client.messages
         .create({
-           body: 'Your verification code for byecom '+code+" \n 23XiUiRVHsd",
+           body: 'Your verification code for byecom '+code+" \n "+autoCode,
            from: this.configService.get('TWILIO_PHONE'),
            to: validPhone
          })
         .then(message => console.log("sms "+validPhone,message.sid));
     //}
   }
-  async  sensSMSdelivery(phone:string,message:string)
+  async  sensSMSdelivery(osName:string='Apple',phone:string,message:string)
     {
         const accountSid = this.configService.get('TWILIO_ACCOUNT_SID');
         const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
         const client = require('twilio')(accountSid, authToken); 
     let validPhone=await this.addCountrycode(phone);   
-
+    let autoCode:string="23XiUiRVHsd";
+    if(osName!="Apple") autoCode="dmnIsLrTu2D";
     client.messages
     .create({
        body: message,
@@ -48,7 +51,7 @@ export class SendEmailMiddleware {
    
         client.messages
         .create({
-           body: message+" \n 23XiUiRVHsd",
+           body: message+" \n "+autoCode,
            from: this.configService.get('TWILIO_PHONE'),
            to: validPhone
          })

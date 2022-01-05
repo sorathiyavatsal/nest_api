@@ -5,7 +5,7 @@ import { ApiProperty,ApiParam} from '@nestjs/swagger';
 export class DeliveryDistanceUpdateDto {
     @IsNumber()
     @IsNotEmpty()
-    @ApiProperty()
+    @ApiProperty({description:"type of object loc:{type:'Points'},'coordinates:[lat,lng]"})
     loc: object;
 
 

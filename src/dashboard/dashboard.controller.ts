@@ -2,7 +2,7 @@ import { Controller, SetMetadata, UploadedFiles, Request, Get, Post, Body, Put, 
 import { DashboardService } from './dashboard.service';
 import { ApiTags, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-@Controller('dashboard')
+@Controller('da')
 @ApiTags('Dashboard')
 @ApiSecurity('api_key')
 @ApiBearerAuth()
@@ -24,6 +24,12 @@ export class DashboardController {
   async earningBooks(@Request() req) {
 
     return await this.dashboarService.earningData(req.user);
+  }
+  @Get('/trips')
+
+  async tripBooks(@Request() req) {
+
+    return await this.dashboarService.tripData(req.user);
   }
   @Get('/profile')
 

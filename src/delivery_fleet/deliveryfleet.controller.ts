@@ -32,11 +32,11 @@ export class DeliveryFleetController {
   }
 
 
-  // @Post("/find-distance")
-  // async getDeliveryDistance(@Body() Dto: DeliveryDistanceDto) {
+   @Post("/find-near-delivery-boy")
+  async getDeliveryBoyNear(@Body() Dto: DeliveryDistanceDto) {
 
-  //   return await this.deliveryService.getDeliveyDistance(Dto);
-  // }
+    return await this.deliveryService.getDeliveyBoyNear(Dto);
+  }
 
   @Get('/')
   @ApiBearerAuth()
@@ -73,24 +73,27 @@ export class DeliveryFleetController {
   @Put('/update/payment/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiParam({ name: 'id', required: true })
   async updateDeliveryFleetPayment(@Param() params, @Body()  dto:DeliveryPaymentUpdateDto,@Req() req) {
      return await this.deliveryService.updateDeliveryFleetPayment(params.id,dto,req.user);
   }
   @Put('/update/status/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Delivery boy declined/rejected status' })
+  @ApiParam({ name: 'id', required: true })
+  @ApiOperation({ 
+    description:"status is pickup when delivery boy verify  goods pickup location, Pickup location contact number will receive the OTP.Before start from the pickup location  need update another status is 'progress' \n with otp from pickup location contact number. OTP is falid or not receive you can update status pickup to send otp again.Before deliver the goods need update status 'delivered'.Once you update status is deliverd drop location contact person will receive the otp, you can use with otp for update the status 'complete'",
+    summary: "Delivery boy ['progress','pending','complete','dispatched','delivered','cancelled','faliure','accepted','pickup'] status" })
   async updateDeliveryFleetStatus(@Param() params, @Body()  dto:DeliveryStatusDto,@Req() req) {
 
     return await this.deliveryService.updateDeliveryStatus(params.id,dto,req.user);
   }
-  @Put('/update/location/:id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Put('/update/location/:id/:user')
   @ApiParam({ name: 'id', required: true })
+  @ApiParam({ name: 'user', required: true })
   async updateLocationDeliveryFleet(@Param() params, @Body()  dto:DeliveryDistanceUpdateDto,@Req() req) {
     
-    return await this.deliveryService.updateLocationDeliveryFleet(params.id,dto,req,req.user);
+    return await this.deliveryService.updateLocationDeliveryFleet(params.id,dto,req,params.user);
   }
   @Put('/update/:id')
   @ApiBearerAuth()

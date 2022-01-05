@@ -17,7 +17,7 @@ import { UserVerification } from 'src/core/models/userVerification.model';
 import { DeliveryLocation } from '../delivery_fleet/deliveryLocation.model';
 import { identity } from 'rxjs';
 import { use } from 'passport';
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
+import { SSL_OP_NO_TLSv1_1, SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 @Injectable()
 export class DashboardService {
     settings:any=[];
@@ -39,23 +39,37 @@ export class DashboardService {
         let data:any=new Date(date);
         return data.substr(0,15)
     }
+    async tripData(user:any) {
+        
+        let  invoice = await this.deliveryfleetModel.aggregate([
+            {$match:{deliveryBoy: user.user._id}},
+            { $group: { _id:  "$pickupDate",
+                        totalPrice: { $sum: "$price" },
+                        fromAddress:1,
+                        toAddress:1,
+                        count: { $sum: 1 }
+                     } }
+                    ]);
+        return invoice;
+    
+    } 
     async earningData(user:any) {
-        if(user.role=="DELIVERY")
-        {
-            let  invoice = await this.deliveryfleetModel.find({ deliveryId: user._id });
+        
+            let  invoice = await this.deliveryfleetModel.aggregate([
+                {$match:{deliveryBoy: user.user._id}},
+                { $group: { _id:  "$pickupDate",
+                            totalPrice: { $sum: "$price" },
+                            count: { $sum: 1 }
+                         } }
+                        ]);
             return invoice;
-        }
-        else
-        {
-
-        }
+        
       }       
     async profileData(user:any) {
         let invoice: any ={};
         let resultData:any=[];
         let today:any=new Date();
-        if(user.role=="DELIVERY")
-        {
+        
              invoice = await this.deliveryfleetModel.find({ deliveryId: user._id });
              resultData['totalTrip'] = invoice.length;
              resultData['totalAmount']=0;
@@ -75,19 +89,14 @@ export class DashboardService {
                 }
             if(resultData['review']<3) resultData['review']=3.2;
             resultData['todayTotal']=resultData['previousTotal']+(resultData.ongoing?resultData.ongoing.price:0);
-        }
-        else
-        {
-
-        }
+        
         return resultData;
     }
     async dashboardData(user:any) {
         let invoice: any ={};
         let resultData:any=[];
         let today:any=new Date();
-        if(user.role=="DELIVERY")
-        {
+        
              invoice = await this.deliveryfleetModel.find({ deliveryId: user._id });
              resultData['ongoing'] = invoice.find((n:any)=>(this.todayDate(n.pickupDate)==today.substr(0,15) && n.invoiceStatus!='pending' && n.invoiceStatus!='complete' && n.invoiceStatus!='declined'))
              resultData['upcoming'] = invoice.filter((n:any)=>(this.todayDate(n.pickupDate)==today.substr(0,15) && n.invoiceStatus=='accepted')).length;
@@ -102,11 +111,7 @@ export class DashboardService {
                 }
             
             resultData['todayTotal']=resultData['previousTotal']+(resultData.ongoing?resultData.ongoing.price:0);
-        }
-        else
-        {
-
-        }
+        
         return resultData;
     }
 }

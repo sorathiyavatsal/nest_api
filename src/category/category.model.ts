@@ -8,6 +8,10 @@ export const  CategorySchema = new mongoose.Schema({
         type: Object,
       
     },
+    svgImage:
+    {
+        type:String
+    },
     name: {
         type: String,
         unique: true,
@@ -38,6 +42,7 @@ export interface Category extends mongoose.Document {
     name: string;
     rate: number;
     image:object,
+    svgImage:string,
     activeStatus:boolean
     updatedAt:Date,
     createdAt:Date,
