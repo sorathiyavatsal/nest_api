@@ -66,20 +66,22 @@ export class ProfileController {
   schema: {
     type: 'object',
     properties: {
-      userId: { type: 'string' },
-        gender: { type: 'string' },
-        dob: { type: 'string' },
-        shop_name: { type: 'string' },
-        shop_address: { type: 'string' },
-        sell_items: { type: 'object' },
+      userId: {type: 'string' , description:"_id from the  add user response api" },
+        gender: { type: 'string', description:"you can pass any one the value ['Male','Female','Others']" },
+        dob: { type: 'string', description:"DOB example value 1988-12-12" },
+        fullName: { type: 'string' },
+        shop_name: { type: 'string', description:"required only merchant profile" },
+        shop_address: { type: 'string', description:"required only merchant profile" },
+        sell_items: { type: 'object',description:"required only merchant profile" },
         adharcard_no: { type: 'string' },
         pancard_no: { type: 'string' },
-        gst_no: { type: 'string' },
-        bank_details: { type: 'object' },
-        driving_card: { type: 'string' },
-        vehicle_no: { type: 'string' },
-        store_license: { type: 'string' },
-        services_area: { type: 'string' },
+        gst_no: { type: 'string',description:"required only merchant profile" },
+        bank_details: { type: 'object',description:"required only merchant profile" },
+        driving_card: { type: 'string',description:"required only DA profile" },
+        vehicle_no: { type: 'string',description:"required only DA profile" },
+        vehicle_type: { type: 'string',description:"required only DA profile" },
+        store_license: { type: 'string',description:"required only merchant profile" },
+        services_area: { type: 'string',description:"required only merchant profile" },
         profile_photo: {
           
           type: 'string',
@@ -90,13 +92,14 @@ export class ProfileController {
         store_license_image: {
 
           type: 'array',
+          description:"required only merchant profile",
           items: {
             type: 'string',
             format: 'binary',
           }
         },
         vehicle_image: {
-
+          description:"required only DA profile",
           type: 'array',
           items: {
             type: 'string',
@@ -104,7 +107,7 @@ export class ProfileController {
           }
         },
         store_no_image: {
-
+          description:"required only merchant profile",
           type: 'array',
           items: {
             type: 'string',
@@ -120,7 +123,7 @@ export class ProfileController {
           }
         },
         driving_card_image: {
-
+          description:"required only DA profile",
           type: 'array',
           items: {
             type: 'string',
@@ -175,20 +178,22 @@ export class ProfileController {
     schema: {
       type: 'object',
       properties: {
-        userId: { type: 'string' },
-          gender: { type: 'string' },
-          dob: { type: 'string' },
-          shop_name: { type: 'string' },
-          shop_address: { type: 'string' },
-          sell_items: { type: 'object' },
+        userId: { type: 'string' , description:"_id from the  add user response api" },
+          gender: { type: 'string', description:"you can pass any one the value ['Male','Female','Others']" },
+          dob: { type: 'string', description:"DOB example value 1988-12-12" },
+          fullName: { type: 'string' },
+          shop_name: { type: 'string', description:"required only merchant profile" },
+          shop_address: { type: 'string', description:"required only merchant profile" },
+          sell_items: { type: 'object',description:"required only merchant profile" },
           adharcard_no: { type: 'string' },
           pancard_no: { type: 'string' },
-          gst_no: { type: 'string' },
-          bank_details: { type: 'object' },
-          driving_card: { type: 'string' },
-          vehicle_no: { type: 'string' },
-          store_license: { type: 'string' },
-          services_area: { type: 'string' },
+          gst_no: { type: 'string',description:"required only merchant profile" },
+          bank_details: { type: 'object',description:"required only merchant profile" },
+          driving_card: { type: 'string',description:"required only DA profile" },
+          vehicle_no: { type: 'string',description:"required only DA profile" },
+          vehicle_type: { type: 'string',description:"required only DA profile" },
+          store_license: { type: 'string',description:"required only merchant profile" },
+          services_area: { type: 'string',description:"required only merchant profile" },
           profile_photo: {
             
             type: 'string',
@@ -199,13 +204,14 @@ export class ProfileController {
           store_license_image: {
   
             type: 'array',
+            description:"required only merchant profile",
             items: {
               type: 'string',
               format: 'binary',
             }
           },
           vehicle_image: {
-  
+            description:"required only DA profile",
             type: 'array',
             items: {
               type: 'string',
@@ -213,7 +219,7 @@ export class ProfileController {
             }
           },
           store_no_image: {
-  
+            description:"required only merchant profile",
             type: 'array',
             items: {
               type: 'string',
@@ -229,7 +235,7 @@ export class ProfileController {
             }
           },
           driving_card_image: {
-  
+            description:"required only DA profile",
             type: 'array',
             items: {
               type: 'string',

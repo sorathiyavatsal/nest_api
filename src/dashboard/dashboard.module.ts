@@ -1,3 +1,4 @@
+import { ProfileSchema } from './../profile/profile.model';
 import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
 import { HolidaysSchema } from '../holiday/holiday.model';
@@ -24,6 +25,7 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
       { name: 'Holidays', schema: HolidaysSchema},
       { name: 'Weights', schema: WeightsSchema},
       { name: 'Packages', schema: PackagesSchema},
+      { name: 'Profile', schema: ProfileSchema},
       { name: 'Category', schema: CategorySchema},
       { name: 'Packagings', schema: PackagingsSchema},
       { name: 'Settings', schema: SettingsSchema},

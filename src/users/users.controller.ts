@@ -9,15 +9,16 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { profileStatusDto } from './dto/useravailable';
 import { locationUpdateDto } from './dto/locationupdate';
+import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Controller('users')
 @ApiTags('Users')
 @ApiSecurity('api_key')
 export class UsersController {
-  constructor(private userService: UsersService) { }
+  constructor(private sendSMS:SendEmailMiddleware,private userService: UsersService) { }
 
   @ApiOperation({ summary: 'All users' })
   @ApiBearerAuth()
- @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @Get('/all')
   async getAllUsers(@Request() request) {
@@ -44,6 +45,9 @@ export class UsersController {
   }
   @ApiOperation({ summary: 'delivery boy location update' })
   @ApiParam({ name: 'id', required: true })
+  @Roles(Role.DELIVERY)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Put('/delivery-boy/location/:id')
   async deliveryBoyUpdateLocation(@Param() params, @Body() locationUpdate: locationUpdateDto, @Req() req) {
 
@@ -51,7 +55,8 @@ export class UsersController {
   }
   @ApiOperation({ summary: 'delivery boy status update' })
   @ApiBearerAuth()
- @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.DELIVERY)
   @ApiParam({ name: 'id', required: true })
   @Put('/delivery-boy/duty/:id')
   async deliveryBoyUpdateStatus(@Param() params, @Body() profileStatus: profileStatusDto, @Req() req) {
@@ -61,10 +66,16 @@ export class UsersController {
   @ApiOperation({ summary: 'Admin Approved/Rejected Accounts' })
   @ApiParam({ name: 'id', required: true })
   @ApiBearerAuth()
+  @Roles(Role.ADMIN)
   @UseGuards(AuthGuard('jwt')) 
   @Put('/delivery-boy/status/:id')
   async adminUpdateStatus(@Param() params, @Body() profileStatus: profileStatusDto, @Req() req) {
 
-    return await this.userService.activeAccount(params.id, profileStatus, req.user);
+    let user= await this.userService.activeAccount(params.id, profileStatus, req.user);
+    if(user && user.verifyStatus==true)
+    this.sendSMS.sensSMSdelivery('Apple',user.phoneNumber,'Byecome verified your account')
+    if(user && user.verifyStatus==false)
+    this.sendSMS.sensSMSdelivery('Apple',user.phoneNumber,'Byecome rejected your account')
+    return user;
   }
 }
