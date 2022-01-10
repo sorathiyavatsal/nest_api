@@ -24,7 +24,7 @@ export class WeightsService {
     }
     async getAllWeights(user:any)
     {
-      return  this.WeightsModel.find({});  
+      return  this.WeightsModel.find({}).populate('category', 'name');  ;  
     }
     async getWeightsDetail (id:any)
     {
