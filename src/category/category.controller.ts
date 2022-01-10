@@ -14,13 +14,11 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 const path = require('path')
 @Controller('category')
-@ApiTags('Category')
+@ApiTags('Goods')
 @ApiBearerAuth()
 @ApiSecurity('api_key')
-
-
 export class CategoryController {
-  constructor(private securityService: CategoryService) { }
+  constructor(private securityService: CategoryService) {}
 
   @Get('/all')
   async getCategories(@Request() request) {
@@ -33,7 +31,7 @@ export class CategoryController {
   @ApiParam({ name: 'id', required: true })
   @Get('/categories/:id')
   async getCategoryDetail(@Param() params, @Request() request: any) {
-    console.log("weclome" + params.id)
+    console.log('weclome' + params.id);
     return await this.securityService.getCategoryDetail(params.id);
   }
   @UseGuards(AuthGuard('jwt'))
@@ -43,13 +41,12 @@ export class CategoryController {
     FileInterceptor('image', {
       storage: diskStorage({
         destination: './public/uploads/category',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split("/");
+        filename: function(req, file, cb) {
+          let extArray = file.mimetype.split('/');
           let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension)
-        }
-
-      })
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
     }),
   )
   @ApiBody({
@@ -60,26 +57,26 @@ export class CategoryController {
         activeStatus: { type: 'boolean' },
 
         image: {
-
           type: 'string',
 
           format: 'binary',
-
         },
-
       },
     },
   })
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP' })
+  @ApiOperation({
+    summary:
+      'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
+  })
   async addCategories(@UploadedFile() file, @Request() request) {
     if (file) {
-
-      request.body.image = file
-
-
+      request.body.image = file;
     }
-    return await this.securityService.createCategory(request.body, request.user);
+    return await this.securityService.createCategory(
+      request.body,
+      request.user,
+    );
   }
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
@@ -89,13 +86,12 @@ export class CategoryController {
     FileInterceptor('image', {
       storage: diskStorage({
         destination: './public/uploads/category',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split("/");
+        filename: function(req, file, cb) {
+          let extArray = file.mimetype.split('/');
           let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension)
-        }
-
-      })
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
     }),
   )
   @ApiBody({
@@ -106,33 +102,46 @@ export class CategoryController {
         activeStatus: { type: 'boolean' },
 
         image: {
-
           type: 'string',
 
           format: 'binary',
-
         },
-
       },
     },
   })
-  @ApiOperation({ summary: 'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP' })
+  @ApiOperation({
+    summary:
+      'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
+  })
   @ApiConsumes('multipart/form-data')
-  async updateCategories(@UploadedFile() file, @Param() params, @Request() request: any) {
+  async updateCategories(
+    @UploadedFile() file,
+    @Param() params,
+    @Request() request: any,
+  ) {
     if (file) {
-
-      request.body.image = file
-
+      request.body.image = file;
     }
-    return await this.securityService.updateCategory(params.id, request.body, request.user);
+    return await this.securityService.updateCategory(
+      params.id,
+      request.body,
+      request.user,
+    );
   }
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiParam({ name: 'id', required: true })
   @Get('/delete-categories/:id')
-  async deleteCategories(@Param() params, @Body() editSecurityDto: EditCategoryDto, @Request() request: any) {
-
-    return await this.securityService.updateCategory(params.id, editSecurityDto, request.user);
+  async deleteCategories(
+    @Param() params,
+    @Body() editSecurityDto: EditCategoryDto,
+    @Request() request: any,
+  ) {
+    return await this.securityService.updateCategory(
+      params.id,
+      editSecurityDto,
+      request.user,
+    );
   }
 }
 export const editFileName = (req, file, callback) => {

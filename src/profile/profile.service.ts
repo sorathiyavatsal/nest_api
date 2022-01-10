@@ -153,6 +153,7 @@ export class ProfileService {
                 data.pancard_no = profileDto.pancard_no;
                 data.driving_card = profileDto.driving_card;
                 data.vehicle_type = profileDto.vehicle_type;
+                data.job_type = profileDto.job_type;
                     if(files.profile_photo)
                     data.profile_photo= files.profile_photo;
                     if(files.vehicle_image)

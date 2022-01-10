@@ -20,7 +20,7 @@ export class PackageService {
     
     async getAllPackages(user:any)
     {
-      return  this.PackagesModel.find({});  
+      return this.PackagesModel.find({}).populate('category', 'name');  
     }
     async getPackgesDetail(id:any)
     {

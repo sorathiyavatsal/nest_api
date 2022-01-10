@@ -119,7 +119,7 @@ export class AuthService {
         false
       );
 
-      return user.toObject({ versionKey: false });
+      return { user: user.toObject({ versionKey: false }) };
     });
   }
   async loginVerificationSmsOtp(req:any,user: any) {

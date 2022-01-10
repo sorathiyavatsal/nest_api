@@ -2,74 +2,75 @@ import { IsString, IsEmail, IsNotEmpty, IsBoolean,IsNumber,IsDateString, IsDate}
 import { ApiProperty } from '@nestjs/swagger';
 
 export class EditProfileDto {
-    
-    @IsString()
-    @ApiProperty()
-    profile_photo: string;
+  @IsString()
+  @ApiProperty()
+  profile_photo: string;
 
-    @IsString()
-    @ApiProperty()
-    gender: string;
+  @IsString()
+  @ApiProperty()
+  gender: string;
 
-    @IsString()
-    @ApiProperty()
-    fullName: string;
-    @IsString()
-    @ApiProperty()
-    store_license: string;
+  @IsString()
+  @ApiProperty()
+  fullName: string;
+  @IsString()
+  @ApiProperty()
+  store_license: string;
 
-    @IsString()
-    @ApiProperty()
-    services_area: object;
+  @IsString()
+  @ApiProperty()
+  services_area: object;
 
-    @IsDate()
-    @ApiProperty()
-    dob: Date;
+  @IsString()
+  @ApiProperty()
+  job_type: string;
 
-    @IsString()
-    @ApiProperty()
-    shop_name: string;
+  @IsDate()
+  @ApiProperty()
+  dob: Date;
 
-    @IsString()
-    @ApiProperty()
-    shop_address: string;
+  @IsString()
+  @ApiProperty()
+  shop_name: string;
 
-    @IsString()
-    @ApiProperty()
-    sell_items: string;
+  @IsString()
+  @ApiProperty()
+  shop_address: string;
 
-    @IsString()
-    @ApiProperty()
-    adharcard_no: string;
+  @IsString()
+  @ApiProperty()
+  sell_items: string;
 
-    @IsString()
-    @ApiProperty()
-    pancard_no: string;
+  @IsString()
+  @ApiProperty()
+  adharcard_no: string;
 
-    @IsString()
-    @ApiProperty()
-    gst_no: string;
+  @IsString()
+  @ApiProperty()
+  pancard_no: string;
 
-    @IsString()
-    @ApiProperty()
-    bank_account_holer_name: string;
+  @IsString()
+  @ApiProperty()
+  gst_no: string;
 
-    @IsNumber()
-    @ApiProperty()
-    bank_account_no:number;
+  @IsString()
+  @ApiProperty()
+  bank_account_holer_name: string;
 
-    @IsString()
-    @ApiProperty()
-    bank_name:string;
+  @IsNumber()
+  @ApiProperty()
+  bank_account_no: number;
 
-    @IsString()
-    @ApiProperty()
-    ifsc_code:string;
-  
+  @IsString()
+  @ApiProperty()
+  bank_name: string;
 
-    @IsBoolean()
-    @IsNotEmpty()
-    @ApiProperty()
-    activeStatus: boolean;
-    
+  @IsString()
+  @ApiProperty()
+  ifsc_code: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty()
+  activeStatus: boolean;
 }
