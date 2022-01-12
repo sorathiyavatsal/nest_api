@@ -57,7 +57,7 @@ import { AdminModule } from './admin/admin.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: `mongodb://localhost:27017/${configService.get(
+        uri: `mongodb://byecomdev:613ec0ad93a7da3d782d3412@18.221.236.237:27017/${configService.get(
           'DB_NAME',
         )}?retryWrites=true&w=majority`,
         useNewUrlParser: true,
@@ -80,7 +80,7 @@ import { AdminModule } from './admin/admin.module';
     HolidaysModule,
     SettingsyModule,
     DashboardModule,
-    AdminModule
+    AdminModule,
   ],
   controllers: [],
   providers: [
