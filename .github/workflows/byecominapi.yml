@@ -20,4 +20,4 @@ jobs:
                cd /home/ubuntu/api
                git pull https://byecomin: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@github.com/byecomin/api.git
                npm i
-               npm build
+               npm run build
