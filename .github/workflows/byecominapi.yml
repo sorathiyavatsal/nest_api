@@ -1,0 +1,20 @@
+name: Publish byecomin api to ec2	
+on:
+  push:
+    branches:
+      - main
+jobs:
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
+    runs-on: ubuntu-latest
+    steps:
+    - uses:  actions/checkout@v1
+
+    - name: ls -a via sshddd
+      uses: appleboy/ssh-action@master
+      with:  
+           host: "3.134.140.172"
+           username: "root"
+           password: "dejavu@35"
+           script: |
+               date
