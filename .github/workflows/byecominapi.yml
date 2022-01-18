@@ -13,9 +13,9 @@ jobs:
     - name: ls -a via sshddd
       uses: appleboy/ssh-action@master
       with:  
-           host: "3.134.140.172"
-           username: "root"
-           password: "dejavu@35"
+           host: ${{ secrets.HOST }}
+           username: ${{ secrets.USER }}
+           password: ${{ secrets.PSWD }}
            script: |
                cd /home/ubuntu/api
                git pull https://byecomin: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@github.com/byecomin/api.git
