@@ -1,86 +1,99 @@
 import { Controller, SetMetadata, Request,Get, Post, Body, Delete, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { SettingsService} from "./setting.service"
-import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth,ApiParam,ApiConsumes,  ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiProperty,
+  ApiSecurity,
+  ApiBearerAuth,
+  ApiParam,
+  ApiConsumes,
+  ApiOperation,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from "../auth/user.model";
+import { User } from '../auth/user.model';
 import { userInfo } from 'os';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { CreateSettingsDto } from './dto/create-settings';
 import { EditSettingsDto } from './dto/edit-settings';
-import {FileInterceptor,FilesInterceptor,FileFieldsInterceptor} from '@nestjs/platform-express'
+import {
+  FileInterceptor,
+  FilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { query } from 'winston';
 
 @Controller('settings')
 @ApiTags('Settings')
 @ApiBearerAuth()
 @ApiSecurity('api_key')
-
 export class SettingsController {
-    constructor(private securityService: SettingsService) { }
-  
+  constructor(private securityService: SettingsService) {}
+
   @Get('/all')
-  async getCategories(@Request() request) {
-    
-    return await this.securityService.getAllCustomers(request.user);
+  async getSettings(@Request() request) {
+    return await this.securityService.getAllSettings(request.user);
   }
-  @ApiParam({name: 'id', required: true})
+  @ApiParam({ name: 'id', required: true })
   @Get('/settings/:id')
-  async getCategoryDetail(@Param() params,@Request() request:any) {
-   
-    return await this.securityService.getCategoryDetail(params.id);
+  async getSettingsDetail(@Param() params, @Request() request: any) {
+    return await this.securityService.getSettingsDetail(params.id);
   }
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
-@Post('/add')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
+  @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
       storage: diskStorage({
-        destination: './public/uploads'
-        
-      })
+        destination: './public/uploads',
+      }),
     }),
   )
-  async addCategories(@Body()  createSecurityDto: CreateSettingsDto,@Request() request) {
-   
-    return await this.securityService.createCategory(createSecurityDto,request.user);
+  async addSettings(
+    @Body() createSecurityDto: CreateSettingsDto,
+    @Request() request,
+  ) {
+    return await this.securityService.createSettings(
+      createSecurityDto,
+      request.user,
+    );
   }
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
-
-  @ApiParam({name: 'id', required: true})
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
+  @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'zip_code' })
   @Put('/update/:id')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        name: {type:'string'},
-        activeStatus: {type:'boolean'},
-        
-        image: {
-          
-          type: 'string',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
-        
+        delivery_service_array: { type: 'array' },
       },
     },
   })
   @ApiConsumes('multipart/form-data')
-  async updateCategories(@Param() params,@Body()  editSecurityDto: EditSettingsDto,@Request() request:any) {
-   
-    return await this.securityService.updateCategory(params.id,editSecurityDto,request.user);
+  async updateSettings(
+    @Param() params,
+    @Query() query,
+    @Body() editSecurityDto: EditSettingsDto,
+    @Request() request: any,
+  ) {
+    return await this.securityService.updateSettings(
+      params.id,
+      query.zip_code,
+      editSecurityDto,
+      request.user,
+    );
   }
-@UseGuards(AuthGuard('jwt'))
-@Roles(Role.ADMIN)
-@ApiParam({name: 'id', required: true})
-@Delete('/delete/:id')
-  async deleteCategories(@Param() params,@Request() request:any) {
-   return await this.securityService.deleteSettings(params.id);
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
+  @ApiParam({ name: 'id', required: true })
+  @Delete('/delete/:id')
+  async deleteSettings(@Param() params, @Request() request: any) {
+    return await this.securityService.deleteSettings(params.id);
   }
 }

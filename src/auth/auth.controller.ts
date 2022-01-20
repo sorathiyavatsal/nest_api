@@ -16,40 +16,54 @@ import { userInfo } from 'os';
 @ApiTags('Authentification')
 @ApiSecurity('api_key')
 export class AuthController {
-  constructor(private authService: AuthService) {
-    
-   }
+  constructor(private authService: AuthService) {}
 
- 
   @ApiOperation({ summary: 'Login' })
   @Post('/login')
-  async signIn(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,@Request() req) {
-    return await this.authService.validateUserByPassword(authCredentialsDto,req);
+  async signIn(
+    @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
+    @Request() req,
+  ) {
+    return await this.authService.validateUserByPassword(
+      authCredentialsDto,
+      req,
+    );
   }
 
   @ApiOperation({ summary: 'Add user' })
   @Post('/adduser')
-  async signUp(@Body() authCredentialsDto: UserCredentialsDto,@Req() req) {
-    return await this.authService.createUser(authCredentialsDto,req);
+  async signUp(@Body() authCredentialsDto: UserCredentialsDto, @Req() req) {
+    return await this.authService.createUser(authCredentialsDto, req);
   }
-  
+
   @ApiOperation({ summary: 'Forgot password' })
   @Post('/forgotpass')
-  async forgotPassword(@Body(ValidationPipe) forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto,@Req() req) {
-    
-    return await this.authService.forgotPassword(forgotPasswordCredentialsDto,req);
+  async forgotPassword(
+    @Body(ValidationPipe)
+    forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto,
+    @Req() req,
+  ) {
+    return await this.authService.forgotPassword(
+      forgotPasswordCredentialsDto,
+      req,
+    );
   }
   @ApiOperation({ summary: 'Reset password' })
   @Post('/resetpass')
-  async verifyTokenByEmailPassword(@Body(ValidationPipe) resetPasswordCredentialsDto:ResetPasswordCredentialsDto) {
-    return await this.authService.verifyTokenByEmailPassword(resetPasswordCredentialsDto);
+  async verifyTokenByEmailPassword(
+    @Body(ValidationPipe)
+    resetPasswordCredentialsDto: ResetPasswordCredentialsDto,
+  ) {
+    return await this.authService.verifyTokenByEmailPassword(
+      resetPasswordCredentialsDto,
+    );
   }
 
   @ApiOperation({ summary: 'Verify the otp' })
   @Post('/verify/otp')
-  async verifyTokenByEmail(@Body(ValidationPipe) emailVerifyCredentialsDto:EmailVerifyCredentialsDto) {
+  async verifyTokenByEmail(
+    @Body(ValidationPipe) emailVerifyCredentialsDto: EmailVerifyCredentialsDto,
+  ) {
     return await this.authService.verifyTokenByEmail(emailVerifyCredentialsDto);
   }
-
-  
 }

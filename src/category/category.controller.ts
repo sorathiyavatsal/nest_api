@@ -11,8 +11,9 @@ import { EditCategoryDto } from './dto/edit-category';
 import { FileInterceptor, FilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'
 import { ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
+import { toBase64 } from 'utils/common';
 import { extname } from 'path';
-const path = require('path')
+const path = require('path');
 @Controller('category')
 @ApiTags('Goods')
 @ApiBearerAuth()
@@ -39,14 +40,14 @@ export class CategoryController {
   @Post('/add')
   @UseInterceptors(
     FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './public/uploads/category',
-        filename: function(req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
+      // storage: diskStorage({
+      //   destination: './public/uploads/category',
+      //   filename: function(req, file, cb) {
+      //     let extArray = file.mimetype.split('/');
+      //     let extension = extArray[extArray.length - 1];
+      //     cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+      //   },
+      // }),
     }),
   )
   @ApiBody({
@@ -61,6 +62,7 @@ export class CategoryController {
 
           format: 'binary',
         },
+        orderNumber: { type: 'number' },
       },
     },
   })
@@ -71,8 +73,9 @@ export class CategoryController {
   })
   async addCategories(@UploadedFile() file, @Request() request) {
     if (file) {
-      request.body.image = file;
+      request.body.image = await toBase64(file);
     }
+    console.log('boydydyddyd', request.body);
     return await this.securityService.createCategory(
       request.body,
       request.user,
@@ -84,14 +87,14 @@ export class CategoryController {
   @Put('/update/:id')
   @UseInterceptors(
     FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './public/uploads/category',
-        filename: function(req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
+      // storage: diskStorage({
+      //   destination: './public/uploads/category',
+      //   filename: function(req, file, cb) {
+      //     let extArray = file.mimetype.split('/');
+      //     let extension = extArray[extArray.length - 1];
+      //     cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+      //   },
+      // }),
     }),
   )
   @ApiBody({
@@ -120,7 +123,7 @@ export class CategoryController {
     @Request() request: any,
   ) {
     if (file) {
-      request.body.image = file;
+      request.body.image = await toBase64(file);
     }
     return await this.securityService.updateCategory(
       params.id,

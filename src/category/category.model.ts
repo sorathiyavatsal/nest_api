@@ -12,6 +12,10 @@ export const  CategorySchema = new mongoose.Schema({
     {
         type:String
     },
+    orderNumber:{
+        type: Number,
+        default: 1
+    },
     name: {
         type: String,
         unique: true,

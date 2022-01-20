@@ -56,19 +56,12 @@ import { AdminModule } from './admin/admin.module';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => (
-        console.log(
-          `mongodb+srv://byecom:!7xGYc7wYRyeCN7@cluster0.hzuwh.mongodb.net/${configService.get(
-            'DB_NAME',
-          )}?retryWrites=true&w=majority`,
-        ),
-        {
-          uri: `mongodb+srv://byecom:!7xGYc7wYRyeCN7@cluster0.hzuwh.mongodb.net/${configService.get(
-            'DB_NAME',
-          )}?retryWrites=true&w=majority`,
-          useNewUrlParser: true,
-        }
-      ),
+      useFactory: async (configService: ConfigService) => ({
+        uri: `mongodb+srv://byecom:!7xGYc7wYRyeCN7@cluster0.hzuwh.mongodb.net/${configService.get(
+          'DB_NAME',
+        )}?retryWrites=true&w=majority`,
+        useNewUrlParser: true,
+      }),
       inject: [ConfigService],
     }),
     AuthModule,

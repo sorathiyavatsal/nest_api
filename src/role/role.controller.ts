@@ -39,7 +39,7 @@ export class RoleController {
  @Roles(Role.ADMIN)
   @Post('/add-roles')
   async addRole(@Body()  createRoleDto: CreateRoleDto,@Request() request) {
-   
+    console.log(request.user, 'request');
     return await this.RoleService.createRole(createRoleDto,request.user);
   }
   @UseGuards(AuthGuard('jwt'))

@@ -11,34 +11,37 @@ import * as passport from 'passport';
  * (2) decrypt the access token to get the user object
  */
 @Injectable()
-export class AuthMiddleware  implements NestMiddleware {
-  constructor(private authService:AuthService,private readonly userService: UsersService, private configService: ConfigService) {}
+export class AuthMiddleware implements NestMiddleware {
+  constructor(
+    private authService: AuthService,
+    private readonly userService: UsersService,
+    private configService: ConfigService,
+  ) {}
 
   async use(req: Request | any, res: Response, next: () => void) {
-
-    
     const bearerHeader = req.headers.authorization;
     const accessToken = bearerHeader && bearerHeader.split(' ')[1];
     let user;
-    if(!req.headers.api_key && !bearerHeader)
-    throw new ForbiddenException('Invalid api key');
-    if(req.headers.api_key && !bearerHeader){
-    const checkKey = await this.authService.validateApiKey(req.headers.api_key);
-    
-    if (!checkKey) {
+    if (!req.headers.api_key && !bearerHeader)
       throw new ForbiddenException('Invalid api key');
-      return false;
+    if (req.headers.api_key && !bearerHeader) {
+      const checkKey = await this.authService.validateApiKey(
+        req.headers.api_key,
+      );
+
+      if (!checkKey) {
+        throw new ForbiddenException('Invalid api key');
+        return false;
+      }
     }
-  }
     if (!bearerHeader || !accessToken) {
       return next();
     }
-    
-    const users:any = await this.authService.verifyToken(accessToken);
-      user = await this.userService.findOneId(users._id);
-     if(!user)
-      throw new ForbiddenException('Please register or sign in.');
-    
+
+    const users: any = await this.authService.verifyToken(accessToken);
+    user = await this.userService.findOneId(users._id);
+    if (!user) throw new ForbiddenException('Please register or sign in.');
+
     this.userService.user = user;
 
     if (user) {

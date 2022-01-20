@@ -36,6 +36,7 @@
     "class-validator": "^0.11.0",
     "dotenv": "^8.2.0",
     "express-device": "^0.4.2",
+    "filereader": "^0.10.3",
     "geoip-lite": "^1.4.2",
     "geopoint": "^1.0.1",
     "handlebars": "^4.7.7",
