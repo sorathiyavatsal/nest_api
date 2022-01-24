@@ -34,6 +34,8 @@ import { DeliveryFleetModule } from './delivery_fleet/deliveryfleet.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AdminModule } from './admin/admin.module';
+import { CouponsModule } from './coupons/coupons.module';
+import { PromotionModule } from './promotion/promotion.module';
 @Module({
   imports: [
     MulterModule.register({
@@ -81,6 +83,8 @@ import { AdminModule } from './admin/admin.module';
     SettingsyModule,
     DashboardModule,
     AdminModule,
+    CouponsModule,
+    PromotionModule,
   ],
   controllers: [],
   providers: [
