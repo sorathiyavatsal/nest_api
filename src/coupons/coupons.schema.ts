@@ -10,9 +10,6 @@ export const CouponsSchema = new mongoose.Schema(
     coupoun_code: {
       type: String,
     },
-    promotion_id: {
-      type: ObjectId,
-    },
     createdBy: {
       type: ObjectId,
       ref: 'Users',
@@ -22,12 +19,11 @@ export const CouponsSchema = new mongoose.Schema(
       ref: 'Users',
     },
   },
+
   { timestamps: true },
 );
 
-export interface Coupouns extends mongoose.Document {
-  _id: string;
+export interface Coupons extends mongoose.Document {
   coupoun_name: string;
   coupoun_code: string;
-  promotion_id: string;
 }
