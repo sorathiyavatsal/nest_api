@@ -34,6 +34,10 @@ import { DeliveryFleetModule } from './delivery_fleet/deliveryfleet.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AdminModule } from './admin/admin.module';
+import { PartnersModule } from './partners/partners.module';
+import { SettlementsModule } from './settlements/settlements.module';
+import { FleetCommissionModule } from './fleet-commission/fleet-commission.module';
+
 @Module({
   imports: [
     MulterModule.register({
@@ -81,6 +85,9 @@ import { AdminModule } from './admin/admin.module';
     SettingsyModule,
     DashboardModule,
     AdminModule,
+    PartnersModule,
+    SettlementsModule,
+    FleetCommissionModule,
   ],
   controllers: [],
   providers: [

@@ -7,6 +7,7 @@ import { EditSettingsDto } from './dto/edit-settings';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from './../core/middleware/send-email.middleware';
+import { UseRoles } from 'nest-access-control';
 @Injectable()
 export class SettingsService {
   constructor(
@@ -28,32 +29,53 @@ export class SettingsService {
     user: any,
   ) {
     let query =
-      zip_code !== undefined
+      zip_code !== ''
         ? {
             _id: id,
             'delivery_service_array.zip_code': zip_code,
           }
         : { _id: id };
+    console.log(query);
+    return this.SettingsModel.findOne(query).then(
+      async data => {
+        console.log(data, 'Datatta');
+        if (zip_code !== '') {
+          console.log('hje;lo update');
+          await data.updateOne(query, {
+            $set: {
+              'delivery_service_array.$.city':
+                securityDto['delivery_service_array.city'],
+              'delivery_service_array.$.state_name':
+                securityDto['delivery_service_array.state_name'],
+              'delivery_service_array.$.zip_code':
+                securityDto['delivery_service_array.zip_code'],
+              'delivery_service_array.$.acive':
+                securityDto['delivery_service_array.acive'],
+            },
+          });
+        } else {
+          console.log('123213 update', query);
+          console.log('123443 update', securityDto);
 
-    const updateBody = zip_code
-      ? {
-          $set: {
-            'delivery_service_array.$.city':
-              securityDto.delivery_service_array.city,
-            'delivery_service_array.$.state_name':
-              securityDto.delivery_service_array.state_name,
-            'delivery_service_array.$.zip_code':
-              securityDto.delivery_service_array.zip_code,
-            'delivery_service_array.$.active':
-              securityDto.delivery_service_array.active,
-          },
+          const res = await data.updateOne(
+            query,
+            {
+              $set: {
+                delivery_service_array: securityDto.delivery_service_array,
+              },
+            },
+            { upsert: true },
+          );
+          console.log(res, 'resss');
         }
-      : {
-          $addToSet: {
-            delivery_service_array: securityDto.delivery_service_array,
-          },
-        };
-    return await this.SettingsModel.updateOne(query, updateBody);
+        return data.toObject({ versionKey: false });
+      },
+      error => {
+        let msg = 'Invalid Request!';
+        if (error.errmsg) msg = error.errmsg;
+        return new BadRequestException(msg);
+      },
+    );
   }
   async createSettings(securityDto: CreateSettingsDto, user: any) {
     const newUser = new this.SettingsModel({

@@ -24,6 +24,7 @@ export class ProfileService {
     async getAllProfile(user: any) {
         return this.ProfileModel.find({}).populate('userId');
     }
+    
     async getProfileDetail(id: any) {
         return this.ProfileModel.findById(id).populate('userId');
     }
