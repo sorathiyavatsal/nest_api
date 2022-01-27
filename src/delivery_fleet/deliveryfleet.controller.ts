@@ -118,13 +118,11 @@ export class DeliveryFleetController {
     schema: {
       type: 'object',
       properties: {
-        fromName: { type: 'string' },
         fromAddress: { type: 'string' },
         fromZipcode: { type: 'string' },
         fromLat: { type: 'string' },
         fromLng: { type: 'string' },
         fromPhone: { type: 'string' },
-        toName: { type: 'string' },
         toAddress: { type: 'string' },
         toZipcode: { type: 'string' },
         toLat: { type: 'string' },
@@ -185,13 +183,11 @@ export class DeliveryFleetController {
     schema: {
       type: 'object',
       properties: {
-        fromName: { type: 'string' },
         fromAddress: { type: 'string' },
         fromZipcode: { type: 'string' },
         fromLat: { type: 'string' },
         fromLng: { type: 'string' },
         fromPhone: { type: 'string' },
-        toName: { type: 'string' },
         toAddress: { type: 'string' },
         toZipcode: { type: 'string' },
         toLat: { type: 'string' },
