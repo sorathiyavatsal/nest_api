@@ -28,7 +28,8 @@ export class BrandController {
                     type: 'string'
                 },
                 brandImage: {
-                    type: 'binary',
+                    type: 'string',
+                    format: 'binary',
                 },
                 description: {
                     type: 'string'

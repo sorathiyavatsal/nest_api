@@ -25,7 +25,8 @@ export class StoreController {
             type: 'object',
             properties: {
                 profilePic: {
-                    type: 'binary',
+                    type: 'string',
+                    format: 'binary',
                 },
                 Name: {
                     type: 'string'
@@ -49,13 +50,15 @@ export class StoreController {
                     type: 'string'
                 },
                 aadhar_card_pic: {
-                    type: 'binary'
+                    type: 'string',
+                    format: 'binary',
                 },
                 aadhar_card_number: {
                     type: 'string'
                 },
                 pan_card_pic: {
-                    type: 'binary'
+                    type: 'string',
+                    format: 'binary',
                 },
                 pan_card_number: {
                     type: 'string'
@@ -64,7 +67,8 @@ export class StoreController {
                     type: 'string'
                 },
                 store_licences_pic: {
-                    type: 'binary'
+                    type: 'string',
+                    format: 'binary',
                 },
                 store_licences_number: {
                     type: 'string'
