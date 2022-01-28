@@ -31,32 +31,47 @@ export class PromotionService {
     } catch (e) {
       return new BadRequestException(e);
     }
-    
   }
 
   async deletePromotion(_id: string) {
-    try{
-
+    try {
       let uniqueId = { _id };
-  
+
       console.log(uniqueId);
-  
+
       return await this.PromotionSchema.deleteOne(uniqueId);
-    }catch(e){
+    } catch (e) {
       return new BadRequestException(e);
     }
   }
 
-  async applyPromotion(coupon_id: string,user: any){
-    try{
-      let offer_price;
-        const promotion = await this.PromotionSchema.findOne({coupon_id}).populate("coupon_id");
-        if(promotion.promotion_type == "flat"){
-          offer_price = promotion.promotion_flat_offer 
-        }else{
-          offer_price = promotion.promotion_percentage_offer
+  async applyPromotion(coupon_id: string,couponBody: any, user: any) {
+    try {
+      let offer_price,final_price;
+
+      const promotion = await this.PromotionSchema.findOne({
+        coupon_id,
+      }).populate('coupon_id');
+      if (promotion.promotion_type == 'flat') {
+        offer_price = promotion.promotion_flat_offer;
+      if (promotion.applicable_price >= couponBody.orderPrice) {
+        final_price = couponBody.orderPrice - offer_price
+        return final_price
+       } else {
+         let message = "Coupon is Not valid for this order"
+        return new BadRequestException(message);
+      }
+      } else {
+        offer_price = promotion.promotion_percentage_offer;
+        if (promotion.applicable_price >= couponBody.orderPrice) {
+          final_price = couponBody.orderPrice - (offer_price/100)
+          return final_price
+         } else {
+           let message = "Coupon is Not valid for this order"
+          return new BadRequestException(message);
         }
-    }catch(e){
+      }
+    } catch (e) {
       return new BadRequestException(e);
     }
   }
@@ -90,6 +105,4 @@ export class PromotionService {
       },
     );
   }
-
- 
 }

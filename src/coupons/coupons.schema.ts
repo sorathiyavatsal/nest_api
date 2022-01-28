@@ -14,6 +14,7 @@ export const CouponsSchema = new mongoose.Schema(
       type: ObjectId,
       ref: 'Users',
     },
+    
     modifiedBy: {
       type: ObjectId,
       ref: 'Users',

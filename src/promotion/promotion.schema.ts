@@ -20,6 +20,10 @@ export const PromotionSchema = new mongoose.Schema(
      type:ObjectId,
      ref:"Coupons",
     },
+    applicable_price:{
+      type:Number,
+      required:true,
+    },
     merchant_id: {
       type: ObjectId,
       ref: 'Users',
@@ -85,6 +89,9 @@ export const PromotionSchema = new mongoose.Schema(
 );
 
 export interface Promotion extends mongoose.Document {
+  promotion_percentage_offer: any;
+  promotion_flat_offer: any;
+  promotion_type: string;
   _id: string;
   coupoun_name: string;
   coupoun_code: string;
