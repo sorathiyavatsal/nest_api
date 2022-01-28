@@ -21,6 +21,7 @@ export class FleetCommissionController {
 
     @Post('/add')
     @UseGuards(AuthGuard('jwt'))
+    @ApiConsumes('multipart/form-data','application/json')
     @ApiBody({
         schema: {
             type: 'object',

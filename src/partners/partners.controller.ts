@@ -53,7 +53,7 @@ export class PartnersController {
             },
         },
     })
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data','application/json')
     async postPartners(@Request() request) {
         return await this.PartnersService.postPartners();
     }

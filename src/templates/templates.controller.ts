@@ -22,13 +22,13 @@ export class TemplatesController {
      }
     @Post('/add-template')
     @UseInterceptors(FileInterceptor('file'))
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data','application/json')
     async addTemplates(@UploadedFile() file,@Body()  createTemplateDto: CreateTemplateDto, @Req() req) {
      
       return await this.templatesService.createnewTemplate(createTemplateDto,req);
     }
     @Put('/update-template/:id')
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data','application/json')
     @UseInterceptors(FileInterceptor('file'))
     @ApiParam({name: 'id', required: true})
     async updateTemplates(@Param() params,@UploadedFile() file,@Body()  createTemplateDto: CreateTemplateDto, @Req() req) {

@@ -37,6 +37,7 @@ export class CategoryController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @Post('/add')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -66,7 +67,7 @@ export class CategoryController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiOperation({
     summary:
       'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
@@ -84,6 +85,7 @@ export class CategoryController {
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiParam({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data','application/json')
   @Put('/update/:id')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -116,7 +118,7 @@ export class CategoryController {
     summary:
       'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async updateCategories(
     @UploadedFile() file,
     @Param() params,

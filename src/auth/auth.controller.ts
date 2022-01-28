@@ -20,10 +20,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Login' })
   @Post('/login')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: AuthCredentialsDto
-  })
+  @ApiConsumes('multipart/form-data','application/json')
   async signIn(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
     @Request() req,
@@ -36,14 +33,14 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Add user' })
   @Post('/adduser')
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async signUp(@Body() authCredentialsDto: UserCredentialsDto, @Req() req) {
     return await this.authService.createUser(authCredentialsDto, req);
   }
 
   @ApiOperation({ summary: 'Forgot password' })
   @Post('/forgotpass')
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async forgotPassword(
     @Body(ValidationPipe)
     forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto,
@@ -56,7 +53,7 @@ export class AuthController {
   }
   @ApiOperation({ summary: 'Reset password' })
   @Post('/resetpass')
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async verifyTokenByEmailPassword(
     @Body(ValidationPipe)
     resetPasswordCredentialsDto: ResetPasswordCredentialsDto,
@@ -68,7 +65,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Verify the otp' })
   @Post('/verify/otp')
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async verifyTokenByEmail(
     @Body(ValidationPipe) emailVerifyCredentialsDto: EmailVerifyCredentialsDto,
   ) {

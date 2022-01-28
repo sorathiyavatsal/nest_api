@@ -234,6 +234,7 @@ export class AuthService {
     console.log(userLoginData)
     return userLoginData;
   }
+  
   async validateUserByPassword(
     authCredentialsDto: AuthCredentialsDto,
     request: any,

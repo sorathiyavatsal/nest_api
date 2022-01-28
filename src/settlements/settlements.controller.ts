@@ -58,7 +58,7 @@ export class SettlementsController {
             },
         },
     })
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data','application/json')
     async postSettlements(@Request() request) {
         return await this.SettlementsService.postSettlements();
     }
@@ -75,7 +75,7 @@ export class SettlementsController {
             },
         },
     })
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data','application/json')
     async postDownloadCSV(@Request() request, @Res() res) {
         const fields = [
             {

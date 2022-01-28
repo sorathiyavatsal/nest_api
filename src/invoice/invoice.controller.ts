@@ -74,7 +74,7 @@ export class InvoiceController {
         fileFilter: imageFileFilter,
       }),
     )
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('multipart/form-data','application/json')
     @ApiParam({name: 'id', required: true})
     @ApiOperation({summary:'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP'})
     @ApiBody({
@@ -175,7 +175,7 @@ export class InvoiceController {
       },
     })
   @ApiOperation({summary:'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP'})
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async addInvoice(@UploadedFiles() files,@Req() res) {
     const response = [];
     if(files && files.length>0){

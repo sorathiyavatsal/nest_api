@@ -21,6 +21,7 @@ export class DashboardController {
     return await this.dashboarService.dashboardData(req.user);
   }
  
+  @ApiConsumes('multipart/form-data','application/json')
   @Post('/earnings/graph')
   @ApiOperation({summary:'Delivery Boy Dashboard Graph Data',description:'please pass startDate and EndDate. 9th Earning figma screen. Today (start and end same date). Yesterday ( yesterday start and end date), Tomorrow (tomorrow is start and end date).'})
   async tripBooks(@Body() earningsFilter:earningsFilterDto,@Request() req) {
