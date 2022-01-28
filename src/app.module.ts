@@ -39,6 +39,7 @@ import { SettlementsModule } from './settlements/settlements.module';
 import { FleetCommissionModule } from './fleet-commission/fleet-commission.module';
 import { StoreModule } from './store/store.module';
 import { BrandModule } from './brand/brand.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { BrandModule } from './brand/brand.module';
     FleetCommissionModule,
     StoreModule,
     BrandModule,
+    ProductModule,
   ],
   controllers: [],
   providers: [

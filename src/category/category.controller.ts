@@ -106,7 +106,6 @@ export class CategoryController {
 
         image: {
           type: 'string',
-
           format: 'binary',
         },
       },
