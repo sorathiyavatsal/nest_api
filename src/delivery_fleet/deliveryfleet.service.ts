@@ -2,7 +2,6 @@ import { Holidays } from '../holiday/holiday.model';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { DeliveryFleet } from './deliveryfleet.model';
 import { Weights } from '../weight/weight.model';
-import { Category } from '../category/category.model';
 import { Packages } from '../packages/packages.model';
 import { Packagings } from '../packaging/packaging.model';
 import { Settings } from '../settings/settings.model';
@@ -29,7 +28,6 @@ export class DeliveryFleetService {
         @InjectModel('UserVerification') private userVerificationModel: Model<UserVerification>,
         @InjectModel('DeliveryFleet') private deliveryfleetModel: Model<DeliveryFleet>,
         @InjectModel('Weights') private WeightsModel: Model<Weights>,
-        @InjectModel('Category') private CategoryModel: Model<Category>,
         @InjectModel('Packages') private PackagesModel: Model<Packages>,
         @InjectModel('Packagings') private PackagingsModel: Model<Packagings>,
         @InjectModel('Holidays') private holidaysModel: Model<Holidays>,
