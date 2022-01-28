@@ -54,20 +54,26 @@ export class PromotionService {
       }).populate('coupon_id');
       if (promotion.promotion_type == 'flat') {
         offer_price = promotion.promotion_flat_offer;
-      if (promotion.applicable_price >= couponBody.orderPrice) {
-        final_price = couponBody.orderPrice - offer_price
-        return final_price
-       } else {
-         let message = "Coupon is Not valid for this order"
-        return new BadRequestException(message);
-      }
-      } else {
+        if (promotion.applicable_price >= couponBody.orderPrice) {
+          final_price = couponBody.orderPrice - offer_price;
+          return {
+            status: 200,
+            final_discount: final_price
+          };
+        } else {
+          let message = 'Coupon is Not valid for this order';
+          return new BadRequestException(message);
+        }
+      } else if (promotion.promotion_type == 'percentage') {
         offer_price = promotion.promotion_percentage_offer;
         if (promotion.applicable_price >= couponBody.orderPrice) {
-          final_price = couponBody.orderPrice - (offer_price/100)
-          return final_price
-         } else {
-           let message = "Coupon is Not valid for this order"
+          final_price = couponBody.orderPrice - (couponBody.orderPrice * offer_price / 100);
+          return {
+            status: 200,
+            final_discount: final_price
+          };
+        } else {
+          let message = 'Coupon is Not valid for this order';
           return new BadRequestException(message);
         }
       }
