@@ -36,15 +36,38 @@ export class ProductController {
                 variant: {
                     type: 'array',
                     items: {
-                        type: 'array',
-                        items: {
-                            type: 'number',
-                        },
+                        type: 'object',
+                        properties: {
+                            size: {
+                                type: 'string'
+                            },
+                            price: {
+                                type: 'number'
+                            },
+                            quantity: {
+                                type: 'number'
+                            }
+                        }
                     },
                 },
-                brandImage: {
-                    type: 'string',
-                    format: 'binary',
+                pageTitle: {
+                    type: 'string'
+                },
+                metaDescription: {
+                    type: 'string'
+                },
+                urlHandle: {
+                    type: 'string'
+                },
+                productImage: {
+                    type: 'array',
+                    items: {
+                        type: 'string',
+                        format: 'binary'
+                    }
+                },
+                category: {
+                    type: 'array'
                 },
                 status: {
                     type: 'boolean'
