@@ -7,6 +7,7 @@ import {
   Post,
   Body,
   Put,
+  Patch,
   ValidationPipe,
   Query,
   Req,
@@ -60,6 +61,7 @@ export class PromotionController {
   async applyPromotion(@Param() params, @Request() request) {
     return await this.PromotionService.applyPromotion(
       params.coupon_id,
+      request.body,
       request.user,
     );
   }
