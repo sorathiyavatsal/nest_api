@@ -41,6 +41,7 @@ import { StoreModule } from './store/store.module';
 import { BrandModule } from './brand/brand.module';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
+import { TaxModule } from './tax/tax.module';
 
 @Module({
   imports: [
@@ -96,6 +97,7 @@ import { OrderModule } from './order/order.module';
     BrandModule,
     ProductModule,
     OrderModule,
+    TaxModule,
   ],
   controllers: [],
   providers: [

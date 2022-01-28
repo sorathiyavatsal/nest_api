@@ -95,4 +95,10 @@ export class SettingsService {
   async deleteSettings(id: string): Promise<any> {
     return await this.SettingsModel.findByIdAndRemove(id);
   }
+  async taxSettings(id: string): Promise<any> {
+    return await {};
+  }
+  async orderSettings(id: string): Promise<any> {
+    return await {};
+  }
 }

@@ -3,6 +3,7 @@ import { DashboardService } from './dashboard.service';
 import { ApiTags,  ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { earningsFilterDto } from "./dto/earnings.filter.dto";
+import { distanceRequestDto } from "./dto/distnace_request.dto";
 @Controller('da')
 @ApiTags('Delivery Associte')
 @ApiSecurity('api_key')
@@ -28,6 +29,15 @@ export class DashboardController {
 
     return await this.dashboarService.tripData(earningsFilter,req.user);
   }
+
+  @ApiConsumes('multipart/form-data','application/json')
+  @Post('/distance-request')
+  @ApiOperation({summary:'Delivery Boy request for distance',description:'.'})
+  async distanceRequest(@Body() distanceRequest:distanceRequestDto,@Request() req) {
+
+    return await this.dashboarService.distanceReuqest(distanceRequest, req.user);
+  }
+
   @Get('/profile')
   @ApiOperation({summary:'Delivery Boy Profile Data'})
   
