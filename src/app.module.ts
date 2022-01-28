@@ -37,6 +37,8 @@ import { AdminModule } from './admin/admin.module';
 import { PartnersModule } from './partners/partners.module';
 import { SettlementsModule } from './settlements/settlements.module';
 import { FleetCommissionModule } from './fleet-commission/fleet-commission.module';
+import { StoreModule } from './store/store.module';
+import { BrandModule } from './brand/brand.module';
 
 @Module({
   imports: [
@@ -88,6 +90,8 @@ import { FleetCommissionModule } from './fleet-commission/fleet-commission.modul
     PartnersModule,
     SettlementsModule,
     FleetCommissionModule,
+    StoreModule,
+    BrandModule,
   ],
   controllers: [],
   providers: [
