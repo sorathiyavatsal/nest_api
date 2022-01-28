@@ -16,6 +16,9 @@ export const PromotionSchema = new mongoose.Schema(
     promotion_content_type: {
       type: String,
     },
+    coupon_id:{
+     type:ObjectId,ref:"Coupons",
+    },
     merchant_id: {
       type: ObjectId,
       ref: 'Users',

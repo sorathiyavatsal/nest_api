@@ -15,6 +15,7 @@ import {
     UseInterceptors,
     UploadedFile,
     UploadedFiles,
+    Delete,
   } from '@nestjs/common';
   import { request } from 'http';
   import { CouponsService } from './coupons.service';
@@ -29,30 +30,28 @@ import { error } from 'console';
 
 @Controller('coupons')
 export class CouponsController {
-    constructor(private securityService: CouponsService) {}
+    constructor(private CouponsService: CouponsService) {}
     //find all coupons here
-@Get('/allCoupens')
+@Get('/allCoupons')
 async getAllCoupons(@Request() request){
-    return await this.securityService.getAllCoupons(request.user)
+    return await this.CouponsService.getAllCoupons(request.user)
 }
  //{get SingleCouponById here}
- @Get('/SinglePromotion')
+ @Get('/singleCoupon/:id')
  async getSingleCoupon(@Param() params ,@Request() request) {
-   return await this.securityService.getCouponbyId(params.id,request.user);
+   return await this.CouponsService.getCouponbyId(params.id,request.user);
  }
  //{update promotion by id here}
  @Put('/updateCoupon/:id')
  async updateCoupon(@Param() params ,@Request() request) {
-   return await this.securityService.updateCoupon( params.id,
+   return await this.CouponsService.updateCoupon( params.id,
        request.body,
        request.user,)
  }
  ///delete api  
- @Put('/updateCoupon/:id')
+ @Delete('/deleteCoupon/:id')
  async deleteCoupon(@Param() params ,@Request() request) {
-   return await this.securityService.deleteCoupon( params.id,
-       request.body,
-       request.user,)
+   return await this.CouponsService.deleteCoupon( params.id)
  }
 
 
@@ -87,7 +86,7 @@ async getAllCoupons(@Request() request){
    console.log('boydydyddyd', request.body);
    
    
-   return await this.securityService.createCoupon(
+   return await this.CouponsService.createCoupon(
      request.body,
      request.user,
    );
