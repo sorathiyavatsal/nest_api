@@ -101,14 +101,11 @@ export const DeliveryFleetSchema = new mongoose.Schema({
         required: true
     },
     pickupTime: {
-        type: Date,
+        type: String,
         required: true
-        
     },
     cor: {
         type: String
-       
-        
     },
     deliverChargeType: {
         type: String,

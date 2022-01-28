@@ -5,7 +5,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { BrandService } from "./brand.service"
 
 @Controller('brand')
-@ApiTags('brand')
+@ApiTags('Brand')
 @ApiBearerAuth()
 @ApiSecurity('api_key')
 export class BrandController {

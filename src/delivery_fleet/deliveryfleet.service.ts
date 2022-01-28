@@ -56,8 +56,8 @@ export class DeliveryFleetService {
         }
         let dto = req.body;
         let userid: string;
-        if (req.user && req.user.user._id) {
-            userid = req.user.user._id;
+        if (req.user && req.user._id) {
+            userid = req.user._id;
             dto.createdBy = userid;
             dto.modifiedBy = userid;
         }
