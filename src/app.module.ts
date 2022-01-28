@@ -18,7 +18,6 @@ import {
 import { UsersModule } from './users/users.module';
 import { TemplatesModule } from './templates/templates.module';
 import { SecurityModule } from './security/security.module';
-import { CategoryModule } from './category/category.module';
 import { WeightsModule } from './weight/weight.module';
 import { RoleModule } from './role/role.module';
 import { ProfileModule } from './profile/profile.module';
@@ -40,6 +39,7 @@ import { FleetCommissionModule } from './fleet-commission/fleet-commission.modul
 import { StoreModule } from './store/store.module';
 import { BrandModule } from './brand/brand.module';
 import { ProductModule } from './product/product.module';
+import { GoodsModule } from './goods/goods.module';
 
 @Module({
   imports: [
@@ -80,7 +80,6 @@ import { ProductModule } from './product/product.module';
     SecurityModule,
     WeightsModule,
     DeliveryFleetModule,
-    CategoryModule,
     WeightsModule,
     PackagesModule,
     PackagingsModule,
@@ -94,6 +93,7 @@ import { ProductModule } from './product/product.module';
     StoreModule,
     BrandModule,
     ProductModule,
+    GoodsModule,
   ],
   controllers: [],
   providers: [
