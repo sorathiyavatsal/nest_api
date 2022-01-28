@@ -164,4 +164,8 @@ export class DashboardService {
         
         return resultData;
     }
+
+    async distanceReuqest(distanceRequest, user:any) {
+        return {};
+    }
 }
