@@ -112,7 +112,7 @@ export class DeliveryFleetController {
       fileFilter: imageFileFilter,
     }),
   )
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiParam({ name: 'id', required: true })
   @ApiOperation({ summary: 'Update Delivery Fleet' })
   @ApiBody({
@@ -228,7 +228,7 @@ export class DeliveryFleetController {
     },
   })
   @ApiOperation({ summary: 'Add Delivery Fleet' })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async addInvoice(@UploadedFiles() files, @Req() res) {
 
     const response = [];

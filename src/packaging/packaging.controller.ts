@@ -37,6 +37,7 @@ export class PackagingsController {
   }
   @UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
+@ApiConsumes('multipart/form-data','application/json')
   @Post('/add-Packagings')
   async addPackagings(@Body()  createPackagingsDto: CreatePackagingsDto,@Request() request) {
    
@@ -44,6 +45,7 @@ export class PackagingsController {
   }
   @UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
+@ApiConsumes('multipart/form-data','application/json')
   @ApiParam({name: 'id', required: true})
   @Put('/update-Packagings/:id')
   async updatePackagings(@Param() params,@Body()  editPackagingsDto: EditPackagingsDto,@Request() request:any) {
@@ -53,6 +55,7 @@ export class PackagingsController {
   
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiParam({name: 'id', required: true})
   @Delete('/delete-Packagings/:id')
   async deletePackagings(@Param('id') id: string) {

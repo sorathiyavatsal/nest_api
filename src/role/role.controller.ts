@@ -37,6 +37,7 @@ export class RoleController {
 
   @UseGuards(AuthGuard('jwt'))
  @Roles(Role.ADMIN)
+ @ApiConsumes('multipart/form-data','application/json')
   @Post('/add-roles')
   async addRole(@Body()  createRoleDto: CreateRoleDto,@Request() request) {
     console.log(request.user, 'request');
@@ -44,6 +45,7 @@ export class RoleController {
   }
   @UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
+@ApiConsumes('multipart/form-data','application/json')
   @ApiParam({name: 'id', required: true})
   @Put('/update-Role/:id')
   async updateRole(@Param() params,@Body()  editRoleDto: EditRoleDto,@Request() request:any) {
@@ -54,6 +56,7 @@ export class RoleController {
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiParam({name: 'id', required: true})
+  @ApiConsumes('multipart/form-data','application/json')
   @Delete('/delete-Role/:id')
   async deleteRole(@Param('id') id: string) {
     return await this.RoleService.deleteRole(id);

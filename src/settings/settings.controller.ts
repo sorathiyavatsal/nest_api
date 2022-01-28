@@ -45,6 +45,7 @@ export class SettingsController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
@@ -66,6 +67,7 @@ export class SettingsController {
   @Roles(Role.ADMIN)
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'zip_code' })
+  @ApiConsumes('multipart/form-data','application/json')
   @Put('/update/:id')
   @ApiBody({
     schema: {
@@ -75,7 +77,7 @@ export class SettingsController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async updateSettings(
     @Param() params,
     @Query() query,
@@ -91,6 +93,7 @@ export class SettingsController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiParam({ name: 'id', required: true })
   @Delete('/delete/:id')
   async deleteSettings(@Param() params, @Request() request: any) {

@@ -1,8 +1,12 @@
-import { IsString, IsEmail, IsNotEmpty, IsBoolean, IsNumber, IsDateString, IsDate } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsBoolean, IsNumber, IsDateString, IsDate, IsISBN } from 'class-validator';
 import { ApiProperty,ApiParam } from '@nestjs/swagger';
 
 export class EditDeliveryFleetDto {
    
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    fromName: string;
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -25,7 +29,10 @@ export class EditDeliveryFleetDto {
     fromPhone: string;
 
 
-  
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    toName: string;
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -94,5 +101,11 @@ export class EditDeliveryFleetDto {
     @ApiProperty()
     activeStatus: boolean;
 
-    
+    @IsString()
+    @ApiProperty()
+    distance: string;
+
+    @IsNumber()
+    @ApiProperty()
+    price: number;
 }
