@@ -40,6 +40,7 @@ import { FleetCommissionModule } from './fleet-commission/fleet-commission.modul
 import { StoreModule } from './store/store.module';
 import { BrandModule } from './brand/brand.module';
 import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { ProductModule } from './product/product.module';
     StoreModule,
     BrandModule,
     ProductModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [
