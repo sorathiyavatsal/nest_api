@@ -41,6 +41,8 @@ import { BrandModule } from './brand/brand.module';
 import { ProductModule } from './product/product.module';
 import { GoodsModule } from './goods/goods.module';
 import { CategoryModule } from './category/category.module';
+import { OrderModule } from './order/order.module';
+import { TaxModule } from './tax/tax.module';
 
 @Module({
   imports: [
@@ -96,6 +98,8 @@ import { CategoryModule } from './category/category.module';
     ProductModule,
     GoodsModule,
     CategoryModule,
+    OrderModule,
+    TaxModule,
   ],
   controllers: [],
   providers: [
