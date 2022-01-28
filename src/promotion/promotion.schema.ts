@@ -71,10 +71,15 @@ export const PromotionSchema = new mongoose.Schema(
         age: false,
       },
     },
-    
     promotion_target_users_by: {
       type: String,
       enum: ['gender', 'location', 'age'],
+    },
+    promotion_start_date:{
+        type: Date,
+    },
+    promotion_end_date:{
+        type: Date,
     },
     createdBy: {
       type: ObjectId,

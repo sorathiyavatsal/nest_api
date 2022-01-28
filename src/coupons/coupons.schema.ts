@@ -10,6 +10,9 @@ export const CouponsSchema = new mongoose.Schema(
     coupoun_code: {
       type: String,
     },
+    coupon_expiration:{
+        type: Date
+    },
     createdBy: {
       type: ObjectId,
       ref: 'Users',

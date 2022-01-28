@@ -30,6 +30,9 @@ import { ApiBody } from '@nestjs/swagger';
 import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { response } from 'express';
 @Controller('promotion')
+@ApiTags('Promotion')
+@ApiBearerAuth()
+@ApiSecurity('api_key')
 export class PromotionController {
   constructor(private PromotionService: PromotionService) {}
 
