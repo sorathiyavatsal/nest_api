@@ -57,10 +57,8 @@ export class CategoryController {
       properties: {
         name: { type: 'string' },
         activeStatus: { type: 'boolean' },
-
         image: {
           type: 'string',
-
           format: 'binary',
         },
         orderNumber: { type: 'number' },
