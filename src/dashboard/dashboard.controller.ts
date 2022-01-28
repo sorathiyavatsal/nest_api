@@ -4,7 +4,7 @@ import { ApiTags,  ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperati
 import { AuthGuard } from '@nestjs/passport';
 import { earningsFilterDto } from "./dto/earnings.filter.dto";
 @Controller('da')
-@ApiTags('Dashboard')
+@ApiTags('Delivery Associte')
 @ApiSecurity('api_key')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
