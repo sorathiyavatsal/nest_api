@@ -40,6 +40,7 @@ import { StoreModule } from './store/store.module';
 import { BrandModule } from './brand/brand.module';
 import { ProductModule } from './product/product.module';
 import { GoodsModule } from './goods/goods.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { GoodsModule } from './goods/goods.module';
     BrandModule,
     ProductModule,
     GoodsModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [
