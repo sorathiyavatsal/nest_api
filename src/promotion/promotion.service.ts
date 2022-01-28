@@ -24,19 +24,41 @@ export class PromotionService {
   }
 
   async updatePromotion(_id: string, securityDto: any, user: any) {
-    let uniqueId = { _id };
-    let updateBody = securityDto;
-    console.log(uniqueId);
-    console.log(updateBody);
-    return await this.PromotionSchema.updateOne(uniqueId, updateBody);
+    try {
+      let uniqueId = { _id };
+      let updateBody = securityDto;
+      return await this.PromotionSchema.updateOne(uniqueId, updateBody);
+    } catch (e) {
+      return new BadRequestException(e);
+    }
+    
   }
 
   async deletePromotion(_id: string) {
-    let uniqueId = { _id };
+    try{
 
-    console.log(uniqueId);
+      let uniqueId = { _id };
+  
+      console.log(uniqueId);
+  
+      return await this.PromotionSchema.deleteOne(uniqueId);
+    }catch(e){
+      return new BadRequestException(e);
+    }
+  }
 
-    return await this.PromotionSchema.deleteOne(uniqueId);
+  async applyPromotion(coupon_id: string,user: any){
+    try{
+      let offer_price;
+        const promotion = await this.PromotionSchema.findOne({coupon_id}).populate("coupon_id");
+        if(promotion.promotion_type == "flat"){
+          offer_price = promotion.promotion_flat_offer 
+        }else{
+          offer_price = promotion.promotion_percentage_offer
+        }
+    }catch(e){
+      return new BadRequestException(e);
+    }
   }
 
   async createPromotion(securityDto: any, user: any) {

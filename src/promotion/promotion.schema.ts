@@ -17,7 +17,8 @@ export const PromotionSchema = new mongoose.Schema(
       type: String,
     },
     coupon_id:{
-     type:ObjectId,ref:"Coupons",
+     type:ObjectId,
+     ref:"Coupons",
     },
     merchant_id: {
       type: ObjectId,
@@ -39,6 +40,25 @@ export const PromotionSchema = new mongoose.Schema(
       type: String,
       enum: ['flat', 'percentage'],
     },
+    promotion_target_user_no:{
+        type: Number
+    },
+    promotion_flat_offer:{
+        type: Number
+    },
+    promotion_condition_offer:{
+        type: Object
+    },
+    promotion_percentage_offer:{
+        type: Number
+    },
+    promotion_used_user_no:{
+        type: Number
+    },
+    promotion_applied_by:{
+        type: Array,
+        ref: "User"
+    },
     promotion_target_filters: {
       type: Object,
       default: {
@@ -47,6 +67,7 @@ export const PromotionSchema = new mongoose.Schema(
         age: false,
       },
     },
+    
     promotion_target_users_by: {
       type: String,
       enum: ['gender', 'location', 'age'],

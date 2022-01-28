@@ -40,32 +40,40 @@ export class PromotionController {
 
   //{get SinglePromotionBYId here}
   @Get('/SinglePromotion/:id')
-  async getSinglePromotion(@Param() params ,@Request() request) {
-    return await this.PromotionService.getPromotionbyId(params.id,request.user);
+  async getSinglePromotion(@Param() params, @Request() request) {
+    return await this.PromotionService.getPromotionbyId(
+      params.id,
+      request.user,
+    );
   }
-
-
 
   //{update promotion by id here}
   @Put('/updatePromotion/:id')
-  async updatePromotion(@Param() params ,@Request() request) {
-    return await this.PromotionService.updatePromotion( params.id,
-        request.body,
-        request.user,)
+  async updatePromotion(@Param() params, @Request() request) {
+    return await this.PromotionService.updatePromotion(
+      params.id,
+      request.body,
+      request.user,
+    );
+  }
+  @Get('/applyPromotion/:coupon_id')
+  async applyPromotion(@Param() params, @Request() request) {
+    return await this.PromotionService.applyPromotion(
+      params.coupon_id,
+      request.user,
+    );
   }
   ////delete
   @Delete('/deletePromotion/:id')
-  async deleteCoupon(@Param() params ,@Request() request) {
-    return await this.PromotionService.deletePromotion( params.id)
+  async deleteCoupon(@Param() params, @Request() request) {
+    return await this.PromotionService.deletePromotion(params.id);
   }
 
   //{create promotion}
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @Post('/addPromotions')
-  @UseInterceptors(
-    FileInterceptor('image')
-  )
+  @UseInterceptors(FileInterceptor('image'))
   @ApiBody({
     schema: {
       type: 'object',
@@ -87,5 +95,4 @@ export class PromotionController {
       request.user,
     );
   }
-
 }
