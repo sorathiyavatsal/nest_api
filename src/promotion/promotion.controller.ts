@@ -56,7 +56,7 @@ export class PromotionController {
       request.user,
     );
   }
-  @Get('/applyPromotion/:coupon_id')
+  @Patch('/applyPromotion/:coupon_id')
   async applyPromotion(@Param() params, @Request() request) {
     return await this.PromotionService.applyPromotion(
       params.coupon_id,
