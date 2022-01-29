@@ -75,6 +75,15 @@ export const PromotionSchema = new mongoose.Schema(
       type: String,
       enum: ['gender', 'location', 'age'],
     },
+    promotion_target_gender:{
+        type: String
+    },
+    promotion_target_location:{
+        type: String
+    },
+    promotion_target_age:{
+        type: String
+    },
     promotion_start_date:{
         type: Date,
     },

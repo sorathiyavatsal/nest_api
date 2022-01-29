@@ -22,7 +22,27 @@ export class PromotionService {
   async getPromotionbyId(id: any, user: any) {
     return this.PromotionSchema.findOne({});
   }
-
+  async getPromotionsForUser(promotionDto: any) {
+    let query = promotionDto.age
+      ? { promotion_target_age: promotionDto.age }
+      : promotionDto.gender
+      ? { promotion_target_gender: promotionDto.gender }
+      : promotionDto.location
+      ? { promotion_target_location: promotionDto.location }
+      : {
+          promotion_target_location: promotionDto.location,
+          promotion_target_gender: promotionDto.gender,
+          promotion_target_age: promotionDto.age,
+        };
+    const Promotions = await this.PromotionSchema.aggregate([
+      {
+        $match: query,
+      },
+    ]);
+    return await this.PromotionSchema.populate(Promotions, {
+      path: 'coupon_id',
+    });
+  }
   async updatePromotion(_id: string, securityDto: any, user: any) {
     try {
       let uniqueId = { _id };
@@ -45,40 +65,49 @@ export class PromotionService {
     }
   }
 
-  async applyPromotion(coupon_id: string,couponBody: any, user: any) {
+  async applyPromotion(coupon_id: string, couponBody: any, user: any) {
+    let message;
     try {
-      let offer_price,final_price;
+      let offer_price, final_price;
 
       const promotion = await this.PromotionSchema.findOne({
         coupon_id,
       }).populate('coupon_id');
-      if (promotion.promotion_type == 'flat') {
-        offer_price = promotion.promotion_flat_offer;
-        if (promotion.applicable_price >= couponBody.orderPrice) {
-          final_price = couponBody.orderPrice - offer_price;
-          return {
-            status: 200,
-            final_discount: final_price
-          };
-        } else {
-          let message = 'Coupon is Not valid for this order';
-          return new BadRequestException(message);
+      if (
+        promotion.promotion_end_date < Date.now() ||
+        promotion.coupon_id.coupon_expiration < Date.now()
+      ) {
+        if (promotion.promotion_type == 'flat') {
+          offer_price = promotion.promotion_flat_offer;
+          if (promotion.applicable_price >= couponBody.orderPrice) {
+            final_price = couponBody.orderPrice - offer_price;
+            return {
+              status: 200,
+              final_discount: final_price,
+            };
+          } else {
+            message = 'Coupon is Not valid for this order';
+            return new BadRequestException(message);
+          }
+        } else if (promotion.promotion_type == 'percentage') {
+          offer_price = promotion.promotion_percentage_offer;
+          if (promotion.applicable_price >= couponBody.orderPrice) {
+            final_price =
+              couponBody.orderPrice -
+              (couponBody.orderPrice * offer_price) / 100;
+            return {
+              status: 200,
+              final_discount: final_price,
+            };
+          } else {
+            message = 'Coupon is Not valid for this order';
+          }
         }
-      } else if (promotion.promotion_type == 'percentage') {
-        offer_price = promotion.promotion_percentage_offer;
-        if (promotion.applicable_price >= couponBody.orderPrice) {
-          final_price = couponBody.orderPrice - (couponBody.orderPrice * offer_price / 100);
-          return {
-            status: 200,
-            final_discount: final_price
-          };
-        } else {
-          let message = 'Coupon is Not valid for this order';
-          return new BadRequestException(message);
-        }
+      } else {
+        message = 'Coupon is Expired';
       }
     } catch (e) {
-      return new BadRequestException(e);
+      return new BadRequestException(message);
     }
   }
 

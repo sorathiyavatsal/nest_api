@@ -41,6 +41,11 @@ export class PromotionController {
   async getAllPromotions(@Request() request) {
     return await this.PromotionService.getAllPromotion(request.user);
   }
+  ///{get User Promotions here}
+  @Post('/allUserPromotions')
+  async getUserPromotions(@Request() request) {
+    return await this.PromotionService.getPromotionsForUser(request.body);
+  }
 
   //{get SinglePromotionBYId here}
   @Get('/SinglePromotion/:id')
