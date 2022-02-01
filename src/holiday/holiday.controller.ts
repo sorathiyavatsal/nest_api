@@ -38,6 +38,7 @@ export class HolidaysController {
   }
 
   @Post('/add-holidays')
+  @ApiConsumes('multipart/form-data','application/json')
   async addHolidays(@Body()  createHolidaysDto: CreateHolidaysDto,@Request() request) {
    
     return await this.HolidayService.createHolidays(createHolidaysDto,request.user);
@@ -45,6 +46,7 @@ export class HolidaysController {
 
   @ApiParam({name: 'id', required: true})
   @Put('/update-holidays/:id')
+  @ApiConsumes('multipart/form-data','application/json')
   async updateHolidays(@Param() params,@Body()  editHolidaysDto: EditHolidaysDto,@Request() request:any) {
    
     return await this.HolidayService.updateHolidays(params.id,editHolidaysDto,request.user);

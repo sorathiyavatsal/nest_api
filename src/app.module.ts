@@ -18,7 +18,6 @@ import {
 import { UsersModule } from './users/users.module';
 import { TemplatesModule } from './templates/templates.module';
 import { SecurityModule } from './security/security.module';
-import { CategoryModule } from './category/category.module';
 import { WeightsModule } from './weight/weight.module';
 import { RoleModule } from './role/role.module';
 import { ProfileModule } from './profile/profile.module';
@@ -36,6 +35,17 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { AdminModule } from './admin/admin.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { PromotionModule } from './promotion/promotion.module';
+import { PartnersModule } from './partners/partners.module';
+import { SettlementsModule } from './settlements/settlements.module';
+import { FleetCommissionModule } from './fleet-commission/fleet-commission.module';
+import { StoreModule } from './store/store.module';
+import { BrandModule } from './brand/brand.module';
+import { ProductModule } from './product/product.module';
+import { GoodsModule } from './goods/goods.module';
+import { CategoryModule } from './category/category.module';
+import { OrderModule } from './order/order.module';
+import { TaxModule } from './tax/tax.module';
+
 @Module({
   imports: [
     MulterModule.register({
@@ -75,7 +85,6 @@ import { PromotionModule } from './promotion/promotion.module';
     SecurityModule,
     WeightsModule,
     DeliveryFleetModule,
-    CategoryModule,
     WeightsModule,
     PackagesModule,
     PackagingsModule,
@@ -85,6 +94,16 @@ import { PromotionModule } from './promotion/promotion.module';
     AdminModule,
     CouponsModule,
     PromotionModule,
+    PartnersModule,
+    SettlementsModule,
+    FleetCommissionModule,
+    StoreModule,
+    BrandModule,
+    ProductModule,
+    GoodsModule,
+    CategoryModule,
+    OrderModule,
+    TaxModule,
   ],
   controllers: [],
   providers: [

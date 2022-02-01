@@ -17,6 +17,8 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { CreateSettingsDto } from './dto/create-settings';
 import { EditSettingsDto } from './dto/edit-settings';
+import { CreateTaxSettingsDto } from './dto/tax-settings';
+import { CreateOrderSettingsDto } from './dto/order-settings';
 import {
   FileInterceptor,
   FilesInterceptor,
@@ -38,13 +40,16 @@ export class SettingsController {
   async getSettings(@Request() request) {
     return await this.securityService.getAllSettings(request.user);
   }
+
   @ApiParam({ name: 'id', required: true })
   @Get('/settings/:id')
   async getSettingsDetail(@Param() params, @Request() request: any) {
     return await this.securityService.getSettingsDetail(params.id);
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
@@ -62,10 +67,12 @@ export class SettingsController {
       request.user,
     );
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'zip_code' })
+  @ApiConsumes('multipart/form-data','application/json')
   @Put('/update/:id')
   @ApiBody({
     schema: {
@@ -75,7 +82,7 @@ export class SettingsController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   async updateSettings(
     @Param() params,
     @Query() query,
@@ -89,11 +96,31 @@ export class SettingsController {
       request.user,
     );
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiParam({ name: 'id', required: true })
   @Delete('/delete/:id')
   async deleteSettings(@Param() params, @Request() request: any) {
     return await this.securityService.deleteSettings(params.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
+  @ApiParam({ name: 'id', required: true })
+  @Put('/tax/:id')
+  async taxSettings(@Param() params,@Body() CreateTaxSettingsDto: CreateTaxSettingsDto, @Request() request: any) {
+    return await this.securityService.taxSettings(params.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
+  @ApiParam({ name: 'id', required: true })
+  @Put('/order/:id')
+  async orderSettings(@Param() params,@Body() CreateOrderSettingsDto: CreateOrderSettingsDto, @Request() request: any) {
+    return await this.securityService.orderSettings(params.id);
   }
 }

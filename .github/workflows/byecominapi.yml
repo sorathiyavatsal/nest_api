@@ -18,6 +18,12 @@ jobs:
            password: ${{ secrets.PASWD }}
            script: |
                cd /home/ubuntu/api
+               pm2 delete 0
+               git reset --hard
+               git fetch https://byecomin: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@github.com/byecomin/api.git
                git pull https://byecomin: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@github.com/byecomin/api.git
+               rm -rf dist/
+               rm -rf package-lock.json
                npm i
                npm run build
+               pm2 start "npm run start" --name byecom

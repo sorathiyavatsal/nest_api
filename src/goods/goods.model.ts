@@ -1,18 +1,17 @@
 import * as mongoose from 'mongoose';
-import * as bcrypt from 'bcrypt';
 let Schema = mongoose.Schema,
- ObjectId = Schema.ObjectId;
-export const  CategorySchema = new mongoose.Schema({
-   
+    ObjectId = Schema.ObjectId;
+export const GoodsSchema = new mongoose.Schema({
+
     image: {
         type: Object,
-      
+
     },
     svgImage:
     {
-        type:String
+        type: String
     },
-    orderNumber:{
+    orderNumber: {
         type: Number,
         default: 1
     },
@@ -27,8 +26,8 @@ export const  CategorySchema = new mongoose.Schema({
     },
     activeStatus:
     {
-        type:Boolean,
-        default:true
+        type: Boolean,
+        default: true
     },
     createdBy: {
         type: ObjectId,
@@ -38,20 +37,18 @@ export const  CategorySchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Users'
     }
-    
+
 }, { timestamps: true });
 
-export interface Category extends mongoose.Document {
+export interface Good extends mongoose.Document {
     _id: string;
     name: string;
     rate: number;
-    image:object,
-    svgImage:string,
-    activeStatus:boolean
-    updatedAt:Date,
-    createdAt:Date,
-    createdBy:string,
-    modifiedBy:string
-    
-    
+    image: object,
+    svgImage: string,
+    activeStatus: boolean
+    updatedAt: Date,
+    createdAt: Date,
+    createdBy: string,
+    modifiedBy: string
 }

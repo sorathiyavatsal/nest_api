@@ -36,13 +36,14 @@ export class WeightsController {
   @UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
   @Post('/add-weights')
-
+  @ApiConsumes('multipart/form-data','application/json')
   async addWeights(@Body()  createWeightsDto: CreateWeightsDto,@Request() request) {
    
     return await this.WeightsService.createWeights(createWeightsDto,request.user.user);
   }
   @UseGuards(AuthGuard('jwt'))
 @Roles(Role.ADMIN)
+@ApiConsumes('multipart/form-data','application/json')
   @ApiParam({name: 'id', required: true})
   @Put('/update-weights/:id')
   async updateWeights(@Param() params,@Body()  editWeightsDto: EditWeightsDto,@Request() request:any) {
@@ -51,6 +52,7 @@ export class WeightsController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiParam({name: 'id', required: true})
   @Delete('/delete-weights/:id')
   async deleteCategory(@Param('id') id: string) {

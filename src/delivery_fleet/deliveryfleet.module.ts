@@ -5,7 +5,6 @@ import { DeliveryFleetService } from './deliveryfleet.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeliveryFleetSchema } from './deliveryfleet.model';
 import { WeightsSchema } from '../weight/weight.model';
-import { CategorySchema } from '../category/category.model';
 import { PackagesSchema } from '../packages/packages.model';
 import { SettingsSchema } from '../settings/settings.model';
 import { PackagingsSchema } from '../packaging/packaging.model';
@@ -22,7 +21,6 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
       { name: 'Holidays', schema: HolidaysSchema},
       { name: 'Weights', schema: WeightsSchema},
       { name: 'Packages', schema: PackagesSchema},
-      { name: 'Category', schema: CategorySchema},
       { name: 'Packagings', schema: PackagingsSchema},
       { name: 'Settings', schema: SettingsSchema},
       { name : 'Users', schema:UserSchema},

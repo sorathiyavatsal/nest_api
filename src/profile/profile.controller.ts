@@ -34,6 +34,7 @@ export class ProfileController {
     return await this.ProfileService.getProfileDetail(params.id);
   }
   @UseGuards(AuthGuard('jwt'))
+  @ApiConsumes('multipart/form-data','application/json')
   @Post('/add')
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -170,7 +171,7 @@ export class ProfileController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiOperation({ summary: 'Merchant/Delivery boy add onboarding data' })
   async addProfile(@UploadedFiles() file, @Request() request) {
     return await this.ProfileService.createProfile(
@@ -313,7 +314,7 @@ export class ProfileController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data','application/json')
   @ApiOperation({ summary: 'Merchant/Delivery boy add onboarding data' })
   async updateProfile(
     @Param() params,

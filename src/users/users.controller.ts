@@ -1,5 +1,5 @@
 import { Controller, SetMetadata, Request, Get, Post, Body, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { ApiTags, ApiSecurity, ApiBearerAuth, ApiParam, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiSecurity, ApiBearerAuth, ApiParam, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../auth/user.model";
@@ -48,6 +48,7 @@ export class UsersController {
   @Roles(Role.DELIVERY)
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiConsumes('multipart/form-data','application/json')
   @Put('/delivery-boy/location/:id')
   async deliveryBoyUpdateLocation(@Param() params, @Body() locationUpdate: locationUpdateDto, @Req() req) {
 
@@ -58,6 +59,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.DELIVERY)
   @ApiParam({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data','application/json')
   @Put('/delivery-boy/duty/:id')
   async deliveryBoyUpdateStatus(@Param() params, @Body() profileStatus: profileStatusDto, @Req() req) {
 
@@ -68,6 +70,7 @@ export class UsersController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard('jwt')) 
+  @ApiConsumes('multipart/form-data','application/json')
   @Put('/delivery-boy/status/:id')
   async adminUpdateStatus(@Param() params, @Body() profileStatus: profileStatusDto, @Req() req) {
 
