@@ -23,7 +23,7 @@ jobs:
                git fetch https://byecomin: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@github.com/byecomin/api.git
                git pull https://byecomin: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@github.com/byecomin/api.git
                rm -rf dist/
-               rm -rf package-lock.json
+               rm -rf node_modules/
                npm i
                npm run build
-               pm2 start "npm run start" --name byecom
+               pm2 start "npm run start:prod" --name byecom
