@@ -43,8 +43,6 @@ import { BrandModule } from './brand/brand.module';
 import { ProductModule } from './product/product.module';
 import { GoodsModule } from './goods/goods.module';
 import { CategoryModule } from './category/category.module';
-import { CouponsModule } from './coupons/coupons.module';
-import { PromotionModule } from './promotion/promotion.module';
 import { OrderModule } from './order/order.module';
 import { TaxModule } from './tax/tax.module';
 
@@ -105,7 +103,7 @@ import { TaxModule } from './tax/tax.module';
     GoodsModule,
     CategoryModule,
     CouponsModule,
-    PromotionModule
+    PromotionModule,
     OrderModule,
     TaxModule,
   ],
