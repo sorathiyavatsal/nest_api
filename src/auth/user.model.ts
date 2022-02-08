@@ -74,6 +74,9 @@ export const UserSchema = new mongoose.Schema({
     modifiedBy: {
         type: ObjectId,
         ref: 'Users'
+    },
+    deviceId: {
+        type: String,
     }
    
 

@@ -259,16 +259,14 @@ export class AuthService {
             reject(new UnauthorizedException());
           }
           if (isMatch) {
-            this.userModel.updateOne(
+            this.userModel.findOneAndUpdate(
               { _id: userToAttempt._id },
               {
-                $push: {
-                  deviceId: authCredentialsDto.deviceId
-                },
-              }, 
-              { new: true, upsert: true }
+                deviceId: authCredentialsDto.deviceId.toString()
+              },
+              { upsert: true }
             ).then((errror) => {
-              console.log(errror)
+              console.log("errror", errror)
             });
 
             if (userToAttempt.emailVerified == false) {
@@ -287,7 +285,7 @@ export class AuthService {
             userLoginData.userId = userToAttempt._id;
             userLoginData.createdBy = userToAttempt._id;
             userLoginData.modifiedBy = userToAttempt._id;
-            userLoginData.deviceId = authCredentialsDto.deviceId;
+            userLoginData.deviceId = authCredentialsDto.deviceId.toString();
             userLoginData.attemptStatus = true;
             userLoginData.attemptError = '';
             userLoginData.loginTime = new Date();
@@ -299,7 +297,7 @@ export class AuthService {
             userLoginData.modifiedBy = userToAttempt._id;
             userLoginData.attemptStatus = false;
             userLoginData.attemptError = "Password don't match";
-            userLoginData.deviceId = authCredentialsDto.deviceId;
+            userLoginData.deviceId = authCredentialsDto.deviceId.toString();
             this.saveLoginRequest(userLoginData);
             reject(new BadRequestException(`Password don't match`));
           }
