@@ -11,7 +11,7 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'Category', schema: GoodsSchema },
+      { name: 'Goods', schema: GoodsSchema },
       { name: 'Weights', schema: WeightsSchema },
       { name: 'Packages', schema: PackagesSchema },
       

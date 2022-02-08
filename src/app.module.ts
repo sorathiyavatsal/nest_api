@@ -44,7 +44,6 @@ import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { TaxModule } from './tax/tax.module';
 import { PushNotificationModule } from './push-notification/push-notification.module';
-import { CronService } from './cron/cron.service';
 import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
@@ -115,7 +114,6 @@ import { ScheduleModule } from '@nestjs/schedule';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    CronService
   ],
 })
 export class AppModule {

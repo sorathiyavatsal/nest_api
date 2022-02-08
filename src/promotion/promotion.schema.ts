@@ -111,7 +111,7 @@ export interface Promotion extends mongoose.Document {
   coupoun_code: string;
   promotion_id: string;
   applicable_price: number;
-  coupon_id:mongoose.ObjectId;
+  coupon_id: object;
   promotion_end_date:Date;
 
 }

@@ -8,27 +8,27 @@ import { ConfigService } from 'src/core/config/config.service';
 export class GoodsService {
     constructor(
         private configService: ConfigService,
-        @InjectModel('Category') private CategoryModel: Model<Good>,
+        @InjectModel('Goods') private GoodsModel: Model<Good>,
         @InjectModel('Weights') private WeightModel: Model<Good>,
         @InjectModel('Packages') private PackageModel: Model<Good>,
     ) { }
-    async getActiveCategory(user: any) {
-        let categorys: any = await this.CategoryModel.find({ activeStatus: true });
+    async getActiveGoods(user: any) {
+        let goods: any = await this.GoodsModel.find({ activeStatus: true });
 
         let results: any = [];
-        for (let i = 0; i < categorys.length; i++) {
-            let element = categorys[i];
+        for (let i = 0; i < goods.length; i++) {
+            let element = goods[i];
             let extGet = ['jpg', 'png'];
             let filename = 'd';
             if (element.name) filename = element.name + '.png';
             if (element.image && element.image.path) filename = element.image.path;
             let weights: any = await this.WeightModel.aggregate([
-                { $match: { category: element._id } },
-                { $group: { _id: 'category', max_weight: { $max: '$to_weight' } } },
+                { $match: { goods: element._id } },
+                { $group: { _id: 'goods', max_weight: { $max: '$to_weight' } } },
             ]).limit(1);
             let packs: any = await this.PackageModel.aggregate([
-                { $match: { category: element._id } },
-                { $group: { _id: 'category', max_pack: { $max: '$to_pack' } } },
+                { $match: { goods: element._id } },
+                { $group: { _id: 'goods', max_pack: { $max: '$to_pack' } } },
             ]).limit(1);
             element.image = {
                 max_weight: weights,
@@ -37,16 +37,16 @@ export class GoodsService {
             };
             results.push(element);
         }
-        return categorys;
+        return goods;
     }
-    async getAllCategory(user: any) {
-        return this.CategoryModel.find({}).sort({ orderNumber: 1 });
+    async getAllGoods(user: any) {
+        return this.GoodsModel.find({}).sort({ orderNumber: 1 });
     }
-    async getCategoryDetail(id: any) {
-        return this.CategoryModel.findById(id);
+    async getGoodsDetail(id: any) {
+        return this.GoodsModel.findById(id);
     }
-    async updateCategory(id: string, securityDto: any, user: any) {
-        return this.CategoryModel.findOne({ _id: id }).then(
+    async updateGoods(id: string, securityDto: any, user: any) {
+        return this.GoodsModel.findOne({ _id: id }).then(
             data => {
                 data.name = securityDto.name;
                 data.activeStatus = securityDto.activeStatus;
@@ -63,8 +63,8 @@ export class GoodsService {
             },
         );
     }
-    async createCategory(securityDto: any, user: any) {
-        const newUser = new this.CategoryModel({
+    async createGoods(securityDto: any, user: any) {
+        const newUser = new this.GoodsModel({
             image: securityDto.image,
             name: securityDto.name,
             createdBy: user._id,
