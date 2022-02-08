@@ -23,18 +23,18 @@ export class GoodsController {
     constructor(private securityService: GoodsService) { }
 
     @Get('/all')
-    async getCategories(@Request() request) {
-        return await this.securityService.getAllCategory(request.user);
+    async getGoods(@Request() request) {
+        return await this.securityService.getAllGoods(request.user);
     }
-    @Get('/active-categories')
-    async getActiveCategories(@Request() request) {
-        return await this.securityService.getActiveCategory(request.user);
+    @Get('/active-goods')
+    async getActiveGoods(@Request() request) {
+        return await this.securityService.getActiveGoods(request.user);
     }
     @ApiParam({ name: 'id', required: true })
-    @Get('/categories/:id')
-    async getCategoryDetail(@Param() params, @Request() request: any) {
+    @Get('/goods/:id')
+    async getGoodsDetail(@Param() params, @Request() request: any) {
         console.log('weclome' + params.id);
-        return await this.securityService.getCategoryDetail(params.id);
+        return await this.securityService.getGoodsDetail(params.id);
     }
     @UseGuards(AuthGuard('jwt'))
     @Roles(Role.ADMIN)
@@ -43,7 +43,7 @@ export class GoodsController {
     @UseInterceptors(
         FileInterceptor('image', {
             // storage: diskStorage({
-            //   destination: './public/uploads/category',
+            //   destination: './public/uploads/goods',
             //   filename: function(req, file, cb) {
             //     let extArray = file.mimetype.split('/');
             //     let extension = extArray[extArray.length - 1];
@@ -71,12 +71,12 @@ export class GoodsController {
         summary:
             'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
     })
-    async addCategories(@UploadedFile() file, @Request() request) {
+    async addGoods(@UploadedFile() file, @Request() request) {
         if (file) {
             request.body.image = await toBase64(file);
         }
         console.log('boydydyddyd', request.body);
-        return await this.securityService.createCategory(
+        return await this.securityService.createGoods(
             request.body,
             request.user,
         );
@@ -89,7 +89,7 @@ export class GoodsController {
     @UseInterceptors(
         FileInterceptor('image', {
             // storage: diskStorage({
-            //   destination: './public/uploads/category',
+            //   destination: './public/uploads/goods',
             //   filename: function(req, file, cb) {
             //     let extArray = file.mimetype.split('/');
             //     let extension = extArray[extArray.length - 1];
@@ -117,7 +117,7 @@ export class GoodsController {
             'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
     })
     @ApiConsumes('multipart/form-data', 'application/json')
-    async updateCategories(
+    async updateGoods(
         @UploadedFile() file,
         @Param() params,
         @Request() request: any,
@@ -125,7 +125,7 @@ export class GoodsController {
         if (file) {
             request.body.image = await toBase64(file);
         }
-        return await this.securityService.updateCategory(
+        return await this.securityService.updateGoods(
             params.id,
             request.body,
             request.user,
@@ -134,13 +134,13 @@ export class GoodsController {
     @UseGuards(AuthGuard('jwt'))
     @Roles(Role.ADMIN)
     @ApiParam({ name: 'id', required: true })
-    @Get('/delete-categories/:id')
-    async deleteCategories(
+    @Get('/delete-goods/:id')
+    async deleteGoods(
         @Param() params,
         @Body() editSecurityDto: EditGoodsDto,
         @Request() request: any,
     ) {
-        return await this.securityService.updateCategory(
+        return await this.securityService.updateGoods(
             params.id,
             editSecurityDto,
             request.user,

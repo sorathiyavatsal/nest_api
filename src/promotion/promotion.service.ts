@@ -72,41 +72,40 @@ export class PromotionService {
       const promotion = await this.PromotionSchema.findOne({
         coupon_id,
       }).populate('coupon_id');
-
-      console.log(promotion)
-      // if (
-      //   new Date(promotion.promotion_end_date).getTime() < Date.now() ||
-      //   promotion.coupon_id.coupon_expiration < Date.now()
-      // ) {
-      //   if (promotion.promotion_type == 'flat') {
-      //     offer_price = promotion.promotion_flat_offer;
-      //     if (promotion.applicable_price >= couponBody.orderPrice) {
-      //       final_price = couponBody.orderPrice - offer_price;
-      //       return {
-      //         status: 200,
-      //         final_discount: final_price,
-      //       };
-      //     } else {
-      //       message = 'Coupon is Not valid for this order';
-      //       return new BadRequestException(message);
-      //     }
-      //   } else if (promotion.promotion_type == 'percentage') {
-      //     offer_price = promotion.promotion_percentage_offer;
-      //     if (promotion.applicable_price >= couponBody.orderPrice) {
-      //       final_price =
-      //         couponBody.orderPrice -
-      //         (couponBody.orderPrice * offer_price) / 100;
-      //       return {
-      //         status: 200,
-      //         final_discount: final_price,
-      //       };
-      //     } else {
-      //       message = 'Coupon is Not valid for this order';
-      //     }
-      //   }
-      // } else {
-      //   message = 'Coupon is Expired';
-      // }
+      
+      if (
+        new Date(promotion.promotion_end_date).getTime() < Date.now() ||
+        promotion.coupon_id['coupon_expiration'] < Date.now()
+      ) { 
+        if (promotion.promotion_type == 'flat') {
+          offer_price = promotion.promotion_flat_offer;
+          if (promotion.applicable_price >= couponBody.orderPrice) {
+            final_price = couponBody.orderPrice - offer_price;
+            return {
+              status: 200,
+              final_discount: final_price,
+            };
+          } else {
+            message = 'Coupon is Not valid for this order';
+            return new BadRequestException(message);
+          }
+        } else if (promotion.promotion_type == 'percentage') {
+          offer_price = promotion.promotion_percentage_offer;
+          if (promotion.applicable_price >= couponBody.orderPrice) {
+            final_price =
+              couponBody.orderPrice -
+              (couponBody.orderPrice * offer_price) / 100;
+            return {
+              status: 200,
+              final_discount: final_price,
+            };
+          } else {
+            message = 'Coupon is Not valid for this order';
+          }
+        }
+      } else {
+        message = 'Coupon is Expired';
+      }
     } catch (e) {
       return new BadRequestException(message);
     }
