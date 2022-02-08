@@ -6,7 +6,7 @@ export class EditWeightsDto {
    
     @IsString()
     @ApiProperty()
-    category: number;
+    category: string;
   
     @IsNumber()
     @ApiProperty()

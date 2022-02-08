@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-let Schema = mongoose.Schema,
+let Schema = mongoose.Types,
     ObjectId = Schema.ObjectId;
 export const GoodsSchema = new mongoose.Schema({
 

@@ -8,7 +8,6 @@ import { ConfigModule } from '../core/config/config.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DeliveryController } from './delivery.controller';
-import { MailerModule } from '@nest-modules/mailer';
 import { UserLoginSchema } from 'src/core/models/userLogin.model';
 import { UserVerificationSchema } from 'src/core/models/userVerification.model';
 import { JwtStrategy } from './jwt.strategy';

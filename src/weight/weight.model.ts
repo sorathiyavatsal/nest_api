@@ -1,7 +1,8 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-let Schema = mongoose.Schema,
- ObjectId = Schema.ObjectId;
+let Schema = mongoose.SchemaType,
+
+ObjectId = mongoose.Types.ObjectId;
 
 export const WeightsSchema = new mongoose.Schema(
          {

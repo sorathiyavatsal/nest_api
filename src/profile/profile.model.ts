@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { type } from 'os';
-let Schema = mongoose.Schema,
+let Schema = mongoose.Types,
   ObjectId = Schema.ObjectId;
 export const ProfileSchema = new mongoose.Schema(
   {
@@ -126,5 +126,13 @@ export interface Profile extends mongoose.Document {
   updatedAt: Date,
   createdAt: Date,
   createdBy: string,
-  modifiedBy: string
+  modifiedBy: string,
+  store_license_image: object,
+  aadhar_card_image: object,
+  pan_card_image: object,
+  vehicle_no: string,
+  driving_card: string,
+  vehicle_type: string,
+  vehicle_image: object,
+  driving_card_image: object
 }

@@ -9,7 +9,7 @@ export class EditPackagingsDto {
   
     @IsNumber()
     @ApiProperty()
-    rate: Number;
+    rate: number;
 
     @IsBoolean()
     @IsNotEmpty()

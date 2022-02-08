@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-let Schema = mongoose.Schema,
+let Schema = mongoose.Types,
  ObjectId = Schema.ObjectId;
 export const SettingsSchema = new mongoose.Schema(
   {

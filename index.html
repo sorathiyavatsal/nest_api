@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Websockets Client</title>
+    <link href="/styles.css" rel="stylesheet">
+    <link href="https://unpkg.com/vue-simple-notify/dist/vue-simple-notify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-simple-notify/dist/vue-simple-notify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+</head>
+
+<body>
+    <main id="v-app">
+        <section class="alerts">
+            <alerts-component :items="alerts"></alerts-component>
+        </section>
+        <section class="chat">
+            <h1>Websockets Tester</h1>
+            <form>
+                <input v-model="text" type="text" />
+                <button type="submit" @click.prevent="sendChatMessage()">Send</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        Vue.component('alerts-component', VueSimpleNotify.VueSimpleNotify);
+        var app = new Vue({
+            el: '#v-app',
+            data: {
+                username: '',
+                text: '',
+                messages: {
+                    general: [],
+                    typescript: [],
+                    nestjs: []
+                },
+                socket: { chat: null, alerts: null },
+                alerts: [],
+                activeRoom: 'general',
+                rooms: {
+                    general: false,
+                    typescript: false,
+                    nestjs: false
+                }
+            },
+            methods: {
+                sendChatMessage() {
+                    this.socket.chat = io.connect('http://localhost:5000/pushNotification', { transports : ['websocket'] });
+
+                    this.socket.chat.on('deliveryNotification', (room) => {
+                        this.rooms[room] = true;
+                    });
+                },
+            },
+        });
+
+    </script>
+</body>
+
+</html>

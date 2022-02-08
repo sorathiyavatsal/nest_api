@@ -7,7 +7,6 @@ import { EditSettingsDto } from './dto/edit-settings';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from './../core/middleware/send-email.middleware';
-import { UseRoles } from 'nest-access-control';
 @Injectable()
 export class SettingsService {
   constructor(
@@ -64,7 +63,6 @@ export class SettingsService {
                 delivery_service_array: securityDto.delivery_service_array,
               },
             },
-            { upsert: true },
           );
           console.log(res, 'resss');
         }

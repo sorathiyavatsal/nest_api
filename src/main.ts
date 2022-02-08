@@ -6,10 +6,11 @@ import { HttpExceptionFilter } from './core/filters/http.filter';
 import { FallbackExceptionFilter } from './core/filters/fallback.filter';
 import { join } from 'path';
 import { resolve } from 'path';
+
 const express = require('express')
 async function bootstrap() {
   
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const reflector = app.get<Reflector>(Reflector);
   app.useGlobalGuards();
   app.use('/public', express.static(join(__dirname, '..', 'public'))); 

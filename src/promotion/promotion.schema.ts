@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-let Schema = mongoose.Schema,
+let Schema = mongoose.Types,
   ObjectId = Schema.ObjectId;
 export const PromotionSchema = new mongoose.Schema(
   {
@@ -110,4 +110,8 @@ export interface Promotion extends mongoose.Document {
   coupoun_name: string;
   coupoun_code: string;
   promotion_id: string;
+  applicable_price: number;
+  coupon_id:mongoose.ObjectId;
+  promotion_end_date:Date;
+
 }

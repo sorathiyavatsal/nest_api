@@ -7,7 +7,6 @@ import { EditPackagesDto } from './dto/edit-packages';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
-import { UseRoles } from 'nest-access-control';
 @Injectable()
 export class PackageService {
     constructor(

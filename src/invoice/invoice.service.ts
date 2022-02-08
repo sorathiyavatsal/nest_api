@@ -79,7 +79,7 @@ export class InvoiceService {
         let distance = point1.distanceTo(point2, true)//output in kilometers
         order.distenance = distance;
         order.price = distance*15;
-        this.invoiceModel.findAndModify({_id:order._id},order,function(err:any,doc:any) {
+        this.invoiceModel.findOneAndUpdate({_id:order._id},order,function(err:any,doc:any) {
            return doc; 
         });
     }

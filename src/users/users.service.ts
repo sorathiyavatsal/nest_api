@@ -39,7 +39,7 @@ export class UsersService {
     async updateStatus(id:string,dto:any,user:any)
     {
         return await this.usersgetModel.findById(id).then(data=>{
-            data.activeStatus=dto.activeStatus;
+            data.activeStatus = dto.activeStatus;
             data.save();
             return data.toObject({ versionKey: false });
         })

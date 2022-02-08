@@ -13,6 +13,7 @@ import { HolidaysModule } from 'src/holiday/holiday.module';
 import { UserSchema } from 'src/auth/user.model';
 import { DeliveryLocationSchema } from './deliveryLocation.model';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
+import { UserLoginSchema } from 'src/core/models/userLogin.model';
 import { UserVerificationSchema } from 'src/core/models/userVerification.model';
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
       { name: 'Settings', schema: SettingsSchema},
       { name : 'Users', schema:UserSchema},
       { name : 'UserVerification', schema:UserVerificationSchema},
-      { name : 'DeliveryLocation', schema:DeliveryLocationSchema}
+      { name : 'DeliveryLocation', schema:DeliveryLocationSchema},
+      { name : 'UserLogin', schema:UserLoginSchema}
     ]),
     ConfigModule,
     HolidaysModule
