@@ -3,14 +3,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserLoginSchema } from 'src/core/models/userLogin.model';
 import { UserSchema } from 'src/auth/user.model';
 import { SettingsSchema } from '../settings/settings.model';
+import { DeliveryFleetSchema } from '../delivery_fleet/deliveryfleet.model';
 import { NotificationGateway } from './push-notification.gateway'
 
 @Module({
   imports: [
     MongooseModule.forFeature([
+      { name: 'DeliveryFleet', schema: DeliveryFleetSchema },
       { name: 'Settings', schema: SettingsSchema },
       { name: 'Users', schema: UserSchema },
-      { name: 'UserLogin', schema: UserLoginSchema }
+      { name: 'UserLogin', schema: UserLoginSchema },
     ]),
     NotificationGateway
   ],
