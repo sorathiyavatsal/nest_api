@@ -46,6 +46,7 @@
     "geoip-lite": "^1.4.3",
     "geopoint": "^1.0.1",
     "handlebars": "^4.7.7",
+    "https": "^1.0.0",
     "json2csv": "^5.0.6",
     "mongoose": "^6.2.0",
     "nest-winston": "^1.6.2",

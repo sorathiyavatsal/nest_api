@@ -7,10 +7,6 @@ import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import axios from 'axios'
 import delay from 'delay';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { DeliveryFleet } from '../delivery_fleet/deliveryfleet.model';
-
 @WebSocketGateway(5001, {
     cors: {
         origin: '*',
@@ -23,15 +19,18 @@ export class NotificationGateway {
     private axios = axios
     private jobStatus = false
     private deliveryAcceptBoy = {}
+    private delivery_fleet_id = ""
+    private token = ""
 
     @SubscribeMessage('deliveryNotification')
     async handleDeliveryNotification(client: Socket, payload: any): Promise<void> {
         try {
             const deliveryBoys = payload.deliveryBoys;
-
+            this.token = payload.token
+            this.delivery_fleet_id = payload.delivery_fleet_id
             const deliveryFleet = await axios({
                 method: "GET",
-                url: `http://localhost:5000/api/delivery-fleet/${payload.delivery_fleet_id}`,
+                url: `http://3.134.140.172:5000/api/delivery-fleet/${this.delivery_fleet_id}`,
                 headers: JSON.parse(JSON.stringify({
                     "Authorization": "Bearer " + payload.token
                 })),
@@ -59,8 +58,20 @@ export class NotificationGateway {
     }
 
     @SubscribeMessage('deliveryAccept')
-    async handleAcceptJob() {
+    async handleAcceptJob(client: Socket, payload: any) {
         this.jobStatus = true
+
+        await axios({
+            method: "PUT",
+            url: `http://3.134.140.172:5000/api/delivery-fleet/update/${this.delivery_fleet_id}`,
+            data: JSON.parse(JSON.stringify({
+                'invoiceStatus' : 'complete'
+            })),
+            headers: JSON.parse(JSON.stringify({
+                "Authorization": "Bearer " + this.token
+            })),
+        })
+        
         return this.deliveryAcceptBoy
     }
 
@@ -96,15 +107,15 @@ export class NotificationGateway {
                         }
                     },
                 },
-                registration_ids: ["dlfiJ2T0QeCBc55cVdwTKM:APA91bG1MdknQWqAfvanzOz-kyFGvnkpwMO3Cjs2GUynLKLoQz0AyRx16zGCrTyrzx7uQP4TEPa6jFXbUGvX2wXKL6iFLsRROrRL7pWPrBp7lZkz4wMzqxzJhbOZe7VRHJVhihxIR_Sr"]
-                //registration_ids: [deliveryBoy.deviceId]
+                // registration_ids: ["dlfiJ2T0QeCBc55cVdwTKM:APA91bG1MdknQWqAfvanzOz-kyFGvnkpwMO3Cjs2GUynLKLoQz0AyRx16zGCrTyrzx7uQP4TEPa6jFXbUGvX2wXKL6iFLsRROrRL7pWPrBp7lZkz4wMzqxzJhbOZe7VRHJVhihxIR_Sr"]
+                registration_ids: [deliveryBoy.deviceId]
             }))
-            // const data = await axios({
-            //     method: "POST",
-            //     url: "https://fcm.googleapis.com/fcm/send",
-            //     data: body,
-            //     headers: headers,
-            // })
+            const data = await axios({
+                method: "POST",
+                url: "https://fcm.googleapis.com/fcm/send",
+                data: body,
+                headers: headers,
+            })
         } catch (error) {
             this.logger.log(error.message)
         }
