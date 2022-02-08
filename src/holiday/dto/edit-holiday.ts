@@ -9,11 +9,11 @@ export class EditHolidaysDto {
   
     @IsString()
     @ApiProperty()
-    fromDate: Date;
+    fromDate: string;
 
     @IsString()
     @ApiProperty()
-    toDate: Date;
+    toDate: string;
 
     @IsBoolean()
     @IsNotEmpty()

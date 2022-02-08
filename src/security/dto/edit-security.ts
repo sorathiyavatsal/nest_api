@@ -15,7 +15,7 @@ export class EditSecurityDto {
     @IsBoolean()
     @IsNotEmpty()
     @ApiProperty()
-    activeStatus: string;
+    activeStatus: boolean;
 
     
 }

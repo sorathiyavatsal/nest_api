@@ -1,7 +1,7 @@
 import { verify } from 'jsonwebtoken';
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-let Schema = mongoose.Schema,
+let Schema = mongoose.Types,
  ObjectId = Schema.ObjectId;
 export const UserSchema = new mongoose.Schema({
     userId: {
@@ -53,15 +53,7 @@ export const UserSchema = new mongoose.Schema({
         type: String
     },
     loc:{
-        type: {
-            type: String, 
-            enum: ['Point'], 
-            
-          },
-          coordinates: {
-            type: [Number],
-            
-          }
+        type: Array,
     },
     activeStatus: {
         type: Boolean,
@@ -127,6 +119,7 @@ export interface User extends mongoose.Document {
     fullName:string,
     role:string,
     userId:string,
+    deviceId:string,
     updatedAt:Date,
     createdAt:Date,
     createdBy:string,
@@ -134,6 +127,10 @@ export interface User extends mongoose.Document {
     modifiedBy:string,
     liveStatus:boolean,
     phoneVerified:boolean,
-    permissions:object
+    permissions:object,
+    loc:object,
+    activeStatus:boolean,
+    password:string,
+    verifyStatus: boolean,
 }
 

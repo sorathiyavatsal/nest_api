@@ -7,7 +7,6 @@ import { EditWeightsDto } from './dto/edit-weight';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
-import { UseRoles } from 'nest-access-control';
 @Injectable()
 export class WeightsService {
     constructor(
@@ -34,7 +33,7 @@ export class WeightsService {
     {
         return this.WeightsModel.findOne({_id:id}).then((data)=>{
             
-            data.category=weightDto.category;
+            data.category= weightDto.category;
             data.from_weight=weightDto.from_weight;
             data.to_weight=weightDto.to_weight;
             data.rate=weightDto.rate;

@@ -17,7 +17,7 @@ export class EditPackagesDto {
 
     @IsNumber()
     @ApiProperty()
-    rate: Number;
+    rate: number;
     
     @IsBoolean()
     @IsNotEmpty()

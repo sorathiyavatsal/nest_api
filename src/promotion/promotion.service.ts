@@ -6,7 +6,6 @@ import { Model } from 'mongoose';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from './../core/middleware/send-email.middleware';
-import { UseRoles } from 'nest-access-control';
 import { WeightsSchema } from 'src/weight/weight.model';
 import { PackagesSchema } from 'src/packages/packages.model';
 import { toBase64 } from 'utils/common';
@@ -73,39 +72,41 @@ export class PromotionService {
       const promotion = await this.PromotionSchema.findOne({
         coupon_id,
       }).populate('coupon_id');
-      if (
-        promotion.promotion_end_date < Date.now() ||
-        promotion.coupon_id.coupon_expiration < Date.now()
-      ) {
-        if (promotion.promotion_type == 'flat') {
-          offer_price = promotion.promotion_flat_offer;
-          if (promotion.applicable_price >= couponBody.orderPrice) {
-            final_price = couponBody.orderPrice - offer_price;
-            return {
-              status: 200,
-              final_discount: final_price,
-            };
-          } else {
-            message = 'Coupon is Not valid for this order';
-            return new BadRequestException(message);
-          }
-        } else if (promotion.promotion_type == 'percentage') {
-          offer_price = promotion.promotion_percentage_offer;
-          if (promotion.applicable_price >= couponBody.orderPrice) {
-            final_price =
-              couponBody.orderPrice -
-              (couponBody.orderPrice * offer_price) / 100;
-            return {
-              status: 200,
-              final_discount: final_price,
-            };
-          } else {
-            message = 'Coupon is Not valid for this order';
-          }
-        }
-      } else {
-        message = 'Coupon is Expired';
-      }
+
+      console.log(promotion)
+      // if (
+      //   new Date(promotion.promotion_end_date).getTime() < Date.now() ||
+      //   promotion.coupon_id.coupon_expiration < Date.now()
+      // ) {
+      //   if (promotion.promotion_type == 'flat') {
+      //     offer_price = promotion.promotion_flat_offer;
+      //     if (promotion.applicable_price >= couponBody.orderPrice) {
+      //       final_price = couponBody.orderPrice - offer_price;
+      //       return {
+      //         status: 200,
+      //         final_discount: final_price,
+      //       };
+      //     } else {
+      //       message = 'Coupon is Not valid for this order';
+      //       return new BadRequestException(message);
+      //     }
+      //   } else if (promotion.promotion_type == 'percentage') {
+      //     offer_price = promotion.promotion_percentage_offer;
+      //     if (promotion.applicable_price >= couponBody.orderPrice) {
+      //       final_price =
+      //         couponBody.orderPrice -
+      //         (couponBody.orderPrice * offer_price) / 100;
+      //       return {
+      //         status: 200,
+      //         final_discount: final_price,
+      //       };
+      //     } else {
+      //       message = 'Coupon is Not valid for this order';
+      //     }
+      //   }
+      // } else {
+      //   message = 'Coupon is Expired';
+      // }
     } catch (e) {
       return new BadRequestException(message);
     }

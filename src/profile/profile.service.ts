@@ -7,7 +7,6 @@ import { EditProfileDto } from './dto/edit-profile';
 import { v5 as uuidv5 } from 'uuid';
 import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
-import { UseRoles } from 'nest-access-control';
 import { ObjectUnsubscribedError } from 'rxjs';
 let  ObjectId = require('mongodb').ObjectId;
 @Injectable()

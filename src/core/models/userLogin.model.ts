@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-let Schema = mongoose.Schema,
+let Schema = mongoose.Types,
  ObjectId = Schema.ObjectId;
 export const UserLoginSchema = new mongoose.Schema({
     browser: {
@@ -17,6 +17,9 @@ export const UserLoginSchema = new mongoose.Schema({
     device: {
         type: Object,
        
+    },
+    deviceId: {
+        type: String,
     },
     redirectUrl: {
         type: String,

@@ -1,7 +1,5 @@
 import * as mongoose from 'mongoose';
-import * as bcrypt from 'bcrypt';
-let Schema = mongoose.Schema,
- ObjectId = Schema.ObjectId;
+let ObjectId = mongoose.Types.ObjectId;
 export const DeliveryFleetSchema = new mongoose.Schema({
     fromName: {
         type: String,
@@ -210,6 +208,4 @@ export interface DeliveryFleet extends mongoose.Document {
     totalHrs:string,
     createdBy:string,
     modifiedBy:string
-   
-    
 }

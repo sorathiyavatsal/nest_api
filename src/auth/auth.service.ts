@@ -43,7 +43,6 @@ export class AuthService {
     private configService: ConfigService,
     private securityService: SecurityService,
   ) {
-    
   }
   async validateApiKey(key: any) {
     return await this.securityService.validateApiKey(key);
@@ -53,34 +52,34 @@ export class AuthService {
     else return false;
   }
   async createmobileUser(userCredentialsDto: MangerDeliveryCredentialsDto, req: any) {
-    
     if (!userCredentialsDto.verifyType) {
       return new BadRequestException('Verification type is required');
     }
     let userToAttempt = await this.findOneByPhone(userCredentialsDto.phoneNumber);
     if (userToAttempt) {
-      
-      if(userCredentialsDto.deliveryId)
-    {
-       console.log(userCredentialsDto.deliveryId)
-     let updateUser:any= await this.deliveryfleetModel.findOneAndUpdate({_id:userCredentialsDto.deliveryId},{$set:{
-         userId:userToAttempt._id,
-         createdBy:userToAttempt._id,
-         modifiedBy:userToAttempt._id
-       }},{upsert: true});
-       console.log(updateUser)
-    }
-      let userotp: any = await this.loginVerificationSmsOtp(req,userToAttempt);
+
+      if (userCredentialsDto.deliveryId) {
+        console.log(userCredentialsDto.deliveryId)
+        let updateUser: any = await this.deliveryfleetModel.findOneAndUpdate({ _id: userCredentialsDto.deliveryId }, {
+          $set: {
+            userId: userToAttempt._id,
+            createdBy: userToAttempt._id,
+            modifiedBy: userToAttempt._id
+          }
+        }, { upsert: true });
+        console.log(updateUser)
+      }
+      let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
       return { user: userToAttempt, message: 'Verification sent to mobile' };
     }
     let findroles = this.findRole(userCredentialsDto.role);
     if (!findroles) userCredentialsDto.role = 'USER';
-    let usersCount = await this.userModel.estimatedDocumentCount()+1;
+    let usersCount = await this.userModel.estimatedDocumentCount() + 1;
     let today = new Date().toISOString().substr(0, 10);
     let todayDate = today.replace(/-/g, '');
-    let reDigit = usersCount.length;
-    
-   
+    let reDigit = usersCount;
+
+
     let userId = todayDate + usersCount;
     const newUser = new this.userModel({
       userId: userId,
@@ -102,15 +101,16 @@ export class AuthService {
         otp: Math.floor(1000 + Math.random() * 9000),
       });
       newTokenVerifyEmail.save();
-      if(userCredentialsDto.deliveryId)
-    {
-      console.log(userCredentialsDto.deliveryId)
-       this.deliveryfleetModel.findOneAndUpdate({_id:userCredentialsDto.deliveryId},{$set:{
-         userId:user._id,
-         createdBy:user._id,
-         modifiedBy:user._id
-       }},{upsert: true});
-    }
+      if (userCredentialsDto.deliveryId) {
+        console.log(userCredentialsDto.deliveryId)
+        this.deliveryfleetModel.findOneAndUpdate({ _id: userCredentialsDto.deliveryId }, {
+          $set: {
+            userId: user._id,
+            createdBy: user._id,
+            modifiedBy: user._id
+          }
+        }, { upsert: true });
+      }
       this.sendEmailMiddleware.sensSMS(
         req.headers['OsName'],
         user.phoneNumber,
@@ -122,7 +122,7 @@ export class AuthService {
       return { user: user.toObject({ versionKey: false }) };
     });
   }
-  async loginVerificationSmsOtp(req:any,user: any) {
+  async loginVerificationSmsOtp(req: any, user: any) {
     let verifiedTemplate = 'loginsms';
     const newTokenVerifyEmail = new this.userVerificationModel({
       verificationType: 'sms',
@@ -143,15 +143,15 @@ export class AuthService {
 
     return newTokenVerifyEmail;
   }
-  async createUser(userCredentialsDto: UserCredentialsDto,req:any) {
+  async createUser(userCredentialsDto: UserCredentialsDto, req: any) {
     let userToAttempt = await this.findOneByEmail(userCredentialsDto.email);
     if (!userToAttempt) {
       let findroles = this.findRole(userCredentialsDto.role);
       if (!findroles) userCredentialsDto.role = 'USER';
-      let usersCount = await this.userModel.estimatedDocumentCount()+1;
+      let usersCount = await this.userModel.estimatedDocumentCount() + 1;
       let today = new Date().toISOString().substr(0, 10);
       let todayDate = today.replace(/-/g, '');
-      let reDigit = usersCount.length;
+      let reDigit = usersCount;
 
       let userId = todayDate + usersCount;
       const newUser = new this.userModel({
@@ -234,7 +234,6 @@ export class AuthService {
     console.log(userLoginData)
     return userLoginData;
   }
-  
   async validateUserByPassword(
     authCredentialsDto: AuthCredentialsDto,
     request: any,
@@ -260,6 +259,18 @@ export class AuthService {
             reject(new UnauthorizedException());
           }
           if (isMatch) {
+            this.userModel.updateOne(
+              { _id: userToAttempt._id },
+              {
+                $push: {
+                  deviceId: authCredentialsDto.deviceId
+                },
+              }, 
+              { new: true, upsert: true }
+            ).then((errror) => {
+              console.log(errror)
+            });
+
             if (userToAttempt.emailVerified == false) {
               userLoginData.userId = userToAttempt._id;
               userLoginData.createdBy = userToAttempt._id;
@@ -276,6 +287,7 @@ export class AuthService {
             userLoginData.userId = userToAttempt._id;
             userLoginData.createdBy = userToAttempt._id;
             userLoginData.modifiedBy = userToAttempt._id;
+            userLoginData.deviceId = authCredentialsDto.deviceId;
             userLoginData.attemptStatus = true;
             userLoginData.attemptError = '';
             userLoginData.loginTime = new Date();
@@ -287,6 +299,7 @@ export class AuthService {
             userLoginData.modifiedBy = userToAttempt._id;
             userLoginData.attemptStatus = false;
             userLoginData.attemptError = "Password don't match";
+            userLoginData.deviceId = authCredentialsDto.deviceId;
             this.saveLoginRequest(userLoginData);
             reject(new BadRequestException(`Password don't match`));
           }
@@ -302,7 +315,7 @@ export class AuthService {
   }
   async forgotPassword(
     forgotPasswordCredentialsDto: ForgotPasswordCredentialsDto,
-    req:any,
+    req: any,
   ) {
     let userToAttempt: any = await this.findOneByEmail(
       forgotPasswordCredentialsDto.email,
@@ -493,8 +506,7 @@ export class AuthService {
               data.verifiedStatus = true;
               data.verifiedTime = new Date();
               data.save();
-              if(userToAttempt.role=="DELIVERY")
-              {
+              if (userToAttempt.role == "DELIVERY") {
                 return { user: data, token: userToken, message: 'Welcome Back!' }
               }
               else if (userToAttempt.fullName && userToAttempt.fullName != '') {

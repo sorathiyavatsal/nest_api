@@ -1,6 +1,5 @@
 import {
   Module,
-  NestModule,
   MiddlewareConsumer,
   RequestMethod,
 } from '@nestjs/common';
@@ -10,7 +9,6 @@ import { ConfigService } from './core/config/config.service';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import * as winston from 'winston';
 import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
@@ -45,12 +43,15 @@ import { GoodsModule } from './goods/goods.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { TaxModule } from './tax/tax.module';
-
+import { PushNotificationModule } from './push-notification/push-notification.module';
+import { CronService } from './cron/cron.service';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     MulterModule.register({
       dest: './public/uploads',
     }),
+    ScheduleModule.forRoot(),
     ConfigModule,
     MailerModule.forRoot({
       transport:
@@ -106,6 +107,7 @@ import { TaxModule } from './tax/tax.module';
     PromotionModule,
     OrderModule,
     TaxModule,
+    PushNotificationModule,
   ],
   controllers: [],
   providers: [
@@ -113,6 +115,7 @@ import { TaxModule } from './tax/tax.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    CronService
   ],
 })
 export class AppModule {

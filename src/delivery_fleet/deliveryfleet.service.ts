@@ -17,6 +17,7 @@ import { throws } from 'assert';
 import { User } from "../auth/user.model";
 import { UserVerification } from 'src/core/models/userVerification.model';
 import { DeliveryLocation } from './deliveryLocation.model';
+import { UserLogin } from 'src/core/models/userLogin.model';
 import { identity } from 'rxjs';
 const GeoPoint = require('geopoint');
 let  ObjectId = require('mongodb').ObjectId;
@@ -33,7 +34,8 @@ export class DeliveryFleetService {
         @InjectModel('Holidays') private holidaysModel: Model<Holidays>,
         @InjectModel('Settings') private SettingsModel: Model<Settings>,
         @InjectModel('Users') private UserModel: Model<User>,
-        @InjectModel('DeliveryLocation') private LocationModel :  Model<DeliveryLocation>
+        @InjectModel('DeliveryLocation') private LocationModel :  Model<DeliveryLocation>,
+        @InjectModel('UserLogin') private UserLogin :  Model<UserLogin>
     ){
       
     }
@@ -111,16 +113,19 @@ export class DeliveryFleetService {
             minDis = min_dis_data.column_value;
             
         }
-        let deliveryBoy: any = await this.UserModel.find(
-            {role:'DELIVERY',
-            loc:
+
+        let deliveryBoy = await this.UserModel.find(
             {
-                $geoWithin: { 
-                    $centerSphere: [ [ parseInt(order.fromLat) , parseInt(order.fromLng) ],maxDis/3959]
+                role:'DELIVERY',
+                loc:
+                {
+                    $geoWithin: { 
+                        $centerSphere: [ [ parseFloat(order.fromLat) , parseFloat(order.fromLng) ], maxDis/3963.2]
                     }
-                
+                }
             }
-        })
+        );
+
         return {boys:deliveryBoy,dto:order,max:maxDis};
     }
     async updateLocationDeliveryFleet(id: any, dto: any, req: any, user:any) {

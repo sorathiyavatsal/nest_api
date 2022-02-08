@@ -1,11 +1,11 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { HttpExceptionFilter } from './core/filters/http.filter';
 import { FallbackExceptionFilter } from './core/filters/fallback.filter';
 import { join } from 'path';
 import { resolve } from 'path';
+
 const express = require('express')
 async function bootstrap() {
   

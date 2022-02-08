@@ -2,7 +2,7 @@ import { IsString,  IsEmail, IsNotEmpty, IsBoolean, IsNumber,  IsDateString, IsD
 import { ApiProperty,ApiParam} from '@nestjs/swagger';
 
 
-export class DeliveryDistanceDto {
+export class DeliveryBoyNotificationDto {
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
