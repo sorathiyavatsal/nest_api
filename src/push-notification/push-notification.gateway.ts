@@ -23,7 +23,7 @@ export class NotificationGateway {
     private token = ""
 
     @SubscribeMessage('deliveryNotification')
-    async handleDeliveryNotification(client: Socket, payload: any): Promise<void> {
+    async handleDeliveryNotification(client: Socket, payload: any): Promise<Object> {
         try {
             const deliveryBoys = payload.deliveryBoys;
             this.token = payload.token
@@ -41,7 +41,7 @@ export class NotificationGateway {
                     while (i < deliveryBoys.length) {
                         this.deliveryAcceptBoy = deliveryBoys[i]
                         if (this.jobStatus) {
-                            break;
+                            return this.deliveryAcceptBoy
                         }
                         this.sendPushNotification(deliveryBoys[i], deliveryFleet.data);
                         i++;
@@ -89,26 +89,19 @@ export class NotificationGateway {
             }))
             const body = JSON.parse(JSON.stringify({
                 notification: {
-                    title: "You got new Job",
-                    body: {
-                        distance: deliveryFleet.distance,
-                        price: deliveryFleet.price,
-                        fromLocation: {
-                            Address: deliveryFleet.fromAddress,
-                            Zipcode: deliveryFleet.fromZipcode,
-                            Lat: deliveryFleet.fromLat,
-                            Lng: deliveryFleet.fromLng,
-                        },
-                        toLocation: {
-                            Address: deliveryFleet.toAddress,
-                            Zipcode: deliveryFleet.toZipcode,
-                            Lat: deliveryFleet.toLat,
-                            Lng: deliveryFleet.toLng,
-                        }
-                    },
+                    title: "Byecom JOB notification",
+                    body: "You got new Job",
                 },
-                // registration_ids: ["dlfiJ2T0QeCBc55cVdwTKM:APA91bG1MdknQWqAfvanzOz-kyFGvnkpwMO3Cjs2GUynLKLoQz0AyRx16zGCrTyrzx7uQP4TEPa6jFXbUGvX2wXKL6iFLsRROrRL7pWPrBp7lZkz4wMzqxzJhbOZe7VRHJVhihxIR_Sr"]
-                registration_ids: [deliveryBoy.deviceId]
+                registration_ids: [deliveryBoy.deviceId],
+                data: JSON.stringify({
+                    distance: deliveryFleet.distance,
+                    price: deliveryFleet.price,
+                    fromLocation: {
+                        Address: deliveryFleet.fromAddress,
+                        Lat: deliveryFleet.fromLat,
+                        Lng: deliveryFleet.fromLng,
+                    }
+                })
             }))
             const data = await axios({
                 method: "POST",

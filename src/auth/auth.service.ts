@@ -259,15 +259,18 @@ export class AuthService {
             reject(new UnauthorizedException());
           }
           if (isMatch) {
-            this.userModel.findOneAndUpdate(
-              { _id: userToAttempt._id },
-              {
-                deviceId: authCredentialsDto.deviceId.toString()
-              },
-              { upsert: true }
-            ).then((errror) => {
-              console.log("errror", errror)
-            });
+              if(authCredentialsDto.deviceId) {
+                this.userModel.findOneAndUpdate(
+                    { _id: userToAttempt._id },
+                    {
+                      deviceId: authCredentialsDto.deviceId.toString()
+                    },
+                    { upsert: true }
+                  ).then((errror) => {
+                    console.log("errror", errror)
+                  });
+                  userLoginData.deviceId = authCredentialsDto.deviceId.toString();
+              }
 
             if (userToAttempt.emailVerified == false) {
               userLoginData.userId = userToAttempt._id;
@@ -285,7 +288,6 @@ export class AuthService {
             userLoginData.userId = userToAttempt._id;
             userLoginData.createdBy = userToAttempt._id;
             userLoginData.modifiedBy = userToAttempt._id;
-            userLoginData.deviceId = authCredentialsDto.deviceId.toString();
             userLoginData.attemptStatus = true;
             userLoginData.attemptError = '';
             userLoginData.loginTime = new Date();
