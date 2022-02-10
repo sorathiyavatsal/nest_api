@@ -12,8 +12,6 @@ export class AuthCredentialsDto {
     @ApiProperty()
     password: string;
 
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty()
     deviceId: string;
 }
