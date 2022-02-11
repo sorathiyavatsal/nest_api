@@ -7,14 +7,11 @@ import { ConfigModule } from '../core/config/config.module';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: 'Weights', schema: WeightsSchema }
-      
-    ]),
-    ConfigModule
+    MongooseModule.forFeature([{ name: 'Weights', schema: WeightsSchema }]),
+    ConfigModule,
   ],
   controllers: [WeightsController],
   providers: [WeightsService, SendEmailMiddleware],
-  exports:[WeightsService]
+  exports: [WeightsService],
 })
 export class WeightsModule {}

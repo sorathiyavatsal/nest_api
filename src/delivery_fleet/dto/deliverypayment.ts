@@ -1,11 +1,17 @@
-import { IsString,  IsEmail, IsNotEmpty, IsBoolean, IsNumber,  IsDateString, IsDate } from 'class-validator';
-import { ApiProperty,ApiParam} from '@nestjs/swagger';
-
+import {
+  IsString,
+  IsEmail,
+  IsNotEmpty,
+  IsBoolean,
+  IsNumber,
+  IsDateString,
+  IsDate,
+} from 'class-validator';
+import { ApiProperty, ApiParam } from '@nestjs/swagger';
 
 export class DeliveryPaymentUpdateDto {
-    @IsNumber()
-    @IsNotEmpty()
-    @ApiProperty()
-    deliverChargeType: string;
-    
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty()
+  deliverChargeType: string;
 }

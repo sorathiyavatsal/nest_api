@@ -8,29 +8,32 @@ export class AppLogger implements LoggerService {
   }
   initializeLogger(label?: string) {
     this.logger = winston.createLogger({
-       level: 'info',
+      level: 'info',
       transports: [
         new winston.transports.File({
-          filename: './logs/warn.log', level: 'warn', format: winston.format.combine(
-            winston.format.timestamp(),
-          ),
+          filename: './logs/warn.log',
+          level: 'warn',
+          format: winston.format.combine(winston.format.timestamp()),
         }),
         new winston.transports.File({
-          filename: './logs/error.log', level: 'error', format: winston.format.combine(
-            winston.format.timestamp(),
-          ),
+          filename: './logs/error.log',
+          level: 'error',
+          format: winston.format.combine(winston.format.timestamp()),
         }),
         new winston.transports.File({
-           filename: './logs/info.log', level: 'info', format: winston.format.combine(
-            winston.format.timestamp(),
-          ),
-        })
-      ]
-    })
-  
+          filename: './logs/info.log',
+          level: 'info',
+          format: winston.format.combine(winston.format.timestamp()),
+        }),
+      ],
+    });
   }
   error(message: string, trace: string) {
-    this.logger.error("error", `${new Date().toLocaleString()}` + message, trace);
+    this.logger.error(
+      'error',
+      `${new Date().toLocaleString()}` + message,
+      trace,
+    );
   }
 
   warn(message: string) {
@@ -38,7 +41,6 @@ export class AppLogger implements LoggerService {
   }
 
   log(message: string) {
-     this.logger.log('info',`${new Date().toLocaleString()}` +  message);
+    this.logger.log('info', `${new Date().toLocaleString()}` + message);
   }
- 
 }

@@ -11,13 +11,13 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
   imports: [
     MongooseModule.forFeature([
       { name: 'Invoice', schema: InvoiceSchema },
-      { name: 'Holidays', schema: HolidaysSchema}
+      { name: 'Holidays', schema: HolidaysSchema },
     ]),
     ConfigModule,
-    HolidaysModule
+    HolidaysModule,
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService, SendEmailMiddleware],
-  exports:[InvoiceService]
+  exports: [InvoiceService],
 })
 export class InvoiceModule {}

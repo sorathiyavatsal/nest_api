@@ -1,38 +1,49 @@
 import {
-    Controller,
-    SetMetadata,
-    Request,
-    Get,
-    Post,
-    Body,
-    Put,
-    ValidationPipe,
-    Query,
-    Req,
-    Res,
-    Param,
-    UseGuards,
-    UseInterceptors,
-    UploadedFile,
-    UploadedFiles,
-    Delete,
-  } from '@nestjs/common';
-  import { request } from 'http';
-  import { CouponsService } from './coupons.service';
-  import { toBase64 } from 'utils/common';
-  import { AuthGuard } from '@nestjs/passport';
-  import { Roles } from '../auth/roles.decorator';
-  import { Role } from '../auth/role.enum';
-  import { FileInterceptor, FilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'
-  import { ApiBody } from '@nestjs/swagger';
-  import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+  Controller,
+  SetMetadata,
+  Request,
+  Get,
+  Post,
+  Body,
+  Put,
+  ValidationPipe,
+  Query,
+  Req,
+  Res,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
+  Delete,
+} from '@nestjs/common';
+import { request } from 'http';
+import { CouponsService } from './coupons.service';
+import { toBase64 } from 'utils/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/role.enum';
+import {
+  FileInterceptor,
+  FilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
+import { ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiProperty,
+  ApiSecurity,
+  ApiBearerAuth,
+  ApiParam,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { error } from 'console';
 
 @Controller('coupons')
 @ApiTags('Coupons')
 @ApiBearerAuth()
 @ApiSecurity('api_key')
-
 export class CouponsController {
   constructor(private CouponsService: CouponsService) {}
   //find all coupons here

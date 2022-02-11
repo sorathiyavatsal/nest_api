@@ -25,9 +25,21 @@ import { toBase64 } from 'utils/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
-import { FileInterceptor, FilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'
+import {
+  FileInterceptor,
+  FilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { ApiBody } from '@nestjs/swagger';
-import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiProperty,
+  ApiSecurity,
+  ApiBearerAuth,
+  ApiParam,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { response } from 'express';
 @Controller('promotion')
 @ApiTags('Promotion')

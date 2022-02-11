@@ -2,85 +2,74 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { type } from 'os';
 let Schema = mongoose.Types,
- ObjectId = Schema.ObjectId;
-export const ProfileDeliveryBoySchema = new mongoose.Schema({
-    
-    full_time:{ type: Boolean, default: false},
+  ObjectId = Schema.ObjectId;
+export const ProfileDeliveryBoySchema = new mongoose.Schema(
+  {
+    full_time: { type: Boolean, default: false },
 
-    part_time:{ type: Boolean, default: false},
+    part_time: { type: Boolean, default: false },
 
     profile_photo: {
-        type: Object,
-        
+      type: Object,
     },
     gender: {
-        type: String,
-        enum : ['Male','Female','Others'],
-        
+      type: String,
+      enum: ['Male', 'Female', 'Others'],
     },
     dob: {
-        type: Date,
-        required: false
+      type: Date,
+      required: false,
     },
 
-
     adharcard_no: {
-        type: Object,
-        
+      type: Object,
     },
 
     pancard_no: {
-        type: Object,
+      type: Object,
     },
 
     driving_license_no: {
-        type: Object,
+      type: Object,
     },
 
-    vehicle : {type: String,
-    enum : ['by_cycle','car','bus']
-    },
+    vehicle: { type: String, enum: ['by_cycle', 'car', 'bus'] },
 
     vehicle_rc_no: {
-        type: Object,
+      type: Object,
     },
 
-
-
-    activeStatus:
-    {
-        type:Boolean,
-        default:true
+    activeStatus: {
+      type: Boolean,
+      default: true,
     },
     createdBy: {
-        type: ObjectId,
-        ref: 'Users'
+      type: ObjectId,
+      ref: 'Users',
     },
     modifiedBy: {
-        type: ObjectId,
-        ref: 'Users'
-    }
-    
-    
-}, { timestamps: true });
+      type: ObjectId,
+      ref: 'Users',
+    },
+  },
+  { timestamps: true },
+);
 
 export interface ProfileDeliveryBoy extends mongoose.Document {
-    _id: string;
-    full_time:boolean,
-    paart_time:boolean,
-    profile_photo: object,
-    gender: string,
-    dob: Date,
-    adharcard_no: object,
-    pancard_no: object,
-    driving_license_no: object,
-    vehicle:string,
-    vehicle_rc_no:object,
-    activeStatus:boolean,
-    updatedAt:Date,
-    createdAt:Date,
-    createdBy:string,
-    modifiedBy:string
-    
-    
+  _id: string;
+  full_time: boolean;
+  paart_time: boolean;
+  profile_photo: object;
+  gender: string;
+  dob: Date;
+  adharcard_no: object;
+  pancard_no: object;
+  driving_license_no: object;
+  vehicle: string;
+  vehicle_rc_no: object;
+  activeStatus: boolean;
+  updatedAt: Date;
+  createdAt: Date;
+  createdBy: string;
+  modifiedBy: string;
 }

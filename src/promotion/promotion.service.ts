@@ -72,11 +72,11 @@ export class PromotionService {
       const promotion = await this.PromotionSchema.findOne({
         coupon_id,
       }).populate('coupon_id');
-      
+
       if (
         new Date(promotion.promotion_end_date).getTime() < Date.now() ||
         promotion.coupon_id['coupon_expiration'] < Date.now()
-      ) { 
+      ) {
         if (promotion.promotion_type == 'flat') {
           offer_price = promotion.promotion_flat_offer;
           if (promotion.applicable_price >= couponBody.orderPrice) {
@@ -133,7 +133,7 @@ export class PromotionService {
       (user: any) => {
         return user.toObject({ versionKey: false });
       },
-      error => {
+      (error) => {
         let msg = 'Invalid Request!';
         if (error.errmsg) msg = error.errmsg;
         return new BadRequestException(msg);

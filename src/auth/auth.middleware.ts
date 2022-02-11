@@ -1,6 +1,11 @@
 import { AuthService } from './auth.service';
 import { verify } from 'jsonwebtoken';
-import { NestMiddleware, Injectable,UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import {
+  NestMiddleware,
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from '../auth/jwt-payload.interface';

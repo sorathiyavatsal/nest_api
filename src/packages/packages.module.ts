@@ -7,14 +7,11 @@ import { ConfigModule } from '../core/config/config.module';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: 'Packages', schema: PackagesSchema }
-      
-    ]),
-    ConfigModule
+    MongooseModule.forFeature([{ name: 'Packages', schema: PackagesSchema }]),
+    ConfigModule,
   ],
   controllers: [PackagesController],
   providers: [PackageService, SendEmailMiddleware],
-  exports:[PackageService]
+  exports: [PackageService],
 })
 export class PackagesModule {}

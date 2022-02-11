@@ -13,7 +13,7 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
 import { JwtStrategy } from './jwt.strategy';
 import { ConfigService } from '../core/config/config.service';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
-import { ApiKeyStrategy  } from './auth-header-api-key.strategy';
+import { ApiKeyStrategy } from './auth-header-api-key.strategy';
 import { SecurityModule } from 'src/security/security.module';
 import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
 @Module({
@@ -22,8 +22,7 @@ import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
       { name: 'User', schema: UserSchema },
       { name: 'UserVerification', schema: UserVerificationSchema },
       { name: 'UserLogin', schema: UserLoginSchema },
-      { name: 'DeliveryFleet',schema:DeliveryFleetSchema}
-      
+      { name: 'DeliveryFleet', schema: DeliveryFleetSchema },
     ]),
     PassportModule.register({ defaultStrategy: 'jwt', session: true }),
     JwtModule.registerAsync({
@@ -31,18 +30,18 @@ import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
       useFactory: async (configService: ConfigService) => ({
         secretOrPrivateKey: configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get('EXPIRES_IN')
-        }
+          expiresIn: configService.get('EXPIRES_IN'),
+        },
       }),
       inject: [ConfigService],
     }),
     SecurityModule,
     DeliveryFleetModule,
-   
-    ConfigModule
+
+    ConfigModule,
   ],
-  providers: [AuthService, JwtStrategy, SendEmailMiddleware,ApiKeyStrategy ],
-  controllers: [AuthController,DeliveryController],
-  exports: [AuthService,ApiKeyStrategy]
+  providers: [AuthService, JwtStrategy, SendEmailMiddleware, ApiKeyStrategy],
+  controllers: [AuthController, DeliveryController],
+  exports: [AuthService, ApiKeyStrategy],
 })
-export class AuthModule { }
+export class AuthModule {}

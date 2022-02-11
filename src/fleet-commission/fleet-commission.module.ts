@@ -4,6 +4,6 @@ import { FleetCommissionService } from './fleet-commission.service';
 
 @Module({
   controllers: [FleetCommissionController],
-  providers: [FleetCommissionService]
+  providers: [FleetCommissionService],
 })
 export class FleetCommissionModule {}
