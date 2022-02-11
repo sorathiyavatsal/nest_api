@@ -1,5 +1,22 @@
-import { Controller, SetMetadata, Request,Get, Post, Body, Delete, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { SettingsService} from "./setting.service"
+import {
+  Controller,
+  SetMetadata,
+  Request,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Put,
+  ValidationPipe,
+  Query,
+  Req,
+  Res,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import { SettingsService } from './setting.service';
 import {
   ApiTags,
   ApiProperty,
@@ -49,7 +66,7 @@ export class SettingsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
@@ -72,7 +89,7 @@ export class SettingsController {
   @Roles(Role.ADMIN)
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'zip_code' })
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @Put('/update/:id')
   @ApiBody({
     schema: {
@@ -82,7 +99,7 @@ export class SettingsController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   async updateSettings(
     @Param() params,
     @Query() query,
@@ -99,7 +116,7 @@ export class SettingsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', required: true })
   @Delete('/delete/:id')
   async deleteSettings(@Param() params, @Request() request: any) {
@@ -108,19 +125,27 @@ export class SettingsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', required: true })
   @Put('/tax/:id')
-  async taxSettings(@Param() params,@Body() CreateTaxSettingsDto: CreateTaxSettingsDto, @Request() request: any) {
+  async taxSettings(
+    @Param() params,
+    @Body() CreateTaxSettingsDto: CreateTaxSettingsDto,
+    @Request() request: any,
+  ) {
     return await this.securityService.taxSettings(params.id);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', required: true })
   @Put('/order/:id')
-  async orderSettings(@Param() params,@Body() CreateOrderSettingsDto: CreateOrderSettingsDto, @Request() request: any) {
+  async orderSettings(
+    @Param() params,
+    @Body() CreateOrderSettingsDto: CreateOrderSettingsDto,
+    @Request() request: any,
+  ) {
     return await this.securityService.orderSettings(params.id);
   }
 }

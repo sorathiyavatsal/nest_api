@@ -10,53 +10,54 @@ import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Injectable()
 export class PackagingsService {
-    constructor(
-        private configService:ConfigService,
-        private sendEmailMiddleware: SendEmailMiddleware,
-        @InjectModel('Packagings') private PackagingsModel: Model<Packagings>
-    ){
+  constructor(
+    private configService: ConfigService,
+    private sendEmailMiddleware: SendEmailMiddleware,
+    @InjectModel('Packagings') private PackagingsModel: Model<Packagings>,
+  ) {}
 
-    }
-    
-    
-    async getAllPackagings(user:any)
-    {
-      return  this.PackagingsModel.find({});  
-    }
-    async getPackagingsDetail(id:any)
-    {
-      return  this.PackagingsModel.findById(id);  
-    }  
-    async updatePackagings(id:string,PackagingsDto:EditPackagingsDto,user:any)
-    {
-        return this.PackagingsModel.findById({_id:id}).then((data)=>{
-            data.category = PackagingsDto.category;
-            data.rate = PackagingsDto.rate;
-            data.modifiedBy = user._id;
-            data.activeStatus  = PackagingsDto.activeStatus;
-            data.save();
-            return data.toObject({ versionKey: false });
-        },error=>{
-            let msg='Invalid Request!';
-            if(error.errmsg) msg=error.errmsg
-            return new BadRequestException(msg);
-        });
-    }
-    async createPackagings(PackagingsDto:CreatePackagingsDto,user:any)
-    {
-        
-        const newUser = new this.PackagingsModel(PackagingsDto);
-        return await newUser.save().then((user:any) => {
-            
-            return user.toObject({ versionKey: false });
-        },error=>{
-            let msg='Invalid Request!';
-            if(error.errmsg) msg=error.errmsg
-            return new BadRequestException(msg);
-        });
-    }
+  async getAllPackagings(user: any) {
+    return this.PackagingsModel.find({});
+  }
+  async getPackagingsDetail(id: any) {
+    return this.PackagingsModel.findById(id);
+  }
+  async updatePackagings(
+    id: string,
+    PackagingsDto: EditPackagingsDto,
+    user: any,
+  ) {
+    return this.PackagingsModel.findById({ _id: id }).then(
+      (data) => {
+        data.category = PackagingsDto.category;
+        data.rate = PackagingsDto.rate;
+        data.modifiedBy = user._id;
+        data.activeStatus = PackagingsDto.activeStatus;
+        data.save();
+        return data.toObject({ versionKey: false });
+      },
+      (error) => {
+        let msg = 'Invalid Request!';
+        if (error.errmsg) msg = error.errmsg;
+        return new BadRequestException(msg);
+      },
+    );
+  }
+  async createPackagings(PackagingsDto: CreatePackagingsDto, user: any) {
+    const newUser = new this.PackagingsModel(PackagingsDto);
+    return await newUser.save().then(
+      (user: any) => {
+        return user.toObject({ versionKey: false });
+      },
+      (error) => {
+        let msg = 'Invalid Request!';
+        if (error.errmsg) msg = error.errmsg;
+        return new BadRequestException(msg);
+      },
+    );
+  }
 
-    async deletePackagings(id:string): Promise<any> {
-        return await this.PackagingsModel.findByIdAndRemove(id);
-    }
+  async deletePackagings(id: string): Promise<any> {
+    return await this.PackagingsModel.findByIdAndRemove(id);
+  }
 }

@@ -14,12 +14,11 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
       { name: 'Goods', schema: GoodsSchema },
       { name: 'Weights', schema: WeightsSchema },
       { name: 'Packages', schema: PackagesSchema },
-      
     ]),
-    ConfigModule
+    ConfigModule,
   ],
   controllers: [GoodsController],
   providers: [GoodsService, SendEmailMiddleware],
-  exports:[GoodsService]
+  exports: [GoodsService],
 })
 export class GoodsModule {}

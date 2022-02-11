@@ -32,7 +32,8 @@ const DeviceDetector = require('node-device-detector');
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel('DeliveryFleet') private deliveryfleetModel: Model<DeliveryFleet>,
+    @InjectModel('DeliveryFleet')
+    private deliveryfleetModel: Model<DeliveryFleet>,
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('UserLogin') private UserLoginModel: Model<UserLogin>,
     @InjectModel('UserVerification')
@@ -42,8 +43,7 @@ export class AuthService {
     private sendEmailMiddleware: SendEmailMiddleware,
     private configService: ConfigService,
     private securityService: SecurityService,
-  ) {
-  }
+  ) {}
   async validateApiKey(key: any) {
     return await this.securityService.validateApiKey(key);
   }
@@ -51,34 +51,41 @@ export class AuthService {
     if (Object.values(Role).includes(key)) return true;
     else return false;
   }
-  async createmobileUser(userCredentialsDto: MangerDeliveryCredentialsDto, req: any) {
+  async createmobileUser(
+    userCredentialsDto: MangerDeliveryCredentialsDto,
+    req: any,
+  ) {
     if (!userCredentialsDto.verifyType) {
       return new BadRequestException('Verification type is required');
     }
-    let userToAttempt = await this.findOneByPhone(userCredentialsDto.phoneNumber);
+    let userToAttempt = await this.findOneByPhone(
+      userCredentialsDto.phoneNumber,
+    );
     if (userToAttempt) {
-
       if (userCredentialsDto.deliveryId) {
-        console.log(userCredentialsDto.deliveryId)
-        let updateUser: any = await this.deliveryfleetModel.findOneAndUpdate({ _id: userCredentialsDto.deliveryId }, {
-          $set: {
-            userId: userToAttempt._id,
-            createdBy: userToAttempt._id,
-            modifiedBy: userToAttempt._id
-          }
-        }, { upsert: true });
-        console.log(updateUser)
+        console.log(userCredentialsDto.deliveryId);
+        let updateUser: any = await this.deliveryfleetModel.findOneAndUpdate(
+          { _id: userCredentialsDto.deliveryId },
+          {
+            $set: {
+              userId: userToAttempt._id,
+              createdBy: userToAttempt._id,
+              modifiedBy: userToAttempt._id,
+            },
+          },
+          { upsert: true },
+        );
+        console.log(updateUser);
       }
       let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
       return { user: userToAttempt, message: 'Verification sent to mobile' };
     }
     let findroles = this.findRole(userCredentialsDto.role);
     if (!findroles) userCredentialsDto.role = 'USER';
-    let usersCount = await this.userModel.estimatedDocumentCount() + 1;
+    let usersCount = (await this.userModel.estimatedDocumentCount()) + 1;
     let today = new Date().toISOString().substr(0, 10);
     let todayDate = today.replace(/-/g, '');
     let reDigit = usersCount;
-
 
     let userId = todayDate + usersCount;
     const newUser = new this.userModel({
@@ -89,7 +96,7 @@ export class AuthService {
       phoneNumber: userCredentialsDto.phoneNumber,
     });
 
-    return await newUser.save().then(user => {
+    return await newUser.save().then((user) => {
       let verifiedTemplate = 'register';
       if (user.verifyType != 'email') verifiedTemplate = 'registersms';
       const newTokenVerifyEmail = new this.userVerificationModel({
@@ -102,21 +109,25 @@ export class AuthService {
       });
       newTokenVerifyEmail.save();
       if (userCredentialsDto.deliveryId) {
-        console.log(userCredentialsDto.deliveryId)
-        this.deliveryfleetModel.findOneAndUpdate({ _id: userCredentialsDto.deliveryId }, {
-          $set: {
-            userId: user._id,
-            createdBy: user._id,
-            modifiedBy: user._id
-          }
-        }, { upsert: true });
+        console.log(userCredentialsDto.deliveryId);
+        this.deliveryfleetModel.findOneAndUpdate(
+          { _id: userCredentialsDto.deliveryId },
+          {
+            $set: {
+              userId: user._id,
+              createdBy: user._id,
+              modifiedBy: user._id,
+            },
+          },
+          { upsert: true },
+        );
       }
       this.sendEmailMiddleware.sensSMS(
         req.headers['OsName'],
         user.phoneNumber,
         newTokenVerifyEmail.otp,
         user.role,
-        false
+        false,
       );
 
       return { user: user.toObject({ versionKey: false }) };
@@ -148,7 +159,7 @@ export class AuthService {
     if (!userToAttempt) {
       let findroles = this.findRole(userCredentialsDto.role);
       if (!findroles) userCredentialsDto.role = 'USER';
-      let usersCount = await this.userModel.estimatedDocumentCount() + 1;
+      let usersCount = (await this.userModel.estimatedDocumentCount()) + 1;
       let today = new Date().toISOString().substr(0, 10);
       let todayDate = today.replace(/-/g, '');
       let reDigit = usersCount;
@@ -163,7 +174,7 @@ export class AuthService {
         phoneNumber: userCredentialsDto.phoneNumber,
       });
 
-      return await newUser.save().then(user => {
+      return await newUser.save().then((user) => {
         let verifiedTemplate = 'register';
         if (user.verifyType != 'email') verifiedTemplate = 'registersms';
         const newTokenVerifyEmail = new this.userVerificationModel({
@@ -200,7 +211,7 @@ export class AuthService {
     }
   }
   async userLoginToken(user: any, request: any) {
-    let userLoginData: any = this.userDeviceData(request)
+    let userLoginData: any = this.userDeviceData(request);
     const payload: any = {
       token: this.createJwtPayload(user),
     };
@@ -211,7 +222,7 @@ export class AuthService {
     userLoginData.attemptError = '';
     userLoginData.loginTime = new Date();
     this.saveLoginRequest(userLoginData);
-    return payload
+    return payload;
   }
   async userDeviceData(request: any) {
     let geo: any = request.ip;
@@ -220,18 +231,26 @@ export class AuthService {
       'Mozilla/5.0 (Linux; Android 5.0; NX505J Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.78 Mobile Safari/537.36';
     const results = detector.detect(userAgent);
 
-
     const resultOs = detector.parseOs(userAgent);
     const resultClient = detector.parseClient(userAgent);
-    const resultDeviceType = detector.parseDeviceType(userAgent, resultOs, resultClient, {});
-    const result: any = Object.assign({ os: resultOs }, { client: resultClient }, { device: resultDeviceType });
+    const resultDeviceType = detector.parseDeviceType(
+      userAgent,
+      resultOs,
+      resultClient,
+      {},
+    );
+    const result: any = Object.assign(
+      { os: resultOs },
+      { client: resultClient },
+      { device: resultDeviceType },
+    );
     let userLoginData: any = {
       device: result.device,
       ipAddress: geo,
       result: result.device,
       browser: request.headers['user-agent'],
     };
-    console.log(userLoginData)
+    console.log(userLoginData);
     return userLoginData;
   }
   async validateUserByPassword(
@@ -241,7 +260,7 @@ export class AuthService {
     let userToAttempt: any = await this.findOneByEmail(
       authCredentialsDto.email,
     );
-    let userLoginData: any = this.userDeviceData(request)
+    let userLoginData: any = this.userDeviceData(request);
     if (!userToAttempt) {
       userLoginData.attemptStatus = false;
       userLoginData.attemptError = 'Email not found !';
@@ -259,18 +278,20 @@ export class AuthService {
             reject(new UnauthorizedException());
           }
           if (isMatch) {
-              if(authCredentialsDto.deviceId) {
-                this.userModel.findOneAndUpdate(
-                    { _id: userToAttempt._id },
-                    {
-                      deviceId: authCredentialsDto.deviceId.toString()
-                    },
-                    { upsert: true }
-                  ).then((errror) => {
-                    console.log("errror", errror)
-                  });
-                  userLoginData.deviceId = authCredentialsDto.deviceId.toString();
-              }
+            if (authCredentialsDto.deviceId) {
+              this.userModel
+                .findOneAndUpdate(
+                  { _id: userToAttempt._id },
+                  {
+                    deviceId: authCredentialsDto.deviceId.toString(),
+                  },
+                  { upsert: true },
+                )
+                .then((errror) => {
+                  console.log('errror', errror);
+                });
+              userLoginData.deviceId = authCredentialsDto.deviceId.toString();
+            }
 
             if (userToAttempt.emailVerified == false) {
               userLoginData.userId = userToAttempt._id;
@@ -308,7 +329,7 @@ export class AuthService {
     });
   }
   async saveLoginRequest(data: any) {
-    console.log(data)
+    console.log(data);
     let userLoginModel = new this.UserLoginModel(data);
     userLoginModel.save();
     // return userLoginModel;
@@ -425,7 +446,7 @@ export class AuthService {
       return await this.userModel
         .findOne({ email: resetPasswordCredentialsDto.email })
         .then(
-          userToAttempt => {
+          (userToAttempt) => {
             passwordTokenData.verifiedStatus = true;
             passwordTokenData.verifiedTime = new Date();
             passwordTokenData.save();
@@ -433,7 +454,7 @@ export class AuthService {
             userToAttempt.save();
             return { msg: 'Password  is successfully updated!' };
           },
-          error => {
+          (error) => {
             throw new BadRequestException('Email not found !');
           },
         );
@@ -442,26 +463,22 @@ export class AuthService {
     }
   }
   async profileUpdate(
-    userId: any, accountSetupDto: AccountSetupDto, request: any
+    userId: any,
+    accountSetupDto: AccountSetupDto,
+    request: any,
   ) {
-
     if (accountSetupDto.email && accountSetupDto.email != '') {
-      let existUser = await this.findOneByEmail(accountSetupDto.email)
-      if (existUser)
-        return new BadRequestException(
-          'Email already exist!'
-        );
+      let existUser = await this.findOneByEmail(accountSetupDto.email);
+      if (existUser) return new BadRequestException('Email already exist!');
     }
-    let user: any = await this.findOneById(userId)
+    let user: any = await this.findOneById(userId);
     if (!user) throw new BadRequestException('User not found !');
     if (accountSetupDto.email && accountSetupDto.email != '') {
-      user.email = accountSetupDto.email
+      user.email = accountSetupDto.email;
     }
     user.fullName = accountSetupDto.fullName;
-    let userToken: any = await this.userLoginToken(user, request)
-    let userData = this.userModel
-      .findByIdAndUpdate(user._id, user)
-      .exec();
+    let userToken: any = await this.userLoginToken(user, request);
+    let userData = this.userModel.findByIdAndUpdate(user._id, user).exec();
 
     let userLoginData: any = this.userDeviceData(request);
 
@@ -472,13 +489,11 @@ export class AuthService {
     userLoginData.attemptError = '';
     userLoginData.loginTime = new Date();
     this.saveLoginRequest(userLoginData);
-    return { user: user, token: userToken.token, message: 'Welcome Back!' }
-
-
+    return { user: user, token: userToken.token, message: 'Welcome Back!' };
   }
   async verifyOtpBySms(
     emailVerifyCredentialsDto: OtpVerifyCredentialsDto,
-    res: any
+    res: any,
   ) {
     try {
       let userToAttempt, errorMsgNotFound, successMsg: any;
@@ -486,11 +501,11 @@ export class AuthService {
       userToAttempt = await this.userModel.findOne({
         phoneNumber: emailVerifyCredentialsDto.phone,
       });
-      errorMsgNotFound = 'Phone number not found !'
+      errorMsgNotFound = 'Phone number not found !';
       successMsg = 'Phone verification is successfully!';
 
       if (!userToAttempt) throw new BadRequestException(errorMsgNotFound);
-      let userToken: any = await this.userLoginToken(userToAttempt, res)
+      let userToken: any = await this.userLoginToken(userToAttempt, res);
       return this.userVerificationModel
         .findOne({
           createdUser: userToAttempt._id,
@@ -498,31 +513,40 @@ export class AuthService {
           verifiedStatus: false,
         })
         .then(
-          data => {
+          (data) => {
             if (data) {
               let userData = this.userModel
-                .findByIdAndUpdate(userToAttempt._id, { emailVerified: true, phoneVerified: true })
+                .findByIdAndUpdate(userToAttempt._id, {
+                  emailVerified: true,
+                  phoneVerified: true,
+                })
                 .exec();
               data.verifiedStatus = true;
               data.verifiedTime = new Date();
               data.save();
-              if (userToAttempt.role == "DELIVERY") {
-                return { user: data, token: userToken, message: 'Welcome Back!' }
+              if (userToAttempt.role == 'DELIVERY') {
+                return {
+                  user: data,
+                  token: userToken,
+                  message: 'Welcome Back!',
+                };
+              } else if (
+                userToAttempt.fullName &&
+                userToAttempt.fullName != ''
+              ) {
+                return {
+                  user: data,
+                  token: userToken,
+                  message: 'Welcome Back!',
+                };
+              } else {
+                return { user: data, message: 'Set up your byecom account!' };
               }
-              else if (userToAttempt.fullName && userToAttempt.fullName != '') {
-
-                return { user: data, token: userToken, message: 'Welcome Back!' }
-              }
-              else {
-
-                return { user: data, message: "Set up your byecom account!" }
-              }
-
             } else {
               return new BadRequestException('Verification code is invalid!');
             }
           },
-          error => {
+          (error) => {
             return new BadRequestException('Verification code is invalid!');
           },
         );
@@ -530,23 +554,20 @@ export class AuthService {
       return new BadRequestException('Internal server error');
     }
   }
-  async verifyTokenByEmail(
-    emailVerifyCredentialsDto: any,
-  ) {
+  async verifyTokenByEmail(emailVerifyCredentialsDto: any) {
     try {
       let userToAttempt, errorMsgNotFound, successMsg: any;
       if (emailVerifyCredentialsDto.email) {
         userToAttempt = await this.userModel.findOne({
           email: emailVerifyCredentialsDto.email,
         });
-        errorMsgNotFound = 'Email not found !'
+        errorMsgNotFound = 'Email not found !';
         successMsg = 'Email verification is successfully!';
-      }
-      else {
+      } else {
         userToAttempt = await this.userModel.findOne({
           phoneNumber: emailVerifyCredentialsDto.phone,
         });
-        errorMsgNotFound = 'Phone number not found !'
+        errorMsgNotFound = 'Phone number not found !';
         successMsg = 'Phone verification is successfully!';
       }
       if (!userToAttempt) throw new BadRequestException(errorMsgNotFound);
@@ -558,7 +579,7 @@ export class AuthService {
           verifiedStatus: false,
         })
         .then(
-          data => {
+          (data) => {
             if (data) {
               let userData = this.userModel
                 .findByIdAndUpdate(userToAttempt._id, { emailVerified: true })
@@ -571,7 +592,7 @@ export class AuthService {
               return new BadRequestException('Verification code is invalid!');
             }
           },
-          error => {
+          (error) => {
             return new BadRequestException('Verification code is invalid!');
           },
         );

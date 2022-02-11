@@ -19,21 +19,21 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
   imports: [
     MongooseModule.forFeature([
       { name: 'DeliveryFleet', schema: DeliveryFleetSchema },
-      { name: 'Holidays', schema: HolidaysSchema},
-      { name: 'Weights', schema: WeightsSchema},
-      { name: 'Packages', schema: PackagesSchema},
-      { name: 'Packagings', schema: PackagingsSchema},
-      { name: 'Settings', schema: SettingsSchema},
-      { name : 'Users', schema:UserSchema},
-      { name : 'UserVerification', schema:UserVerificationSchema},
-      { name : 'DeliveryLocation', schema:DeliveryLocationSchema},
-      { name : 'UserLogin', schema:UserLoginSchema}
+      { name: 'Holidays', schema: HolidaysSchema },
+      { name: 'Weights', schema: WeightsSchema },
+      { name: 'Packages', schema: PackagesSchema },
+      { name: 'Packagings', schema: PackagingsSchema },
+      { name: 'Settings', schema: SettingsSchema },
+      { name: 'Users', schema: UserSchema },
+      { name: 'UserVerification', schema: UserVerificationSchema },
+      { name: 'DeliveryLocation', schema: DeliveryLocationSchema },
+      { name: 'UserLogin', schema: UserLoginSchema },
     ]),
     ConfigModule,
-    HolidaysModule
+    HolidaysModule,
   ],
   controllers: [DeliveryFleetController],
   providers: [DeliveryFleetService, SendEmailMiddleware],
-  exports:[DeliveryFleetService]
+  exports: [DeliveryFleetService],
 })
 export class DeliveryFleetModule {}

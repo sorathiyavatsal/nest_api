@@ -1,8 +1,4 @@
-import {
-  Module,
-  MiddlewareConsumer,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from './core/config/config.module';
 import { ConfigService } from './core/config/config.service';

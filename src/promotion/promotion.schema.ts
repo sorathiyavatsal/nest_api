@@ -16,13 +16,13 @@ export const PromotionSchema = new mongoose.Schema(
     promotion_content_type: {
       type: String,
     },
-    coupon_id:{
-     type:ObjectId,
-     ref:"Coupons",
+    coupon_id: {
+      type: ObjectId,
+      ref: 'Coupons',
     },
-    applicable_price:{
-      type:Number,
-      required:true,
+    applicable_price: {
+      type: Number,
+      required: true,
     },
     merchant_id: {
       type: ObjectId,
@@ -44,24 +44,24 @@ export const PromotionSchema = new mongoose.Schema(
       type: String,
       enum: ['flat', 'percentage'],
     },
-    promotion_target_user_no:{
-        type: Number
+    promotion_target_user_no: {
+      type: Number,
     },
-    promotion_flat_offer:{
-        type: Number
+    promotion_flat_offer: {
+      type: Number,
     },
-    promotion_condition_offer:{
-        type: Object
+    promotion_condition_offer: {
+      type: Object,
     },
-    promotion_percentage_offer:{
-        type: Number
+    promotion_percentage_offer: {
+      type: Number,
     },
-    promotion_used_user_no:{
-        type: Number
+    promotion_used_user_no: {
+      type: Number,
     },
-    promotion_applied_by:{
-        type: Array,
-        ref: "User"
+    promotion_applied_by: {
+      type: Array,
+      ref: 'User',
     },
     promotion_target_filters: {
       type: Object,
@@ -75,20 +75,20 @@ export const PromotionSchema = new mongoose.Schema(
       type: String,
       enum: ['gender', 'location', 'age'],
     },
-    promotion_target_gender:{
-        type: String
+    promotion_target_gender: {
+      type: String,
     },
-    promotion_target_location:{
-        type: String
+    promotion_target_location: {
+      type: String,
     },
-    promotion_target_age:{
-        type: String
+    promotion_target_age: {
+      type: String,
     },
-    promotion_start_date:{
-        type: Date,
+    promotion_start_date: {
+      type: Date,
     },
-    promotion_end_date:{
-        type: Date,
+    promotion_end_date: {
+      type: Date,
     },
     createdBy: {
       type: ObjectId,
@@ -112,6 +112,5 @@ export interface Promotion extends mongoose.Document {
   promotion_id: string;
   applicable_price: number;
   coupon_id: object;
-  promotion_end_date:Date;
-
+  promotion_end_date: Date;
 }

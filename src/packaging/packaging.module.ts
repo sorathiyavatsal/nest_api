@@ -8,13 +8,12 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'Packagings', schema: PackagingsSchema }
-      
+      { name: 'Packagings', schema: PackagingsSchema },
     ]),
-    ConfigModule
+    ConfigModule,
   ],
   controllers: [PackagingsController],
   providers: [PackagingsService, SendEmailMiddleware],
-  exports:[PackagingsService]
+  exports: [PackagingsService],
 })
 export class PackagingsModule {}

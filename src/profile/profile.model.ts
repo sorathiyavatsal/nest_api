@@ -109,30 +109,30 @@ export const ProfileSchema = new mongoose.Schema(
 
 export interface Profile extends mongoose.Document {
   _id: string;
-  profile_photo: object,
-  gender: string,
-  dob: Date,
-  fullName: string,
-  shop_name: string,
-  shop_address: string,
-  sell_items: string,
-  adharcard_no: string,
-  pancard_no: string,
-  gst_no: string,
-  store_license: string,
-  bank_details: object,
-  services_area: object,
-  activeStatus: boolean,
-  updatedAt: Date,
-  createdAt: Date,
-  createdBy: string,
-  modifiedBy: string,
-  store_license_image: object,
-  aadhar_card_image: object,
-  pan_card_image: object,
-  vehicle_no: string,
-  driving_card: string,
-  vehicle_type: string,
-  vehicle_image: object,
-  driving_card_image: object
+  profile_photo: object;
+  gender: string;
+  dob: Date;
+  fullName: string;
+  shop_name: string;
+  shop_address: string;
+  sell_items: string;
+  adharcard_no: string;
+  pancard_no: string;
+  gst_no: string;
+  store_license: string;
+  bank_details: object;
+  services_area: object;
+  activeStatus: boolean;
+  updatedAt: Date;
+  createdAt: Date;
+  createdBy: string;
+  modifiedBy: string;
+  store_license_image: object;
+  aadhar_card_image: object;
+  pan_card_image: object;
+  vehicle_no: string;
+  driving_card: string;
+  vehicle_type: string;
+  vehicle_image: object;
+  driving_card_image: object;
 }

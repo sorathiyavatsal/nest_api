@@ -1,111 +1,117 @@
-import { IsString, IsEmail, IsNotEmpty, IsBoolean, IsNumber, IsDateString, IsDate, IsISBN } from 'class-validator';
-import { ApiProperty,ApiParam } from '@nestjs/swagger';
+import {
+  IsString,
+  IsEmail,
+  IsNotEmpty,
+  IsBoolean,
+  IsNumber,
+  IsDateString,
+  IsDate,
+  IsISBN,
+} from 'class-validator';
+import { ApiProperty, ApiParam } from '@nestjs/swagger';
 
 export class EditDeliveryFleetDto {
-   
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    fromName: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    fromAddress: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    fromZipcode: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    fromLat: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    fromLng: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    fromPhone: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  fromName: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  fromAddress: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  fromZipcode: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  fromLat: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  fromLng: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  fromPhone: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  toName: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  toAddress: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  toZipcode: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  toLat: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  toLng: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  toPhone: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    toName: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    toAddress: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    toZipcode: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    toLat: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    toLng: string;
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    toPhone: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  goods: string;
 
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty()
+  numberofPack: number;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    goods: string;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    @ApiProperty()
-    numberofPack: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty()
+  weightPack: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @ApiProperty()
-    weightPack: number;
+  @IsString()
+  @ApiProperty()
+  pickupType: string;
 
-    @IsString()
-    @ApiProperty()
-    pickupType: string;
+  @IsDate()
+  @ApiProperty()
+  pickupDate: Date;
 
-    @IsDate()
-    @ApiProperty()
-    pickupDate: Date;
-   
-    @IsString()
-    @ApiProperty()
-    pickupTime: string;
+  @IsString()
+  @ApiProperty()
+  pickupTime: string;
 
-    @IsString()
-    @ApiProperty()
-    cor: string;
-   
-    @IsBoolean()
-    @IsNotEmpty()
-    @ApiProperty()
-    deliverChargeType: string;
+  @IsString()
+  @ApiProperty()
+  cor: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    invoiceStatus: string;
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty()
+  deliverChargeType: string;
 
-    @IsBoolean()
-    @IsNotEmpty()
-    @ApiProperty()
-    activeStatus: boolean;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  invoiceStatus: string;
 
-    @IsString()
-    @ApiProperty()
-    distance: string;
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty()
+  activeStatus: boolean;
 
-    @IsNumber()
-    @ApiProperty()
-    price: number;
+  @IsString()
+  @ApiProperty()
+  distance: string;
+
+  @IsNumber()
+  @ApiProperty()
+  price: number;
 }

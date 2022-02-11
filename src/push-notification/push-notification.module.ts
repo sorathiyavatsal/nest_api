@@ -4,7 +4,7 @@ import { UserLoginSchema } from 'src/core/models/userLogin.model';
 import { UserSchema } from 'src/auth/user.model';
 import { SettingsSchema } from '../settings/settings.model';
 import { DeliveryFleetSchema } from '../delivery_fleet/deliveryfleet.model';
-import { NotificationGateway } from './push-notification.gateway'
+import { NotificationGateway } from './push-notification.gateway';
 
 @Module({
   imports: [
@@ -14,9 +14,9 @@ import { NotificationGateway } from './push-notification.gateway'
       { name: 'Users', schema: UserSchema },
       { name: 'UserLogin', schema: UserLoginSchema },
     ]),
-    NotificationGateway
+    NotificationGateway,
   ],
   controllers: [],
   providers: [],
 })
-export class PushNotificationModule { }
+export class PushNotificationModule {}

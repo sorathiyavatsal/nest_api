@@ -7,15 +7,11 @@ import { ConfigModule } from '../core/config/config.module';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: 'Profile', schema: ProfileSchema }
-      
-      
-    ]),
-    ConfigModule
+    MongooseModule.forFeature([{ name: 'Profile', schema: ProfileSchema }]),
+    ConfigModule,
   ],
   controllers: [ProfileController],
   providers: [ProfileService, SendEmailMiddleware],
-  exports:[ProfileService]
+  exports: [ProfileService],
 })
 export class ProfileModule {}

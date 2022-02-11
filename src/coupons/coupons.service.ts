@@ -35,7 +35,7 @@ export class CouponsService {
       (user: any) => {
         return user.toObject({ versionKey: false });
       },
-      error => {
+      (error) => {
         let msg = 'Invalid Request!';
         if (error.errmsg) msg = error.errmsg;
         console.log(error);

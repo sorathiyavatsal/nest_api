@@ -1,77 +1,85 @@
-import { IsString, IsEmail, IsNotEmpty, IsBoolean,IsNumber ,  IsDateString, IsDate} from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsNotEmpty,
+  IsBoolean,
+  IsNumber,
+  IsDateString,
+  IsDate,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProfileDto {
-         @IsString()
-         @ApiProperty()
-         profile_photo: string;
+  @IsString()
+  @ApiProperty()
+  profile_photo: string;
 
-         @IsString()
-         @ApiProperty()
-         gender: string;
+  @IsString()
+  @ApiProperty()
+  gender: string;
 
-         @IsString()
-         @ApiProperty()
-         fullName: string;
+  @IsString()
+  @ApiProperty()
+  fullName: string;
 
-         @IsString()
-         @ApiProperty()
-         job_type: string;
+  @IsString()
+  @ApiProperty()
+  job_type: string;
 
-         @IsString()
-         @ApiProperty()
-         store_license: string;
+  @IsString()
+  @ApiProperty()
+  store_license: string;
 
-         @IsString()
-         @ApiProperty()
-         services_area: object;
+  @IsString()
+  @ApiProperty()
+  services_area: object;
 
-         @IsDate()
-         @ApiProperty()
-         dob: Date;
+  @IsDate()
+  @ApiProperty()
+  dob: Date;
 
-         @IsString()
-         @ApiProperty()
-         shop_name: string;
+  @IsString()
+  @ApiProperty()
+  shop_name: string;
 
-         @IsString()
-         @ApiProperty()
-         shop_address: string;
+  @IsString()
+  @ApiProperty()
+  shop_address: string;
 
-         @IsString()
-         @ApiProperty()
-         sell_items: string;
+  @IsString()
+  @ApiProperty()
+  sell_items: string;
 
-         @IsString()
-         @ApiProperty()
-         adharcard_no: string;
+  @IsString()
+  @ApiProperty()
+  adharcard_no: string;
 
-         @IsString()
-         @ApiProperty()
-         pancard_no: string;
+  @IsString()
+  @ApiProperty()
+  pancard_no: string;
 
-         @IsString()
-         @ApiProperty()
-         gst_no: string;
+  @IsString()
+  @ApiProperty()
+  gst_no: string;
 
-         @IsString()
-         @ApiProperty()
-         bank_account_holer_name: string;
+  @IsString()
+  @ApiProperty()
+  bank_account_holer_name: string;
 
-         @IsNumber()
-         @ApiProperty()
-         bank_account_no: number;
+  @IsNumber()
+  @ApiProperty()
+  bank_account_no: number;
 
-         @IsString()
-         @ApiProperty()
-         bank_name: string;
+  @IsString()
+  @ApiProperty()
+  bank_name: string;
 
-         @IsString()
-         @ApiProperty()
-         ifsc_code: string;
+  @IsString()
+  @ApiProperty()
+  ifsc_code: string;
 
-         @IsBoolean()
-         @IsNotEmpty()
-         @ApiProperty()
-         activeStatus: boolean;
-       }
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty()
+  activeStatus: boolean;
+}

@@ -43,7 +43,7 @@ export class DeliveryController {
     summary: 'Add Manager/Delivery Boy',
   })
   @Post('/adduser')
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   async signupMobileUser(
     @Body() authCredentialsDto: MangerDeliveryCredentialsDto,
     @Req() req,
@@ -53,7 +53,7 @@ export class DeliveryController {
 
   @ApiOperation({ summary: 'Otp Verification' })
   @Post('/verify/otp')
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   async verifyOtp(
     @Body() otpverification: OtpVerifyCredentialsDto,
     @Req() req,
@@ -63,7 +63,7 @@ export class DeliveryController {
   @ApiOperation({ summary: 'Profile Update' })
   @Put('/profile/:id')
   @ApiParam({ name: 'id', required: true })
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   async profileUpdate(
     @Param() params,
     @Body() accountSetupDto: AccountSetupDto,

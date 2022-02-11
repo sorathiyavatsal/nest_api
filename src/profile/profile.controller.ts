@@ -1,14 +1,44 @@
-import { Controller, SetMetadata, UploadedFiles,Request, Get, Post, Delete, Body, Put, ValidationPipe, Query, Req, Res, Param, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { ProfileService } from "./profile.service"
-import { ApiTags, ApiProperty, ApiSecurity, ApiBearerAuth, ApiParam, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import {
+  Controller,
+  SetMetadata,
+  UploadedFiles,
+  Request,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Put,
+  ValidationPipe,
+  Query,
+  Req,
+  Res,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import { ProfileService } from './profile.service';
+import {
+  ApiTags,
+  ApiProperty,
+  ApiSecurity,
+  ApiBearerAuth,
+  ApiParam,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from "../auth/user.model";
+import { User } from '../auth/user.model';
 import { userInfo } from 'os';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { CreateProfileDto } from './dto/create-profile';
 import { EditProfileDto } from './dto/edit-profile';
-import { FileInterceptor, FilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express'
+import {
+  FileInterceptor,
+  FilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -34,7 +64,7 @@ export class ProfileController {
     return await this.ProfileService.getProfileDetail(params.id);
   }
   @UseGuards(AuthGuard('jwt'))
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @Post('/add')
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -50,7 +80,7 @@ export class ProfileController {
       {
         storage: diskStorage({
           destination: './public/uploads/profile',
-          filename: function(req, file, cb) {
+          filename: function (req, file, cb) {
             let extArray = file.mimetype.split('/');
             let extension = extArray[extArray.length - 1];
             cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
@@ -171,7 +201,7 @@ export class ProfileController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({ summary: 'Merchant/Delivery boy add onboarding data' })
   async addProfile(@UploadedFiles() file, @Request() request) {
     return await this.ProfileService.createProfile(
@@ -197,7 +227,7 @@ export class ProfileController {
       {
         storage: diskStorage({
           destination: './public/uploads/profile',
-          filename: function(req, file, cb) {
+          filename: function (req, file, cb) {
             let extArray = file.mimetype.split('/');
             let extension = extArray[extArray.length - 1];
             cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
@@ -314,7 +344,7 @@ export class ProfileController {
       },
     },
   })
-  @ApiConsumes('multipart/form-data','application/json')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({ summary: 'Merchant/Delivery boy add onboarding data' })
   async updateProfile(
     @Param() params,

@@ -36,7 +36,7 @@ export class SettingsService {
         : { _id: id };
     console.log(query);
     return this.SettingsModel.findOne(query).then(
-      async data => {
+      async (data) => {
         console.log(data, 'Datatta');
         if (zip_code !== '') {
           console.log('hje;lo update');
@@ -56,19 +56,16 @@ export class SettingsService {
           console.log('123213 update', query);
           console.log('123443 update', securityDto);
 
-          const res = await data.updateOne(
-            query,
-            {
-              $set: {
-                delivery_service_array: securityDto.delivery_service_array,
-              },
+          const res = await data.updateOne(query, {
+            $set: {
+              delivery_service_array: securityDto.delivery_service_array,
             },
-          );
+          });
           console.log(res, 'resss');
         }
         return data.toObject({ versionKey: false });
       },
-      error => {
+      (error) => {
         let msg = 'Invalid Request!';
         if (error.errmsg) msg = error.errmsg;
         return new BadRequestException(msg);
@@ -83,7 +80,7 @@ export class SettingsService {
       (user: any) => {
         return user.toObject({ versionKey: false });
       },
-      error => {
+      (error) => {
         let msg = 'Invalid Request!';
         if (error.errmsg) msg = error.errmsg;
         return new BadRequestException(msg);
