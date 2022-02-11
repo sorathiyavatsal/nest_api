@@ -39,7 +39,7 @@ export class DeliveryFleetService {
     @InjectModel('DeliveryLocation')
     private LocationModel: Model<DeliveryLocation>,
     @InjectModel('UserLogin') private UserLogin: Model<UserLogin>,
-  ) {}
+  ) { }
   async createnewDeliveryFleet(files: any, req: any) {
     let today = new Date();
     today.setHours(23);
@@ -460,7 +460,7 @@ export class DeliveryFleetService {
     let distenance = Dto.distenance;
     let weather = Dto.weather;
     let traffic = Dto.traffic;
-    let settings = await this.SettingsModel.find({});
+    this.settings = await this.SettingsModel.find({});
     let weight_price = 15;
     let packages_price = 15;
     let packaging_price = 7;

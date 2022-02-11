@@ -5,12 +5,16 @@ let Schema = mongoose.Types,
 export const SettingsSchema = new mongoose.Schema(
   {
     delivery_service_array: { type: Array },
+    fleet_tax: {
+      type: Number
+    }
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export interface Settings extends mongoose.Document {
   _id: string;
+  fleet_tax: number;
   delivery_service_array: [];
   updatedAt: Date;
   createdAt: Date;
