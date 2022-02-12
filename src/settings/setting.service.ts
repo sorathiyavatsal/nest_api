@@ -73,9 +73,8 @@ export class SettingsService {
     );
   }
   async createSettings(securityDto: CreateSettingsDto, user: any) {
-      const data = Object.assign({}, securityDto.delivery_service_array);
     const newUser = new this.SettingsModel({
-      delivery_service_array: [data],
+      delivery_service_array: securityDto.delivery_service_array,
     });
     return await newUser.save().then(
       (user: any) => {

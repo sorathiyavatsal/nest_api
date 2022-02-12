@@ -15,7 +15,7 @@ export const SettingsSchema = new mongoose.Schema(
 export interface Settings extends mongoose.Document {
   _id: string;
   fleet_tax: number;
-  delivery_service_array: [];
+  delivery_service_array: Array<Object>;
   updatedAt: Date;
   createdAt: Date;
 }
