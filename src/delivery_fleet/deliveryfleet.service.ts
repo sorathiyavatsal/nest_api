@@ -39,7 +39,7 @@ export class DeliveryFleetService {
     @InjectModel('DeliveryLocation')
     private LocationModel: Model<DeliveryLocation>,
     @InjectModel('UserLogin') private UserLogin: Model<UserLogin>,
-  ) {}
+  ) { }
   async createnewDeliveryFleet(files: any, req: any) {
     let today = new Date();
     today.setHours(23);
