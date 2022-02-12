@@ -106,7 +106,7 @@ export class NotificationGateway {
             body: 'You got new Job',
           },
           registration_ids: [deliveryBoy.deviceId],
-          data: JSON.stringify({
+          data: JSON.parse(JSON.stringify({
             distance: deliveryFleet.distance,
             price: deliveryFleet.price,
             fromLocation: {
@@ -114,7 +114,7 @@ export class NotificationGateway {
               Lat: deliveryFleet.fromLat,
               Lng: deliveryFleet.fromLng,
             },
-          }),
+          })),
         }),
       );
       const data = await axios({
