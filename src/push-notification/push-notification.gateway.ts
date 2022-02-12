@@ -107,16 +107,12 @@ export class NotificationGateway {
           },
           registration_ids: [deliveryBoy.deviceId],
           data: JSON.parse(JSON.stringify({
-            distance: deliveryFleet.distance,
-            price: deliveryFleet.price,
-            fromLocation: {
-              Address: deliveryFleet.fromAddress,
-              Lat: deliveryFleet.fromLat,
-              Lng: deliveryFleet.fromLng,
-            },
+            deliveryFleet_id: deliveryFleet._id,
+            expire_time: new Date(new Date(new Date().toUTCString()).getTime() + 2 * 60000)
           })),
         }),
       );
+
       const data = await axios({
         method: 'POST',
         url: 'https://fcm.googleapis.com/fcm/send',
