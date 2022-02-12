@@ -33,7 +33,7 @@ export class CategoryController {
         categoryName: {
           type: 'string',
         },
-        profilePic: {
+        categoryPic: {
           type: 'string',
           format: 'binary',
         },
@@ -54,6 +54,6 @@ export class CategoryController {
   })
   @ApiConsumes('multipart/form-data', 'application/json')
   async postCategory(@Request() request) {
-    return await this.CategoryService.postCategory();
+    return await this.CategoryService.postCategory(request);
   }
 }
