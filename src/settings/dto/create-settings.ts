@@ -11,5 +11,5 @@ export class CreateSettingsDto {
   @IsArray()
   @IsNotEmpty()
   @ApiProperty()
-  delivery_service_array: [];
+  delivery_service_array: Array<object>;
 }

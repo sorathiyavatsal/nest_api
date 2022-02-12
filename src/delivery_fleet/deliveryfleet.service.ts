@@ -461,6 +461,7 @@ export class DeliveryFleetService {
     let weather = Dto.weather;
     let traffic = Dto.traffic;
     let settings = await this.SettingsModel.find({});
+    console.log(settings)
     let weight_price = 15;
     let packages_price = 15;
     let packaging_price = 7;

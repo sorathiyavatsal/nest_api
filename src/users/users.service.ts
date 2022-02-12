@@ -11,11 +11,9 @@ export class UsersService {
     @InjectModel('User') private usersgetModel: Model<User>,
     @InjectModel('Profile') private ProfileModel: Model<Profile>,
   ) {}
+
   async updateLocation(id: string, dto: any) {
-    dto.loc = {
-      type: 'Point',
-      coordinates: [dto.lat, dto.lng],
-    };
+    dto.loc = [dto.lat, dto.lng]
     await this.usersgetModel.findOneAndUpdate(
       { _id: id },
       { $set: { loc: dto.loc } },
