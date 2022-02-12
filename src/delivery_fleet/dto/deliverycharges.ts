@@ -30,13 +30,18 @@ export class DeliveryChargesDto {
   @ApiProperty()
   distenance: number;
 
-  @IsNumber()
+  @IsBoolean()
   @IsNotEmpty()
   @ApiProperty()
   weather: boolean;
 
-  @IsNumber()
+  @IsBoolean()
   @IsNotEmpty()
   @ApiProperty()
   traffic: boolean;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty()
+  zipcode: number;
 }

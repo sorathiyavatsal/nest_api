@@ -70,11 +70,11 @@ export class UsersController {
   }
   @ApiOperation({ summary: 'delivery boy location update' })
   @ApiParam({ name: 'id', required: true })
-  @Roles(Role.DELIVERY)
+//   @Roles(Role.DELIVERY)
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data', 'application/json')
-  @Put('/delivery-boy/location/:id')
+  @Put('/location/:id')
   async deliveryBoyUpdateLocation(
     @Param() params,
     @Body() locationUpdate: locationUpdateDto,

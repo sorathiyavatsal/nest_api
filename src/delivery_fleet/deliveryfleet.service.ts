@@ -39,7 +39,7 @@ export class DeliveryFleetService {
     @InjectModel('DeliveryLocation')
     private LocationModel: Model<DeliveryLocation>,
     @InjectModel('UserLogin') private UserLogin: Model<UserLogin>,
-  ) {}
+  ) { }
   async createnewDeliveryFleet(files: any, req: any) {
     let today = new Date();
     today.setHours(23);
@@ -461,6 +461,7 @@ export class DeliveryFleetService {
     let weather = Dto.weather;
     let traffic = Dto.traffic;
     let settings = await this.SettingsModel.find({});
+    let zipSettings = settings[0]["delivery_service_array"].find(s => s["zipcode"] == Dto.zipcode)
     let weight_price = 15;
     let packages_price = 15;
     let packaging_price = 7;
@@ -471,55 +472,13 @@ export class DeliveryFleetService {
     let default_km = 2;
     let meterPrice = 0;
     let default_km_price = 15;
-    let default_km_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'default_km_price',
-    );
-    if (default_km_price_setting) {
-      default_km_price = default_km_price_setting.column_value;
-    }
-    let weight_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'default_weight_price',
-    );
-    if (weight_price_setting) {
-      weight_price = weight_price_setting.column_value;
-    }
-    let packages_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'default_package_price',
-    );
-    if (packages_price_setting) {
-      packages_price = packages_price_setting.column_value;
-    }
-    let packing_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'default_packing_price',
-    );
-    if (packing_price_setting) {
-      packaging_price = packing_price_setting.column_value;
-    }
-    let weather_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'default_weather_price',
-    );
-    if (packing_price_setting) {
-      weather_price = packing_price_setting.column_value;
-    }
-    let traffic_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'default_traffic_price',
-    );
-    if (traffic_price_setting) {
-      traffic_price = traffic_price_setting.column_value;
-    }
-    let addtion_meter_price_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'additional_km_price',
-    );
-    if (traffic_price_setting) {
-      addMP = addtion_meter_price_setting.column_value;
-    }
-    let additional_km_setting: any = this.settings.find(
-      (s: any) => s.column_key == 'additional_km',
-    );
-    if (additional_km_setting) {
-      addKM = traffic_price_setting.column_value;
-    }
-    let default_km_setting: any = this.settings.find(
+
+    default_km_price = zipSettings["fuel_tax"]["charge"];
+    weather_price = zipSettings["weather_tax"]["charge"];
+    traffic_price = zipSettings["traffic_tax"]["charge"];
+    addMP = zipSettings["traffic_tax"]["perM"];
+
+    let default_km_setting: any = settings.find(
       (s: any) => s.column_key == 'default_km',
     );
     if (default_km_setting) {
@@ -530,21 +489,21 @@ export class DeliveryFleetService {
     let weight = await this.WeightsModel.findOne({
       $and: [
         { category: new ObjectId(dto_category) },
-        { from_weight: { $gte: dto_weight } },
-        { to_weight: { $lte: dto_weight } },
+        // { from_weight: { $gte: dto_weight } },
+        // { to_weight: { $lte: dto_weight } },
       ],
     });
-    if (weight && dto_weight > 1) {
+    if (weight) {
       weight_price = dto_weight * weight.rate;
     }
 
     //packages
     let packages = await this.PackagesModel.findOne({
       category: new ObjectId(dto_category),
-      from_pack: { $gte: dto_packages },
-      to_pack: { $lte: dto_packages },
+      // from_pack: { $gte: dto_packages },
+      // to_pack: { $lte: dto_packages },
     });
-    if (packages && packages_price && dto_packages > 1) {
+    if (packages) {
       packages_price = dto_packages * packages.rate;
     }
 
@@ -555,24 +514,40 @@ export class DeliveryFleetService {
     if (packaging) {
       packaging_price = packaging.rate;
     }
+
     if (distenance > default_km) {
       let addDis = distenance - default_km;
       let met = (addDis * 1000) / addKM;
       meterPrice = met * addMP;
     }
-    let price: any =
+
+    let response = {
+      default_km_price: default_km_price,
+      weight_price: weight_price,
+      packages_price: packages_price,
+      packaging_price: packaging_price,
+      weather_price: 0,
+      traffic_price: 0,
+      total: 0
+    }
+
+    let price =
       default_km_price +
       meterPrice +
       weight_price +
       packages_price +
       packaging_price;
+
     if (weather) {
       price = price + weather_price;
+      response.weather_price = weather_price
     }
     if (traffic) {
       price = price + traffic_price;
+      response.traffic_price = traffic_price
     }
 
-    return price.toFixed(2);
+    response.total = price
+    return response;
   }
 }
