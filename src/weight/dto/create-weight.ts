@@ -10,7 +10,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateWeightsDto {
   @IsString()
   @ApiProperty()
-  category: number;
+  category: string;
 
   @IsNumber()
   @ApiProperty()
