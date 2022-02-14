@@ -473,10 +473,12 @@ export class DeliveryFleetService {
     let meterPrice = 0;
     let default_km_price = 15;
 
-    default_km_price = zipSettings["fuel_tax"]["charge"];
-    weather_price = zipSettings["weather_tax"]["charge"];
-    traffic_price = zipSettings["traffic_tax"]["charge"];
-    addMP = zipSettings["traffic_tax"]["perM"];
+    if (zipSettings) {
+      default_km_price = zipSettings["fuel_tax"]["charge"];
+      weather_price = zipSettings["weather_tax"]["charge"];
+      traffic_price = zipSettings["traffic_tax"]["charge"];
+      addMP = zipSettings["traffic_tax"]["perM"];
+    }
 
     let default_km_setting: any = settings.find(
       (s: any) => s.column_key == 'default_km',
