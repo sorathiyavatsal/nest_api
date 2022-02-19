@@ -43,7 +43,7 @@ export class AuthService {
     private sendEmailMiddleware: SendEmailMiddleware,
     private configService: ConfigService,
     private securityService: SecurityService,
-  ) {}
+  ) { }
   async validateApiKey(key: any) {
     return await this.securityService.validateApiKey(key);
   }
@@ -55,15 +55,11 @@ export class AuthService {
     userCredentialsDto: MangerDeliveryCredentialsDto,
     req: any,
   ) {
-    if (!userCredentialsDto.verifyType) {
-      return new BadRequestException('Verification type is required');
-    }
     let userToAttempt = await this.findOneByPhone(
       userCredentialsDto.phoneNumber,
     );
     if (userToAttempt) {
       if (userCredentialsDto.deliveryId) {
-        console.log(userCredentialsDto.deliveryId);
         let updateUser: any = await this.deliveryfleetModel.findOneAndUpdate(
           { _id: userCredentialsDto.deliveryId },
           {
@@ -75,11 +71,11 @@ export class AuthService {
           },
           { upsert: true },
         );
-        console.log(updateUser);
       }
       let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
-      return { user: userToAttempt, message: 'Verification sent to mobile' };
+      return { user: userToAttempt, loginType: "registred", message: 'Verification sent to mobile' };
     }
+
     let findroles = this.findRole(userCredentialsDto.role);
     if (!findroles) userCredentialsDto.role = 'USER';
     let usersCount = (await this.userModel.estimatedDocumentCount()) + 1;
@@ -109,7 +105,6 @@ export class AuthService {
       });
       newTokenVerifyEmail.save();
       if (userCredentialsDto.deliveryId) {
-        console.log(userCredentialsDto.deliveryId);
         this.deliveryfleetModel.findOneAndUpdate(
           { _id: userCredentialsDto.deliveryId },
           {
@@ -129,10 +124,10 @@ export class AuthService {
         user.role,
         false,
       );
-
-      return { user: user.toObject({ versionKey: false }) };
+      return { user: user.toObject({ versionKey: false }), loginStaus: "new user" };
     });
   }
+
   async loginVerificationSmsOtp(req: any, user: any) {
     let verifiedTemplate = 'loginsms';
     const newTokenVerifyEmail = new this.userVerificationModel({
@@ -154,6 +149,7 @@ export class AuthService {
 
     return newTokenVerifyEmail;
   }
+
   async createUser(userCredentialsDto: UserCredentialsDto, req: any) {
     let userToAttempt = await this.findOneByEmail(userCredentialsDto.email);
     if (!userToAttempt) {
@@ -329,7 +325,6 @@ export class AuthService {
     });
   }
   async saveLoginRequest(data: any) {
-    console.log(data);
     let userLoginModel = new this.UserLoginModel(data);
     userLoginModel.save();
     // return userLoginModel;
@@ -519,7 +514,8 @@ export class AuthService {
                 .findByIdAndUpdate(userToAttempt._id, {
                   emailVerified: true,
                   phoneVerified: true,
-                })
+                  deviceId: userToAttempt.deviceId
+                }, { upsert: true })
                 .exec();
               data.verifiedStatus = true;
               data.verifiedTime = new Date();

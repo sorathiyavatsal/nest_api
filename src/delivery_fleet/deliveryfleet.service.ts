@@ -454,102 +454,71 @@ export class DeliveryFleetService {
   }
 
   async getDeliveryCharges(Dto: DeliveryChargesDto) {
-    let dto_category = Dto.category;
-    let dto_weight = Dto.weight;
-    let dto_packages = Dto.packages;
-    let distenance = Dto.distenance;
-    let weather = Dto.weather;
-    let traffic = Dto.traffic;
-    let settings = await this.SettingsModel.find({});
-    let zipSettings = settings[0]["delivery_service_array"].find(s => s["zipcode"] == Dto.zipcode)
-    let weight_price = 15;
-    let packages_price = 15;
-    let packaging_price = 7;
-    let weather_price = 12;
-    let traffic_price = 10;
-    let addMP = 1;
-    let addKM = 300;
-    let default_km = 2;
-    let meterPrice = 0;
-    let default_km_price = 15;
+    try {
+      let category = Dto.category;
+      let weight = Dto.weight;
+      let packages = Dto.packages;
+      let distenance = Dto.distenance;
+      let weather = Dto.weather;
+      let traffic = Dto.traffic;
 
-    if (zipSettings) {
-      default_km_price = zipSettings["fuel_tax"]["charge"];
-      weather_price = zipSettings["weather_tax"]["charge"];
-      traffic_price = zipSettings["traffic_tax"]["charge"];
-      addMP = zipSettings["traffic_tax"]["perM"];
+      let settings = await this.SettingsModel.findOne({ "name": "fuel_charge" });
+      let zipSettings = settings["fuel_charge_array"].find(s => s["zipcode"] == Dto.zipcode)
+      if (!zipSettings) {
+        zipSettings = settings["fuel_charge_array"].find(s => s["zipcode"] == 0)
+      }
+
+      let weight_collection = await this.WeightsModel.findOne({ $or: [{ $and: [{ "category": category }, { "activeStatus": true }] }, { "from_weight": { $gte: weight } }, { "to_weight": { $lte: weight } }] })
+      let weight_price = weight_collection.rate;
+
+      let packages_collection = await this.PackagesModel.findOne({ $or: [{ $and: [{ "category": category }, { "activeStatus": true }] }, { "from_pack": { $gte: weight } }, { "to_pack": { $lte: weight } }] })
+      let packages_price = packages_collection.rate;
+
+      let default_km_charge = zipSettings["fuel_charge"].default_km_charge
+      let default_km = zipSettings["fuel_charge"].default_km
+
+      let additional_km_charge = 0
+      if (distenance > default_km) {
+        let additional_m = default_km - distenance
+        additional_km_charge = additional_m * zipSettings["fuel_charge"].addition_charge
+      }
+
+      let packaging_price = 10;
+
+      let response = {
+        default_km_price: default_km_charge,
+        weight_price: weight_price,
+        packages_price: packages_price,
+        packaging_price: packaging_price,
+        weather_price: 0,
+        traffic_price: 0,
+        total: 0
+      }
+
+      let price =
+        default_km_charge +
+        additional_km_charge +
+        weight_price +
+        packages_price +
+        packaging_price;
+
+      if (weather) {
+        let km_m = (distenance * 1000) / zipSettings["weather_charge"].default_m
+        let weather_price = km_m * zipSettings["weather_charge"].meter_charge
+        price = price + weather_price;
+        response.weather_price = weather_price
+      }
+      if (traffic) {
+        let km_m = (distenance * 1000) / zipSettings["traffic_charge"].default_m
+        let traffic_price = km_m * zipSettings["traffic_charge"].meter_charge
+        price = price + traffic_price;
+        response.traffic_price = traffic_price
+      }
+
+      response.total = price
+      return response;
+    } catch (error) {
+      console.log(error)
     }
-
-    let default_km_setting: any = settings.find(
-      (s: any) => s.column_key == 'default_km',
-    );
-    if (default_km_setting) {
-      addKM = default_km_setting.column_value;
-    }
-
-    //weight
-    let weight = await this.WeightsModel.findOne({
-      $and: [
-        { category: new ObjectId(dto_category) },
-        // { from_weight: { $gte: dto_weight } },
-        // { to_weight: { $lte: dto_weight } },
-      ],
-    });
-    if (weight) {
-      weight_price = dto_weight * weight.rate;
-    }
-
-    //packages
-    let packages = await this.PackagesModel.findOne({
-      category: new ObjectId(dto_category),
-      // from_pack: { $gte: dto_packages },
-      // to_pack: { $lte: dto_packages },
-    });
-    if (packages) {
-      packages_price = dto_packages * packages.rate;
-    }
-
-    //packaging
-    let packaging = await this.PackagingsModel.findOne({
-      category: new ObjectId(dto_category),
-    });
-    if (packaging) {
-      packaging_price = packaging.rate;
-    }
-
-    if (distenance > default_km) {
-      let addDis = distenance - default_km;
-      let met = (addDis * 1000) / addKM;
-      meterPrice = met * addMP;
-    }
-
-    let response = {
-      default_km_price: default_km_price,
-      weight_price: weight_price,
-      packages_price: packages_price,
-      packaging_price: packaging_price,
-      weather_price: 0,
-      traffic_price: 0,
-      total: 0
-    }
-
-    let price =
-      default_km_price +
-      meterPrice +
-      weight_price +
-      packages_price +
-      packaging_price;
-
-    if (weather) {
-      price = price + weather_price;
-      response.weather_price = weather_price
-    }
-    if (traffic) {
-      price = price + traffic_price;
-      response.traffic_price = traffic_price
-    }
-
-    response.total = price
-    return response;
   }
 }
