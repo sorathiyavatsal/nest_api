@@ -37,7 +37,7 @@ import { userInfo } from 'os';
 @ApiTags('Mobile Users')
 @ApiSecurity('api_key')
 export class DeliveryController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
   @ApiOperation({
     description: 'You can resend otp also same API',
     summary: 'Add Manager/Delivery Boy',

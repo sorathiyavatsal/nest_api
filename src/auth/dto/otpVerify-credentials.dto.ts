@@ -17,4 +17,9 @@ export class OtpVerifyCredentialsDto {
   @IsNotEmpty()
   @ApiProperty()
   code: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({})
+  deviceId: string;
 }

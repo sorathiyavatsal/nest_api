@@ -1,5 +1,6 @@
-import { Controller, Post, UseGuards, Request, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Get, UseInterceptors, Body, Response } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -9,13 +10,15 @@ import {
 } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles.decorator';
 import { StoreService } from './store.service';
+import { CreateStoreDto } from './dto/create-store'
+import { diskStorage } from 'multer';
 
 @Controller('store')
 @ApiTags('Store')
 @ApiBearerAuth()
 @ApiSecurity('api_key')
 export class StoreController {
-  constructor(private StoreService: StoreService) {}
+  constructor(private StoreService: StoreService) { }
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
@@ -26,11 +29,12 @@ export class StoreController {
 
   @Post('/add')
   @UseGuards(AuthGuard('jwt'))
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        profilePic: {
+        'profilePic': {
           type: 'string',
           format: 'binary',
         },
@@ -107,10 +111,54 @@ export class StoreController {
           type: 'array',
         },
       },
-    },
+    }
   })
-  @ApiConsumes('multipart/form-data', 'application/json')
-  async postStore(@Request() request) {
-    return await this.StoreService.postStore();
+  @UseInterceptors(
+    FilesInterceptor('profilePic', 20, {
+      storage: diskStorage({
+        destination: './public/profile',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+    }),
+    FilesInterceptor('aadhar_card_pic', 20, {
+      storage: diskStorage({
+        destination: './public/documents',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+    }),
+    FilesInterceptor('pan_card_pic', 20, {
+      storage: diskStorage({
+        destination: './public/documents',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+    }),
+    FilesInterceptor('store_licences_pic', 20, {
+      storage: diskStorage({
+        destination: './public/documents',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+    }),
+  )
+  async postStore(
+    @Request() request,
+    @Response() response,) {
+    const data = await this.StoreService.postStore();
+    response.json(data)
   }
 }

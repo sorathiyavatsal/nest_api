@@ -16,6 +16,8 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Response,
+  HttpCode,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -35,56 +37,60 @@ import {
   FilesInterceptor,
   FileFieldsInterceptor,
 } from '@nestjs/platform-express';
+import { CreatePartnerDto } from './dto/create-partners'
+import { GetPartnerDto } from './dto/get-partners'
+import { EditPartnerDto } from './dto/edit-partners'
 
 @Controller('partners')
 @ApiTags('Partners')
 @ApiBearerAuth()
 @ApiSecurity('api_key')
 export class PartnersController {
-  constructor(private PartnersService: PartnersService) {}
+  constructor(private PartnersService: PartnersService) { }
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  async getAllPartners(@Request() request) {
-    return await this.PartnersService.getAllPartners();
+  async getAllPartners(
+    @Param() getPartnerDto: GetPartnerDto,
+    @Response() response) {
+    const data = await this.PartnersService.getAllPartners(getPartnerDto);
+    response.json(data)
   }
 
   @Post('/add')
   @UseGuards(AuthGuard('jwt'))
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        Name: {
-          type: 'string',
-        },
-        Contact: {
-          type: 'string',
-        },
-        Address: {
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-        },
-        ZipCode: {
-          type: 'number',
-        },
-        DA: {
-          type: 'number',
-        },
-        AllocatedZipCodes: {
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async postPartners(@Request() request) {
-    return await this.PartnersService.postPartners();
+  async postPartners(
+    @Body() createPartnerDto: CreatePartnerDto,
+    @Response() response,
+  ) {
+    const data = await this.PartnersService.postPartners(createPartnerDto);
+    response.json(data)
+  }
+
+  @Put('/update')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiParam({ name: 'id', required: true })
+  async putPartners(
+    @Body() editPartnerDto: EditPartnerDto,
+    @Param() params,
+    @Response() response,
+  ) {
+    const data = await this.PartnersService.putPartners(editPartnerDto, params.id);
+    response.json(data)
+  }
+
+  @Delete('/delete')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiParam({ name: 'id', required: true })
+  async deletePartners(
+    @Param() params,
+    @Response() response,
+  ) {
+    const data = await this.PartnersService.deletePartners(params.id);
+    response.json("partner delete successfully")
   }
 }

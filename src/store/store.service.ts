@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-
+import { CreateStoreDto } from './dto/create-store'
 @Injectable()
 export class StoreService {
   async getAllStore() {
