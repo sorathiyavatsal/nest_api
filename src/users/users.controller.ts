@@ -32,7 +32,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { profileStatusDto } from './dto/useravailable';
 import { locationUpdateDto } from './dto/locationupdate';
-import { savedAddressesDto } from './dto/savedAddresses';
+import { savedAddressesDto } from './dto/savedaddresses';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Controller('users')
 @ApiTags('Users')

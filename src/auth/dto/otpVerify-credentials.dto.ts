@@ -6,7 +6,7 @@ import {
   IsEmpty,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { savedAddressesDto } from 'src/users/dto/savedAddresses';
+import { savedAddressesDto } from 'src/users/dto/savedaddresses';
 
 export class OtpVerifyCredentialsDto {
   @IsString()
