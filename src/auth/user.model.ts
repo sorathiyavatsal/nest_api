@@ -89,6 +89,15 @@ export const UserSchema = new mongoose.Schema(
     deviceId: {
       type: String,
     },
+    savedAddress: [{
+      lat: { type: String, required: true },
+      lng: { type: String, required: true },
+      address: { type: String, required: false },
+      landMark: { type: String, required: false },
+      fullName: { type: String, required: false },
+      phoneNumber: { type: String, required: false },
+      label: { type: String, required: false, enum: ['SHOP', 'HOME', 'OFFICE'],}
+    }]
   },
   { timestamps: true },
 );
@@ -143,4 +152,16 @@ export interface User extends mongoose.Document {
   activeStatus: boolean;
   password: string;
   verifyStatus: boolean;
+  savedAddress: [
+    {
+      _id: string,
+      lat: string,
+      lng: string,
+      address: string,
+      landMark: string,
+      fullName: string,
+      phoneNumber: string,
+      label: string
+    }
+  ];
 }

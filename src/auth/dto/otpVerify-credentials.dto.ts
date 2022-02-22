@@ -6,6 +6,7 @@ import {
   IsEmpty,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { savedAddressesDto } from 'src/users/dto/savedAddresses';
 
 export class OtpVerifyCredentialsDto {
   @IsString()
@@ -22,4 +23,7 @@ export class OtpVerifyCredentialsDto {
   @IsNotEmpty()
   @ApiProperty({})
   deviceId: string;
+
+  @ApiProperty({required: false})
+  savedAddress: [savedAddressesDto]
 }

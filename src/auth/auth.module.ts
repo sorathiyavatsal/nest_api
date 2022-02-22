@@ -16,6 +16,7 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 import { ApiKeyStrategy } from './auth-header-api-key.strategy';
 import { SecurityModule } from 'src/security/security.module';
 import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
+import { UsersModule } from 'src/users/users.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -37,7 +38,7 @@ import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
     }),
     SecurityModule,
     DeliveryFleetModule,
-
+    UsersModule,
     ConfigModule,
   ],
   providers: [AuthService, JwtStrategy, SendEmailMiddleware, ApiKeyStrategy],

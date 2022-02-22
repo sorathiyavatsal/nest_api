@@ -32,6 +32,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { profileStatusDto } from './dto/useravailable';
 import { locationUpdateDto } from './dto/locationupdate';
+import { savedAddressesDto } from './dto/savedAddresses';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @Controller('users')
 @ApiTags('Users')
@@ -130,5 +131,18 @@ export class UsersController {
         'Byecome rejected your account',
       );
     return user;
+  }
+  @ApiOperation({ summary: 'Add/Edit address' })
+  @ApiParam({ name: 'id', required: true })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @Put('/savedaddress/:id')
+  async signupMobileUser(
+    @Param() params,
+    @Body() savedAddresses: savedAddressesDto,
+    @Req() req,
+  ) {
+    return await this.userService.addEditSavedAddress(params.id, savedAddresses, req.user);
   }
 }
