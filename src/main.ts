@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const reflector = app.get<Reflector>(Reflector);
   app.useGlobalGuards();
-  app.use('/public', express.static(join(__dirname, '..', 'public')));
+  app.use('/public', express.static(join(__dirname, '../../', 'public')));
   app.enableCors();
   app.setGlobalPrefix('api');
   app.useGlobalFilters(
