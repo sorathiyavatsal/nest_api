@@ -10,6 +10,7 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -47,6 +48,15 @@ export class CategoryController {
   @ApiParam({ name: 'id', required: true })
   async getCategory(@Param() params, @Response() response) {
     response.json(await this.CategoryService.getCategory(params.id));
+  }
+
+  @Get('/getByType/:type/:name')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('ADMIN')
+  @ApiParam({ name: 'type', type: 'string', required: true })
+  @ApiParam({ name: 'name', type: 'string', required: false })
+  async getTypeCategory(@Param() params, @Response() response) {
+    response.json(await this.CategoryService.getTypeCategory(params));
   }
 
   @Post('/add')
@@ -160,7 +170,9 @@ export class CategoryController {
       });
     }
     request.body.categoryImage = responsedata[0];
-    response.json(await this.CategoryService.putCategory(request.body, params.id));
+    response.json(
+      await this.CategoryService.putCategory(request.body, params.id),
+    );
   }
 
   @Delete('/delete:id')

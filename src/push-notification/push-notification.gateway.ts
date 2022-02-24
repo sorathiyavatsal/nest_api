@@ -163,6 +163,6 @@ export class NotificationGateway {
         lng: payload.loc[1],
       },
     });
-    this.server.emit('Location', data.data.loc);
+    this.server.emit('Location', { loc: data.data.loc });
   }
 }
