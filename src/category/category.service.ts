@@ -21,6 +21,22 @@ export class CategoryService {
     });
   }
 
+  async getTypeCategory(categoryDto: any) {
+    let condition = {
+      categoryType: categoryDto.type,
+      status: true,
+    };
+
+    console.log(categoryDto.name)
+    
+    if (categoryDto.name) {
+      condition['categoryName'] = '/' + categoryDto.name + '/';
+    }
+
+    console.log(condition)
+    return await this.CategoryModel.find(condition);
+  }
+
   async postCategory(categoryDto: any) {
     let categoryData = {
       categoryName: categoryDto.categoryName,
