@@ -7,8 +7,8 @@ let ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class FleetCommissionService {
   constructor(@InjectModel('FleetCommission') private fleetCommissionModel: Model<FleetCommission>) { }
-  async getAllFleetCommission() {
-    return await this.fleetCommissionModel.find({});
+  async getAllFleetCommission(filter: any) {
+    return await this.fleetCommissionModel.find({ name: { $regex: filter.name || '', $options: 'i' } });
   }
 
   async getFleetCommissionById(id: string) {

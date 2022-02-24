@@ -73,3 +73,9 @@ export class fleetCommissionDto {
   zipcodes: [string];
 
 }
+
+export class filterDto{
+  @IsString()
+  @ApiProperty({ required: false, description: "Add name for filter" })
+  name: string;
+}

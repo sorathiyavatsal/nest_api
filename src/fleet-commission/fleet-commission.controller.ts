@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,7 +23,7 @@ import {
 import { FleetCommissionService } from './fleet-commission.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
-import { fleetCommissionDto } from './dto/fleet-commission.dto';
+import { fleetCommissionDto, filterDto } from './dto/fleet-commission.dto';
 
 @Controller('fleet-commission')
 @ApiTags('Fleet_Commission')
@@ -31,12 +32,12 @@ import { fleetCommissionDto } from './dto/fleet-commission.dto';
 export class FleetCommissionController {
   constructor(private FleetCommissionService: FleetCommissionService) {}
 
-  @ApiOperation({ summary: 'Get All Fleet Commission' })
+  @ApiOperation({ summary: 'Get All Fleet Commissions' })
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
   @Get('/')
-  async getAllFleetCommission(@Req() req) {
-    return await this.FleetCommissionService.getAllFleetCommission();
+  async getAllFleetCommission(@Query() filter: filterDto, @Req() req) {
+    return await this.FleetCommissionService.getAllFleetCommission(filter);
   }
 
   @ApiOperation({ summary: 'Get Fleet Commission By Id' })
