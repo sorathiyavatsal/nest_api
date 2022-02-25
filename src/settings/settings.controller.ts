@@ -84,6 +84,7 @@ export class SettingsController {
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiOperation({description: 'metaValue is an array while creating objects inside for [ (service area) we are adding three parameter required for each {1.zipcode,2.areaName,3.status} ], and for [ (fleet_tax)  we are adding three parameter{1.name,2.type,3.value} ] , and for [ (order_settings) we are adding three parameter{1.order_switch,2.operation_time,3.otp_verification_time} ]'})
   @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
@@ -146,7 +147,6 @@ export class SettingsController {
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'zipcode' })
   @ApiConsumes('multipart/form-data', 'application/json')
-  @Put('/updateFuelCharges/:id')
   @ApiBody({
     schema: {
       type: 'object',
@@ -157,11 +157,12 @@ export class SettingsController {
         addition_charge: { type: 'number' },
         default_weather_m: { type: 'number' },
         meter_wether_charge: { type: 'number' },
-        default_m: { type: 'number' },
-        meter_charge: { type: 'number' },
+        default_traffic_m: { type: 'number' },
+        meter_traffice_charge: { type: 'number' },
       },
     },
   })
+  @Put('/updateFuelCharges/:id')
   async updateCharge(
     @Param() params,
     @Query() query,
