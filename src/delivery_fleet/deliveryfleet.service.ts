@@ -476,12 +476,14 @@ export class DeliveryFleetService {
       }
       console.log(zipSettings)
 
-      let weight_collection = await this.WeightsModel.findOne({ $or: [{ $and: [{ "category": category }, { "activeStatus": true }] }, { "from_weight": { $gte: weight } }, { "to_weight": { $lte: weight } }] })
+      let weight_collection = await this.WeightsModel.findOne({ "from_weight": {$lte: weight},"to_weight":{$gte: weight},"category": category,  "activeStatus": true })
       let weight_price = weight_collection.rate;
 
-      let packages_collection = await this.PackagesModel.findOne({ $or: [{ $and: [{ "category": category }, { "activeStatus": true }] }, { "from_pack": { $gte: weight } }, { "to_pack": { $lte: weight } }] })
+      let packages_collection = await this.PackagesModel.findOne({ "from_pack": {$lte: packages},"to_pack":{$gte: packages},"category": category,  "activeStatus": true })
+      
+      console.log(packages_collection,"collection")
       let packages_price = packages_collection.rate;
-
+      
       let default_km_charge = zipSettings["fuelCharged"].default_km_charge
       let default_km = zipSettings["fuelCharged"].default_km
       let tax = fleet_tax.metaValue['value']
@@ -492,8 +494,8 @@ export class DeliveryFleetService {
         additional_km_charge = (additional_m * 1000 /100) * zipSettings["fuelCharged"].addition_charge
       }
 
-      let packaging_price = 10;
-
+      let packaging = await this.PackagingsModel.findOne({category: category})
+      let packaging_price = packaging.rate;
       let response = {
         default_km_price: default_km_charge,
         weight_price: weight_price,

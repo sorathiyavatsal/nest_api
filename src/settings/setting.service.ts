@@ -131,15 +131,14 @@ export class SettingsService {
   }
   async taxSettings(_id: string, securityDto: any) {
     console.log(_id)
+    console.log(securityDto)
     return await this.SettingsModel.updateOne(
       { _id: _id },
       {
-        $set: {
+       
           'metaValue.name': securityDto.name,
           'metaValue.type': securityDto.type,
-          'metaValue.value': securityDto.value,
-        },
-      },
+          'metaValue.value': securityDto.value,      },
     );
     
 }
@@ -170,8 +169,8 @@ export class SettingsService {
             'metaValue.$.fuelCharged.addition_charge': securityDto.addition_charge,
             'metaValue.$.weather_charge.default_m':securityDto.default_weather_m,
             'metaValue.$.weather_charge.meter_charge':securityDto.meter_wether_charge,
-            'metaValue.$.traffic_charge.default_m':securityDto.default_m,
-            'metaValue.$.traffic_charge.meter_charge':securityDto.meter_charge,
+            'metaValue.$.traffic_charge.default_m':securityDto.default_traffic_m,
+            'metaValue.$.traffic_charge.meter_charge':securityDto.meter_traffice_charge,
           },
         },
       );
@@ -183,10 +182,10 @@ export class SettingsService {
             $push: {
 
               metaValue: {
-                zipcode: [securityDto.zipcode],
+                zipcode: securityDto.zipcode,
                 fuelCharged:{"default_km": securityDto.default_km,"default_km_charge": securityDto.default_km_charge,"addition_charge": securityDto.addition_charge},
                 weather_charge:{"default_m": securityDto.default_weather_m,"meter_charge": securityDto.meter_wether_charge},
-                traffic_charge:{"default_m": securityDto.default_m,"meter_charge": securityDto.meter_charge},
+                traffic_charge:{"default_m": securityDto.default_traffic_m,"meter_charge": securityDto.meter_traffice_charge},
 
                 },
             },
