@@ -7,12 +7,16 @@ import {
   Response,
   UseInterceptors,
   UploadedFiles,
+  Put,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiParam,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -33,6 +37,14 @@ export class ProductController {
   @Roles('ADMIN')
   async getAllProducts(@Request() request, @Response() response) {
     response.json(await this.ProductService.getAllProducts());
+  }
+
+  @Get('/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('ADMIN')
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  async getProducts(@Param() params, @Response() response) {
+    response.json(await this.ProductService.getProducts(params.id));
   }
 
   @Post('/meta')
@@ -108,6 +120,19 @@ export class ProductController {
 
   @Post('/add')
   @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FilesInterceptor('productImage', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   @ApiBody({
     schema: {
       type: 'object',
@@ -159,7 +184,106 @@ export class ProductController {
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async postProduct(@Request() request) {
-    return await this.ProductService.postProduct();
+  async postProduct(@Request() request, @UploadedFiles() files) {
+    const response = [];
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        const fileReponse = file.path;
+        response.push(fileReponse);
+      });
+    }
+    request.body.productImage = response;
+    return await this.ProductService.postProduct(request.body);
+  }
+
+  @Put('/update/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FilesInterceptor('productImage', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productName: {
+          type: 'string',
+        },
+        secodary_productName: {
+          type: 'string',
+        },
+        description: {
+          type: 'string',
+        },
+        pageTitle: {
+          type: 'string',
+        },
+        variant: {
+          type: 'array',
+        },
+        metaDescription: {
+          type: 'string',
+        },
+        urlHandle: {
+          type: 'string',
+        },
+        productImage: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        store: {
+          type: 'string',
+        },
+        category: {
+          type: 'string',
+        },
+        collection: {
+          type: 'string',
+        },
+        brand: {
+          type: 'string',
+        },
+        status: {
+          type: 'boolean',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async putProduct(
+    @Param() params,
+    @Request() request,
+    @UploadedFiles() files,
+  ) {
+    const response = [];
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        const fileReponse = file.path;
+        response.push(fileReponse);
+      });
+    }
+    request.body.productImage = response;
+    return await this.ProductService.putProduct(request.body, params.id);
+  }
+
+  @Delete('/delete/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async deleteProduct(@Param() params) {
+    return await this.ProductService.deleteProduct(params.id);
   }
 }

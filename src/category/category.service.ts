@@ -50,7 +50,7 @@ export class CategoryService {
       categoryData['parent'] = categoryDto.parent;
     }
 
-    const newCategory = new this.CategoryModel(categoryDto);
+    const newCategory = await new this.CategoryModel(categoryDto);
 
     return await newCategory.save();
   }
