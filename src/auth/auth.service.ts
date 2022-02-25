@@ -28,6 +28,7 @@ import { Role } from './role.enum';
 import { SecurityService } from '../security/security.service';
 import { TokenInstance } from 'twilio/lib/rest/api/v2010/account/token';
 import { OtpVerifyCredentialsDto } from './dto/otpVerify-credentials.dto';
+import { UsersService } from 'src/users/users.service';
 const DeviceDetector = require('node-device-detector');
 @Injectable()
 export class AuthService {
@@ -43,6 +44,7 @@ export class AuthService {
     private sendEmailMiddleware: SendEmailMiddleware,
     private configService: ConfigService,
     private securityService: SecurityService,
+    private userService: UsersService,
   ) { }
   async validateApiKey(key: any) {
     return await this.securityService.validateApiKey(key);
@@ -510,13 +512,19 @@ export class AuthService {
         .then(
           (data) => {
             if (data) {
+              const savedAddress = ("savedAddress" in emailVerifyCredentialsDto) ? emailVerifyCredentialsDto.savedAddress : null;
               let userData = this.userModel
                 .findByIdAndUpdate(userToAttempt._id, {
                   emailVerified: true,
                   phoneVerified: true,
-                  deviceId: userToAttempt.deviceId
+                  deviceId: userToAttempt.deviceId,
                 }, { upsert: true })
                 .exec();
+              if(userData && savedAddress){
+                savedAddress.forEach(address => {
+                  this.userService.addEditSavedAddress(userToAttempt._id, address, null);
+                })
+              }
               data.verifiedStatus = true;
               data.verifiedTime = new Date();
               data.save();

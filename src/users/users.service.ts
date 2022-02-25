@@ -13,7 +13,7 @@ export class UsersService {
   ) {}
 
   async updateLocation(id: string, dto: any) {
-    dto.loc = [dto.lat, dto.lng]
+    dto.loc = [dto.lat, dto.lng];
     await this.usersgetModel.findOneAndUpdate(
       { _id: id },
       { $set: { loc: dto.loc } },
@@ -47,5 +47,33 @@ export class UsersService {
   }
   async getAllUsers() {
     return await this.usersgetModel.find();
+  }
+  async addEditSavedAddress(id: string, dto: any, user: any) {
+    const existingAddress = await this.usersgetModel.findOneAndUpdate(
+      {
+        _id: new ObjectId(id),
+        ...(dto.savedAddressId
+          ? { 'savedAddress._id': new ObjectId(dto.savedAddressId) }
+          : { 'savedAddress.lan': dto.lan, 'savedAddress.lng': dto.lng }),
+      },
+      {
+        $set: {
+          'savedAddress.$': dto,
+        },
+      },
+      { new: true },
+    );
+
+    if (existingAddress) {
+      return existingAddress.toObject({ versionKey: false });
+    }
+
+    return await this.usersgetModel
+      .findOne({ _id: new ObjectId(id) })
+      .then((data) => {
+        data.savedAddress.push(dto);
+        data.save();
+        return data.toObject({ versionKey: false });
+      });
   }
 }

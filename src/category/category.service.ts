@@ -1,59 +1,103 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Category } from './category.model';
+import { Categories } from './category.model';
 @Injectable()
 export class CategoryService {
-
   constructor(
-    @InjectModel('Category') private CategoryModel: Model<Category>,
+    @InjectModel('categories') private CategoryModel: Model<Categories>,
   ) {}
 
   async getAllCategory() {
-    return [
-      {
-        storeId: 1,
-        storeName: 'Angel',
-        storePic:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        merchantName: 'Angel',
-        merchantPic:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        products: 545,
-        reviews: 4.5,
-        status: 'active',
-      },
-      {
-        storeId: 2,
-        storeName: 'Dianne',
-        storePic:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        merchantName: 'Dianne',
-        merchantPic:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        products: '545',
-        reviews: 5.0,
-        status: 'inactive',
-      },
-    ];
+    return await this.CategoryModel.find({
+      status: true,
+    });
   }
 
-  async postCategory(request: Request) {
+  async getCategory(categoryId: string) {
+    return await this.CategoryModel.findOne({
+      _id: categoryId,
+      status: true,
+    });
+  }
 
-    console.log(request.body)
-    // const Category = await this.CategoryModel();
-
-    return {
-      _id: '61e15773d3f69678b5af40b9',
-      storeName: 'Dianne',
-      storePic:
-        'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      merchantName: 'Dianne',
-      merchantPic:
-        'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      products: '545',
-      reviews: 5.0,
-      status: 'inactive',
+  async getTypeCategory(categoryDto: any) {
+    let condition = {
+      categoryType: categoryDto.type,
+      status: true,
     };
+
+    console.log(categoryDto.name)
+    
+    if (categoryDto.name) {
+      condition['categoryName'] = '/' + categoryDto.name + '/';
+    }
+
+    console.log(condition)
+    return await this.CategoryModel.find(condition);
+  }
+
+  async postCategory(categoryDto: any) {
+    let categoryData = {
+      categoryName: categoryDto.categoryName,
+      categoryImage: categoryDto.categoryImage,
+      categoryType: categoryDto.categoryType,
+      description: categoryDto.description,
+      status: true,
+    };
+
+    if (categoryDto.parent) {
+      categoryData['parent'] = categoryDto.parent;
+    }
+
+    const newCategory = await new this.CategoryModel(categoryDto);
+
+    return await newCategory.save();
+  }
+
+  async putCategory(categoryDto: any, id: string) {
+    let updateData = {};
+    if (categoryDto.categoryName) {
+      updateData['categoryName'] = categoryDto.categoryName;
+    }
+    if (categoryDto.categoryImage) {
+      updateData['categoryImage'] = categoryDto.categoryImage;
+    }
+    if (categoryDto.categoryType) {
+      updateData['categoryType'] = categoryDto.categoryType;
+    }
+    if (categoryDto.description) {
+      updateData['description'] = categoryDto.description;
+    }
+    if (categoryDto.parent) {
+      updateData['parent'] = categoryDto.parent;
+    }
+    if (categoryDto.status) {
+      updateData['status'] = categoryDto.status;
+    }
+
+    const updateCategory = await this.CategoryModel.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: updateData,
+      },
+      { $upsert: true },
+    );
+
+    return updateCategory;
+  }
+
+  async deleteCategory(id: string) {
+    const updateCategory = await this.CategoryModel.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          status: false,
+        },
+      },
+      { $upsert: true },
+    );
+
+    return updateCategory;
   }
 }

@@ -8,54 +8,55 @@ import { Logger } from '@nestjs/common';
 import axios from 'axios';
 import delay from 'delay';
 @WebSocketGateway(5001, {
-  cors: {
-    origin: '*',
-  },
+  cors: true,
 })
 export class NotificationGateway {
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('AppGateway');
-  private axios = axios;
-  private jobStatus = false;
-  private deliveryAcceptBoy = {};
-  private delivery_fleet_id = '';
-  private token = '';
 
   @SubscribeMessage('deliveryNotification')
-  async handleDeliveryNotification(
-    client: Socket,
-    payload: any,
-  ): Promise<Object> {
+  async handleDeliveryNotification(client: Socket, payload: any) {
     try {
-      const deliveryBoys = payload.deliveryBoys;
-      this.token = payload.token;
-      this.delivery_fleet_id = payload.delivery_fleet_id;
+      client.join(payload.delivery_fleet_id);
+      let deliveryBoys = await axios({
+        method: 'POST',
+        url: `http://3.134.140.172:5000/api/delivery-fleet/find-near-delivery-boy`,
+        headers: JSON.parse(
+          JSON.stringify({
+            Authorization: 'Bearer ' + payload.token,
+          }),
+        ),
+        data: {
+          fromLat: payload.loc[0],
+          fromLng: payload.loc[1],
+        },
+      });
+
+      deliveryBoys = deliveryBoys.data.boys;
+
       const deliveryFleet = await axios({
         method: 'GET',
-        url: `http://3.134.140.172:5000/api/delivery-fleet/${this.delivery_fleet_id}`,
+        url: `http://3.134.140.172:5000/api/delivery-fleet/${payload.delivery_fleet_id}`,
         headers: JSON.parse(
           JSON.stringify({
             Authorization: 'Bearer ' + payload.token,
           }),
         ),
       });
+
       if (deliveryFleet) {
         if (Array.isArray(deliveryBoys)) {
           let i = 0;
           while (i < deliveryBoys.length) {
-            this.deliveryAcceptBoy = deliveryBoys[i];
-            if (this.jobStatus) {
-              return this.deliveryAcceptBoy;
-            }
             this.sendPushNotification(deliveryBoys[i], deliveryFleet.data);
             i++;
             await delay(10000);
           }
         } else {
-          this.deliveryAcceptBoy = deliveryBoys;
           this.sendPushNotification(deliveryBoys, deliveryFleet.data);
         }
+      } else {
       }
     } catch (e) {
       console.log(e);
@@ -64,11 +65,9 @@ export class NotificationGateway {
 
   @SubscribeMessage('deliveryAccept')
   async handleAcceptJob(client: Socket, payload: any) {
-    this.jobStatus = true;
-
-    await axios({
+    const delivery_fleet = await axios({
       method: 'PUT',
-      url: `http://3.134.140.172:5000/api/delivery-fleet/update/${this.delivery_fleet_id}`,
+      url: `http://3.134.140.172:5000/api/delivery-fleet/update/${payload.delivery_fleet_id}`,
       data: JSON.parse(
         JSON.stringify({
           invoiceStatus: 'complete',
@@ -76,18 +75,37 @@ export class NotificationGateway {
       ),
       headers: JSON.parse(
         JSON.stringify({
-          Authorization: 'Bearer ' + this.token,
+          Authorization: 'Bearer ' + payload.token,
         }),
       ),
     });
 
-    return this.deliveryAcceptBoy;
+    const delivery_boy = await axios({
+      method: 'GET',
+      url: `http://3.134.140.172:5000/api/users/profile/${payload.delivery_boy_id}`,
+      headers: JSON.parse(
+        JSON.stringify({
+          Authorization: 'Bearer ' + payload.token,
+        }),
+      ),
+    });
+
+    const response = {
+      delivery_fleet: delivery_fleet,
+      delivery_boy: delivery_boy,
+    };
+
+    this.server
+      .to(payload.delivery_fleet_id)
+      .emit('deliveryResponse', delivery_boy.data._id);
+    await client.leave(payload.delivery_fleet_id);
+
+    return response;
   }
 
   @SubscribeMessage('deliveryReject')
-  async handleRejectJob() {
-    this.jobStatus = false;
-    return this.jobStatus;
+  async handleRejectJob(client: Socket, payload: any) {
+    const data = await client.rooms.delete(payload.delivery_boy_id);
   }
 
   async sendPushNotification(deliveryBoy, deliveryFleet) {
@@ -99,6 +117,7 @@ export class NotificationGateway {
           'Content-Type': 'application/json',
         }),
       );
+
       const body = JSON.parse(
         JSON.stringify({
           notification: {
@@ -106,10 +125,15 @@ export class NotificationGateway {
             body: 'You got new Job',
           },
           registration_ids: [deliveryBoy.deviceId],
-          data: JSON.parse(JSON.stringify({
-            deliveryFleet_id: deliveryFleet._id,
-            expire_time: new Date(new Date(new Date().toUTCString()).getTime() + 2 * 60000)
-          })),
+          data: JSON.parse(
+            JSON.stringify({
+              deliveryFleet_id: deliveryFleet._id,
+              deliveryBoy_id: deliveryBoy._id,
+              expire_time: new Date(
+                new Date(new Date().toUTCString()).getTime() + 2 * 60000,
+              ),
+            }),
+          ),
         }),
       );
 
@@ -122,5 +146,26 @@ export class NotificationGateway {
     } catch (error) {
       this.logger.log(error.message);
     }
+  }
+
+  @SubscribeMessage('patchLocation')
+  async handlePathLocation(client: Socket, payload: any) {
+    const data = await axios({
+      method: 'PUT',
+      url: `http://3.134.140.172:5000/api/users/location/${payload.delivery_boy_id}`,
+      headers: JSON.parse(
+        JSON.stringify({
+          Authorization: 'Bearer ' + payload.token,
+        }),
+      ),
+      data: {
+        lat: payload.loc[0],
+        lng: payload.loc[1],
+      },
+    });
+    this.server.emit('Location', {
+      loc: data.data.loc,
+      extraData: payload.extraData,
+    });
   }
 }

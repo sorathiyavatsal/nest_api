@@ -1,36 +1,72 @@
 import { Injectable } from '@nestjs/common';
-
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Brands } from './brand.model';
 @Injectable()
 export class BrandService {
+  constructor(@InjectModel('Brands') private BrandModel: Model<Brands>) {}
+
   async getAllBrand() {
-    return [
-      {
-        brandId: 1,
-        brandName: 'Angel',
-        brandPic:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        products: 545,
-        status: 'active',
-      },
-      {
-        brandId: 2,
-        brandName: 'Dianne',
-        brandPic:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        products: '545',
-        status: 'inactive',
-      },
-    ];
+    return await this.BrandModel.find({
+      status: true,
+    });
   }
 
-  async postBrand() {
-    return {
-      _id: '61e15773d3f69678b5af40b9',
-      brandName: 'Dianne',
-      brandPic:
-        'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      products: '545',
-      status: 'inactive',
-    };
+  async getBrand(brandId: string) {
+    return await this.BrandModel.findOne({
+      _id: brandId,
+      status: true,
+    });
+  }
+
+  async postBrand(brandDto: any) {
+    const newBrand = new this.BrandModel({
+      brandName: brandDto.brandName,
+      brandPic: brandDto.brandImage,
+      description: brandDto.description,
+      status: brandDto.status || true,
+    });
+
+    return await newBrand.save();
+  }
+
+  async putBrand(brandDto: any, id: string) {
+    let updateData = {};
+    if (brandDto.brandName) {
+      updateData['brandName'] = brandDto.brandName;
+    }
+    if (brandDto.brandImage) {
+      updateData['brandPic'] = brandDto.brandImage;
+    }
+    if (brandDto.description) {
+      updateData['description'] = brandDto.description;
+    }
+    if (brandDto.status) {
+      updateData['status'] = brandDto.status;
+    }
+
+    const updateBrand = await this.BrandModel.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: updateData,
+      },
+      { $upsert: true },
+    );
+
+    return updateBrand;
+  }
+
+  async deleteBrand(id: string) {
+    const updateBrand = await this.BrandModel.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          status: false,
+        },
+      },
+      { $upsert: true },
+    );
+
+    return updateBrand;
   }
 }

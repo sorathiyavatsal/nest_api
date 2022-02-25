@@ -1,12 +1,11 @@
 import * as mongoose from 'mongoose';
 let ObjectId = mongoose.Types.ObjectId;
-export const CategorySchema = new mongoose.Schema(
+export const CategoriesSchema = new mongoose.Schema(
     {
         categoryName: {
             type: String,
-            required: true,
         },
-        categoryPic: {
+        categoryImage: {
             type: String
         },
         categoryType: {
@@ -16,7 +15,7 @@ export const CategorySchema = new mongoose.Schema(
             type: String
         },
         parent: {
-            type: ObjectId,
+            type: String,
             ref: 'Category',
         },
         status: {
@@ -26,10 +25,10 @@ export const CategorySchema = new mongoose.Schema(
     { timestamps: true },
 );
 
-export interface Category extends mongoose.Document {
+export interface Categories extends mongoose.Document {
     _id: string;
     categoryName: string,
-    categoryPic: string,
+    categoryImage: string,
     categoryType: string,
     description: string,
     parent: string,
