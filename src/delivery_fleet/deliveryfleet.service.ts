@@ -453,7 +453,7 @@ export class DeliveryFleetService {
     return invoice.toObject({ versionKey: false });
   }
 
-  async getDeliveryCharges(Dto: DeliveryChargesDto) {
+  async getDeliveryCharges(Dto: DeliveryChargesDto ) {
     try {
       let category = Dto.category;
       let weight = Dto.weight;
@@ -461,12 +461,20 @@ export class DeliveryFleetService {
       let distenance = Dto.distenance;
       let weather = Dto.weather;
       let traffic = Dto.traffic;
-
-      let settings = await this.SettingsModel.findOne({ "name": "fuel_charge" });
-      let zipSettings = settings["fuel_charge_array"].find(s => s["zipcode"] == Dto.zipcode)
+      console.log(category)
+      console.log(weight)
+      console.log(packages)
+      console.log(distenance)
+      console.log(weather)
+      console.log(traffic)
+     let fleet_tax= await this.SettingsModel.findOne({ "metaKey": "fleet_tax"})
+      let settings = await this.SettingsModel.findOne({ "metaKey": "fuel_charge","metaValue.zipcode":{$in:[Dto.zipcode]} });
+      console.log(settings)
+      let zipSettings = settings["metaValue"].find(s => s['zipcode'].includes(Dto.zipcode))
       if (!zipSettings) {
-        zipSettings = settings["fuel_charge_array"].find(s => s["zipcode"] == 0)
+        zipSettings = settings["metaValue"].find(s => s['zipcode'].filter((zip) => zip == 0) )
       }
+      console.log(zipSettings)
 
       let weight_collection = await this.WeightsModel.findOne({ $or: [{ $and: [{ "category": category }, { "activeStatus": true }] }, { "from_weight": { $gte: weight } }, { "to_weight": { $lte: weight } }] })
       let weight_price = weight_collection.rate;
@@ -474,13 +482,14 @@ export class DeliveryFleetService {
       let packages_collection = await this.PackagesModel.findOne({ $or: [{ $and: [{ "category": category }, { "activeStatus": true }] }, { "from_pack": { $gte: weight } }, { "to_pack": { $lte: weight } }] })
       let packages_price = packages_collection.rate;
 
-      let default_km_charge = zipSettings["fuel_charge"].default_km_charge
-      let default_km = zipSettings["fuel_charge"].default_km
-
+      let default_km_charge = zipSettings["fuelCharged"].default_km_charge
+      let default_km = zipSettings["fuelCharged"].default_km
+      let tax = fleet_tax.metaValue['value']
+      let taxType = fleet_tax.metaValue['type']
       let additional_km_charge = 0
       if (distenance > default_km) {
-        let additional_m = default_km - distenance
-        additional_km_charge = additional_m * zipSettings["fuel_charge"].addition_charge
+        let additional_m = distenance - default_km
+        additional_km_charge = (additional_m * 1000 /100) * zipSettings["fuelCharged"].addition_charge
       }
 
       let packaging_price = 10;
@@ -492,16 +501,24 @@ export class DeliveryFleetService {
         packaging_price: packaging_price,
         weather_price: 0,
         traffic_price: 0,
-        total: 0
+        tax:0,
+        subtotal:0,
+        total: 0,
       }
 
+      console.log(default_km_charge ,
+        additional_km_charge ,
+        weight_price ,
+        packages_price ,
+        packaging_price)
+      console.log(default_km_charge)
       let price =
         default_km_charge +
         additional_km_charge +
         weight_price +
         packages_price +
         packaging_price;
-
+        console.log(price)
       if (weather) {
         let km_m = (distenance * 1000) / zipSettings["weather_charge"].default_m
         let weather_price = km_m * zipSettings["weather_charge"].meter_charge
@@ -514,8 +531,9 @@ export class DeliveryFleetService {
         price = price + traffic_price;
         response.traffic_price = traffic_price
       }
-
-      response.total = price
+      response.subtotal = price;
+      response.tax = taxType == 'flat' ? tax : tax / 100;
+      response.total = taxType == 'flat' ? price + tax : price + tax / 100;
       return response;
     } catch (error) {
       console.log(error)

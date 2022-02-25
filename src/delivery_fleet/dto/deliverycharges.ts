@@ -10,7 +10,7 @@ import {
 import { ApiProperty, ApiParam } from '@nestjs/swagger';
 
 export class DeliveryChargesDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Goods _id' })
   category: string;

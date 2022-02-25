@@ -8,28 +8,34 @@ import {
 import { ApiProperty, ApiParam } from '@nestjs/swagger';
 
 export class EditSettingsDto {
-  @IsArray()
-  @IsNotEmpty()
-  @ApiProperty()
-  delivery_service_array: [];
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  'delivery_service_array.zip_code': string;
+  status: boolean;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  'delivery_service_array.state_name': string;
+  zipcode: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  'delivery_service_array.city': string;
+  areaName: string;
 
-  @IsBoolean()
-  @IsNotEmpty()
-  @ApiProperty()
-  'delivery_service_array.active': boolean;
+  value: any;
+  type: any;
+  name: any;
+ 
+  default_km: any;
+  default_km_charge: any;
+  addition_charge: any;
+  
+  default_m: any;
+  meter_charge: any;
+  default_weather_m: any;
+  meter_wether_charge: any;
+  static zipcode: any;
+  
 }
