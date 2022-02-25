@@ -4,7 +4,6 @@ export const CategoriesSchema = new mongoose.Schema(
     {
         categoryName: {
             type: String,
-            required: true,
         },
         categoryImage: {
             type: String

@@ -110,6 +110,7 @@ export class CategoryController {
       });
     }
     request.body.categoryImage = response[0];
+
     return await this.CategoryService.postCategory(request.body);
   }
 
