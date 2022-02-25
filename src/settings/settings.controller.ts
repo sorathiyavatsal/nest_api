@@ -53,12 +53,29 @@ import { query } from 'winston';
 export class SettingsController {
   constructor(private securityService: SettingsService) {}
 
-  @Get('/all')
+  @Post('/')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        metaKey: {
+          type: 'string',
+        },
+        status: { type: 'string' },
+      },
+    },
+  })
   async getSettings(@Request() request) {
-    return await this.securityService.getAllSettings(request.user);
+    return await this.securityService.getAllSettings(
+      request.user,
+      request.body,
+      request.id,
+      request.zip_code,
+    );
   }
 
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'zip_code' })
   @Get('/settings/:id')
   async getSettingsDetail(@Param() params, @Request() request: any) {
     return await this.securityService.getSettingsDetail(params.id);
@@ -75,6 +92,17 @@ export class SettingsController {
       }),
     }),
   )
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        metaKey: {
+          type: 'String',
+        },
+        metaValue: { type: 'Array' },
+      },
+    },
+  })
   async addSettings(
     @Body() createSecurityDto: CreateSettingsDto,
     @Request() request,
@@ -90,12 +118,12 @@ export class SettingsController {
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'zip_code' })
   @ApiConsumes('multipart/form-data', 'application/json')
-  @Put('/update/:id')
+  @Put('/service_areas/:id')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        delivery_service_array: { type: 'array' },
+        status: { type: 'string' },
       },
     },
   })
@@ -113,39 +141,88 @@ export class SettingsController {
       request.user,
     );
   }
-
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', required: true })
-  @Delete('/delete/:id')
-  async deleteSettings(@Param() params, @Request() request: any) {
-    return await this.securityService.deleteSettings(params.id);
+  @ApiQuery({ name: 'zipcode' })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @Put('/updateFuelCharges/:id')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        zipcode: { type: 'string' },
+        default_km: { type: 'number' },
+        default_km_charge: { type: 'number' },
+        addition_charge: { type: 'number' },
+        default_weather_m: { type: 'number' },
+        meter_wether_charge: { type: 'number' },
+        default_m: { type: 'number' },
+        meter_charge: { type: 'number' },
+      },
+    },
+  })
+  async updateCharge(
+    @Param() params,
+    @Query() query,
+    @Body() EditSettingsDto: EditSettingsDto,
+    @Request() request: any,
+  ) {
+    await this.securityService.updatecharges(
+      params.id,
+      EditSettingsDto,
+      query.zipcode,
+    );
   }
 
+  // @UseGuards(AuthGuard('jwt'))
+  // @Roles(Role.ADMIN)
+  // @ApiConsumes('multipart/form-data', 'application/json')
+  // @ApiParam({ name: 'id', required: true })
+  // @Delete('/delete/:id')
+  // async deleteSettings(@Param() params, @Request() request: any) {
+  //   return await this.securityService.deleteSettings(params.id);
+  // }
+
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', required: true })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        value: { type: 'number' },
+        type: { type: 'string' },
+        name: { type: 'string' },
+      },
+    },
+  })
   @Put('/tax/:id')
   async taxSettings(
     @Param() params,
-    @Body() CreateTaxSettingsDto: CreateTaxSettingsDto,
+    @Body() CreateTaxSettingsDto: EditSettingsDto,
     @Request() request: any,
   ) {
-    return await this.securityService.taxSettings(params.id);
+    return await this.securityService.taxSettings(
+      params.id,
+      CreateTaxSettingsDto,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', required: true })
-  @Put('/order/:id')
+  @Put('/fleetorder/:id')
   async orderSettings(
     @Param() params,
     @Body() CreateOrderSettingsDto: CreateOrderSettingsDto,
     @Request() request: any,
   ) {
-    return await this.securityService.orderSettings(params.id);
+    return await this.securityService.orderSettings(
+      request.params.id,
+      CreateOrderSettingsDto,
+    );
   }
 }

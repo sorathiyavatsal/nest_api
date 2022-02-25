@@ -11,11 +11,7 @@ export class CreateSettingsDto {
   @IsArray()
   @IsNotEmpty()
   @ApiProperty()
-  delivery_service_array: Array<object>;
-
-  @IsString()
-  @ApiPropertyOptional({
-    description:'this is just testing',
-  })
-  meta_value:string;
+ 
+  metaKey: String
+  metaValue: Array<object>
 }

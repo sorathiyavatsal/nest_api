@@ -52,4 +52,8 @@ export class CreateTaxSettingsDto {
   @IsNotEmpty()
   @ApiProperty()
   display_tax_total: string;
+  status: any;
+  name: any;
+  type: any;
+  value: any;
 }

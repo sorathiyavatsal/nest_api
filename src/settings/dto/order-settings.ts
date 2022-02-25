@@ -5,15 +5,15 @@ export class CreateOrderSettingsDto {
   @IsBoolean()
   @IsNotEmpty()
   @ApiProperty()
-  order_switch: boolean;
+  'metaValue.order_switch': boolean;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  orderTime: string;
+  'metaValue.operation_time': number;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  order_verifyTime: string;
+  'metaValue.otp_verification_time': number;
 }
