@@ -19,7 +19,7 @@ export class SendEmailMiddleware {
     const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
     const client = require('twilio')(accountSid, authToken);
     let validPhone = await this.addCountrycode(phone);
-    let autoCode: string = '23XiUiRVHsd';
+    let autoCode: string = 'bSgLgZOrw/w';
     if (osName != 'Apple') autoCode = 'dmnIsLrTu2D';
     //   if(whatsapp==true && (manager=='MERCHANT' || manager=='DELIVERY' || manager=='MANAGER'))
     //   {
@@ -52,7 +52,7 @@ export class SendEmailMiddleware {
     const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
     const client = require('twilio')(accountSid, authToken);
     let validPhone = await this.addCountrycode(phone);
-    let autoCode: string = '23XiUiRVHsd';
+    let autoCode: string = 'bSgLgZOrw/w';
     if (osName != 'Apple') autoCode = 'dmnIsLrTu2D';
     client.messages
       .create({
