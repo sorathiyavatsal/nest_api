@@ -6,15 +6,37 @@ export const TemplateSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      unique: true,
       required: true,
+      enum: [
+        'REGISTER',
+        'LOGIN',
+        'RESET_PASSWORD',
+        'FORGOT_PASSWORD',
+        'LOGIN_OTP_VERIFICATION',
+        'DELIVERY_FLEET_ORDER_ACCEPTED',
+        'DELIVERY_INPROGRESS',
+        'DELIVERY_DELIVERED',
+        'DELIVERY_PICKUP_OTP',
+        'DELIVERY_DELIVERED_OTP',
+        'ACCOUNT_APPROVED',
+        'ACCOUNT_REJECTED',
+        'API_ACCESS_KEY',
+      ]
     },
     content: {
       type: String,
     },
-    filepath: {
+    emailSubject: {
       type: String,
-      required: true,
+      required: false
+    },
+    type: {
+      type: String,
+      enum: [
+        'SMS',
+        'EMAIL',
+      ],
+      default: 'EMAIL'
     },
     activeStatus: {
       type: Boolean,
@@ -35,10 +57,10 @@ TemplateSchema.index({ content: 'text' });
 export interface Template extends mongoose.Document {
   _id: string;
   name: string;
-  content: Buffer;
-  updatedAt: Date;
-  createdAt: Date;
+  content: string;
+  emailSubject: string;
+  type: string;
+  activeStatus: boolean;
   createdBy: string;
   modifiedBy: string;
-  activeStatus: boolean;
 }

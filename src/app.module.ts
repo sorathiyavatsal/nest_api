@@ -50,9 +50,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigModule,
     MailerModule.forRoot({
       transport:
-        'smtps://leslin@southsoft.co.in:VUdF1oTp8zW@smtp.hostinger.com',
+        'smtps://support@byecom.in:4EmH>&D*@smtp.gmail.com',
       defaults: {
-        from: '"Byecom" <leslin@southsoft.co.in>',
+        from: '"Byecom" <support@byecom.in>',
       },
       template: {
         dir: join(__dirname, 'mail/templates'),

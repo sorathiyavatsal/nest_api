@@ -39,7 +39,7 @@ import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 @ApiSecurity('api_key')
 export class UsersController {
   constructor(
-    private sendSMS: SendEmailMiddleware,
+    private sendEmailMiddleware: SendEmailMiddleware,
     private userService: UsersService,
   ) {}
 
@@ -118,18 +118,36 @@ export class UsersController {
       profileStatus,
       req.user,
     );
-    if (user && user.verifyStatus == true)
-      this.sendSMS.sensSMSdelivery(
-        'Apple',
-        user.phoneNumber,
-        'Byecome verified your account',
-      );
-    if (user && user.verifyStatus == false)
-      this.sendSMS.sensSMSdelivery(
-        'Apple',
-        user.phoneNumber,
-        'Byecome rejected your account',
-      );
+    if (user && user.verifyStatus == true){
+      const mailOptions = {
+        name: 'ACCOUNT_APPROVED',
+        type: 'SMS',
+        device: req.headers.OsName || 'ANDROID',
+        phone: user.phoneNumber,
+      }
+      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+      // this.sendEmailMiddleware.sensSMSdelivery(
+      //   'Apple',
+      //   user.phoneNumber,
+      //   'Byecome verified your account',
+      // );
+    }
+    if (user && user.verifyStatus == false){
+      const mailOptions = {
+        name: 'ACCOUNT_REJECTED',
+        type: 'SMS',
+        device: req.headers.OsName || 'ANDROID',
+        phone: user.phoneNumber,
+      }
+      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+      // this.sendEmailMiddleware.sensSMSdelivery(
+      //   'Apple',
+      //   user.phoneNumber,
+      //   'Byecome rejected your account',
+      // );
+    }
     return user;
   }
   @ApiOperation({ summary: 'Add/Edit address' })

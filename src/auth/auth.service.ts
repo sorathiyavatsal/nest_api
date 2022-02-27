@@ -119,13 +119,24 @@ export class AuthService {
           { upsert: true },
         );
       }
-      this.sendEmailMiddleware.sensSMS(
-        req.headers['OsName'],
-        user.phoneNumber,
-        newTokenVerifyEmail.otp,
-        user.role,
-        false,
-      );
+
+      const mailOptions = {
+        name: 'REGISTER',
+        type: 'SMS',
+        device: req.headers.OsName || 'ANDROID',
+        phone: user.phoneNumber,
+        otp: newTokenVerifyEmail.otp,
+        username: user.fullName,
+      }
+      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+      // this.sendEmailMiddleware.sensSMS(
+      //   req.headers['OsName'],
+      //   user.phoneNumber,
+      //   newTokenVerifyEmail.otp,
+      //   user.role,
+      //   false,
+      // );
       return { user: user.toObject({ versionKey: false }), loginStaus: "new user" };
     });
   }
@@ -142,12 +153,23 @@ export class AuthService {
     });
     newTokenVerifyEmail.save();
 
-    this.sendEmailMiddleware.sensSMS(
-      req.headers['OsName'],
-      user.phoneNumber,
-      newTokenVerifyEmail.otp,
-      user.role,
-    );
+    const mailOptions = {
+      name: 'LOGIN_OTP_VERIFICATION',
+      type: 'SMS',
+      device: req.headers.OsName || 'ANDROID',
+      attachments: [],
+      phone: user.phoneNumber,
+      otp: newTokenVerifyEmail.otp,
+      username: user.fullName,
+    }
+    this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+    // this.sendEmailMiddleware.sensSMS(
+    //   req.headers['OsName'],
+    //   user.phoneNumber,
+    //   newTokenVerifyEmail.otp,
+    //   user.role,
+    // );
 
     return newTokenVerifyEmail;
   }
@@ -185,22 +207,40 @@ export class AuthService {
         });
         newTokenVerifyEmail.save();
         if (user.verifyType == 'email') {
-          let emailData: any = {
-            to: user.email,
-            subject: 'User Verification',
-            template: './register',
-            context: {
-              code: newTokenVerifyEmail.otp,
-            },
-          };
-          this.sendEmailMiddleware.sendEmailAll(emailData);
+          const mailOptions = {
+            name: 'REGISTER',
+            type: 'EMAIL',
+            attachments: [],
+            email: user.email,
+            otp: newTokenVerifyEmail.otp,
+            username: user.fullName,
+          }
+          this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+          // let emailData: any = {
+          //   to: user.email,
+          //   subject: 'User Verification',
+          //   template: './register',
+          //   context: {
+          //     code: newTokenVerifyEmail.otp,
+          //   },
+          // };
+          // this.sendEmailMiddleware.sendEmailAll(emailData);
         } else {
-          this.sendEmailMiddleware.sensSMS(
-            req.headers.OsName,
-            user.phoneNumber,
-            newTokenVerifyEmail.otp,
-            user.role,
-          );
+          const mailOptions = {
+            name: 'REGISTER',
+            type: 'SMS',
+            device: req.headers.OsName || 'ANDROID',
+            phone: user.phoneNumber,
+            otp: newTokenVerifyEmail.otp,
+            username: user.fullName,
+          }
+          this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+          // this.sendEmailMiddleware.sensSMS(
+          //   req.headers.OsName,
+          //   user.phoneNumber,
+          //   newTokenVerifyEmail.otp,
+          //   user.role,
+          // );
         }
         return user.toObject({ versionKey: false });
       });
@@ -357,22 +397,42 @@ export class AuthService {
         });
         newTokenVerifyEmail.save();
         if (userToAttempt.verifyType != 'email') {
-          this.sendEmailMiddleware.sensSMS(
-            req.headers.OsName,
-            userToAttempt.phoneNumber,
-            newTokenVerifyEmail.otp,
-            userToAttempt.role,
-          );
+          const mailOptions = {
+            name: 'FORGOT_PASSWORD',
+            type: 'SMS',
+            device: req.headers.OsName || 'ANDROID',
+            phone: userToAttempt.phoneNumber,
+            otp: newTokenVerifyEmail.otp,
+            username: userToAttempt.fullName,
+          }
+          this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+          // this.sendEmailMiddleware.sensSMS(
+          //   req.headers.OsName,
+          //   userToAttempt.phoneNumber,
+          //   newTokenVerifyEmail.otp,
+          //   userToAttempt.role,
+          // );
         } else {
-          let emailData: any = {
-            to: userToAttempt.email,
-            subject: 'Forgot Password',
-            template: './forgotpassword',
-            context: {
-              code: newTokenVerifyEmail.otp,
-            },
-          };
-          this.sendEmailMiddleware.sendEmailAll(emailData);
+          const mailOptions = {
+            name: 'FORGOT_PASSWORD',
+            type: 'EMAIL',
+            attachments: [],
+            email: userToAttempt.email,
+            otp: newTokenVerifyEmail.otp,
+            username: userToAttempt.fullName,
+          }
+          this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+          // let emailData: any = {
+          //   to: userToAttempt.email,
+          //   subject: 'Forgot Password',
+          //   template: './forgotpassword',
+          //   context: {
+          //     code: newTokenVerifyEmail.otp,
+          //   },
+          // };
+          // this.sendEmailMiddleware.sendEmailAll(emailData);
         }
         resolve({ message: 'Please check your email for next step' });
       }
