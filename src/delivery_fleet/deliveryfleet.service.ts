@@ -25,7 +25,7 @@ let ObjectId = require('mongodb').ObjectId;
 export class DeliveryFleetService {
   settings: any = [];
   constructor(
-    private sendSms: SendEmailMiddleware,
+    private sendEmailMiddleware: SendEmailMiddleware,
     @InjectModel('UserVerification')
     private userVerificationModel: Model<UserVerification>,
     @InjectModel('DeliveryFleet')
@@ -254,9 +254,18 @@ export class DeliveryFleetService {
       { $set: updateObj },
       { upsert: true },
     );
-    //let smsData:any=await this.loginVerificationSmsOtp(delivery.userId)
-    let message: string = 'Byecom delivery accept your delivery  fleet order';
-    this.sendSms.sensSMSdelivery(req, delivery.userId.phoneNumber, message);
+    
+    const mailOptions = {
+      name: 'DELIVERY_FLEET_ORDER_ACCEPTED',
+      type: 'SMS',
+      device: req.headers.OsName || 'ANDROID',
+      phone: delivery.userId.phoneNumber,
+    }
+    this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+    
+    // //let smsData:any=await this.loginVerificationSmsOtp(delivery.userId)
+    // let message: string = 'Byecom delivery accept your delivery  fleet order';
+    // this.sendEmailMiddleware.sensSMSdelivery(req, delivery.userId.phoneNumber, message);
     return { msg: 'Trip is started successfully' };
   }
   async loginVerificationSmsOtp(
@@ -314,8 +323,16 @@ export class DeliveryFleetService {
         verifiedTemplate: 'deliveryProgress',
       });
       if (verification && !verification.verifiedStatus) {
-        message = message + ' boy start from pickup location';
-        this.sendSms.sensSMSdelivery(req, data.userId.phoneNumber, message);
+        const mailOptions = {
+          name: 'DELIVERY_INPROGRESS',
+          type: 'SMS',
+          device: req.headers.OsName || 'ANDROID',
+          phone: data.userId.phoneNumber,
+        }
+        this.sendEmailMiddleware.sendEmailOrSms(mailOptions);    
+
+        // message = message + ' boy start from pickup location';
+        // this.sendEmailMiddleware.sensSMSdelivery(req, data.userId.phoneNumber, message);
         this.userVerificationModel.update(
           {
             otp: dto.otp,
@@ -335,8 +352,16 @@ export class DeliveryFleetService {
         verifiedTemplate: 'deliveryDelivered',
       });
       if (verification && !verification.verifiedStatus) {
-        message = message + ' boy deliver the package to drop location';
-        this.sendSms.sensSMSdelivery(req, data.userId.phoneNumber, message);
+        const mailOptions = {
+          name: 'DELIVERY_DELIVERED',
+          type: 'SMS',
+          device: req.headers.OsName || 'ANDROID',
+          phone: data.userId.phoneNumber,
+        }
+        this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+        // message = message + ' boy deliver the package to drop location';
+        // this.sendEmailMiddleware.sensSMSdelivery(req, data.userId.phoneNumber, message);
         this.userVerificationModel.update(
           {
             otp: dto.otp,
@@ -358,8 +383,18 @@ export class DeliveryFleetService {
         'deliveryProgress',
       );
       code = code.otp;
-      message = message + ' boy delivery pickup otp ' + code;
-      this.sendSms.sensSMSdelivery(req, data.fromPhone, message);
+
+      const mailOptions = {
+        name: 'DELIVERY_PICKUP_OTP',
+        type: 'SMS',
+        device: req.headers.OsName || 'ANDROID',
+        phone: data.fromPhone,
+        otp: code,
+      }
+      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+      // message = message + ' boy delivery pickup otp ' + code;
+      // this.sendEmailMiddleware.sensSMSdelivery(req, data.fromPhone, message);
     } else if (data.invoiceStatus == 'delivered') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
@@ -367,8 +402,18 @@ export class DeliveryFleetService {
         'deliveryDelivered',
       );
       code = code.otp;
-      message = message + ' boy delivery delivered otp ' + code;
-      this.sendSms.sensSMSdelivery(req, data.toPhone, message);
+
+      const mailOptions = {
+        name: 'DELIVERY_DELIVERED_OTP',
+        type: 'SMS',
+        device: req.headers.OsName || 'ANDROID',
+        phone: data.fromPhone,
+        otp: code,
+      }
+      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+      // message = message + ' boy delivery delivered otp ' + code;
+      // this.sendEmailMiddleware.sensSMSdelivery(req, data.toPhone, message);
     } else {
       return new BadRequestException('Invalid Delivery Fleet Request Status');
     }

@@ -5,16 +5,31 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateTemplateDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ description:  'REGISTER, LOGIN, RESET_PASSWORD, FORGOT_PASSWORD, LOGIN_OTP_VERIFICATION, DELIVERY_FLEET_ORDER_ACCEPTED, DELIVERY_INPROGRESS, DELIVERY_DELIVERED, DELIVERY_PICKUP_OTP, DELIVERY_DELIVERED_OTP, ACCOUNT_APPROVED, ACCOUNT_REJECTED, API_ACCESS_KEY'  })
   name: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  template: Template;
+  content: string;
+
+  @IsString()
+  @ApiProperty({ required: false, description: "For Email type Only" })
+  emailSubject: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: "SMS or EMAIL" })
+  type: string;
 
   @IsBoolean()
   @IsNotEmpty()
   @ApiProperty()
-  activeStatus: boolean;
+  activeStatus: Boolean;
+}
+
+export class filterDto {
+  @IsBoolean()
+  @ApiProperty({ required: false })
+  status: Boolean;
 }

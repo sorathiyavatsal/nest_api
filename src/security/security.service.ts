@@ -55,15 +55,24 @@ export class SecurityService {
     });
     return await newUser.save().then(
       (user: any) => {
-        let registerEmail: any = {
-          to: user.email,
-          subject: 'API Access Key',
-          template: './security',
-          context: {
-            apikey: user.apiKey,
-          },
-        };
-        this.sendEmailMiddleware.sendEmailAll(registerEmail);
+        const mailOptions = {
+          name: 'API_ACCESS_KEY',
+          type: 'EMAIL',
+          email: user.email,
+          apikey: user.apiKey,
+          username: user?.fullName || '',
+        }
+        this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+        // let registerEmail: any = {
+        //   to: user.email,
+        //   subject: 'API Access Key',
+        //   template: './security',
+        //   context: {
+        //     apikey: user.apiKey,
+        //   },
+        // };
+        // this.sendEmailMiddleware.sendEmailAll(registerEmail);
         return user.toObject({ versionKey: false });
       },
       (error) => {

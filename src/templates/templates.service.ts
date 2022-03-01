@@ -7,6 +7,7 @@ import { v5 as uuidv5 } from 'uuid';
 import { Buffer } from 'buffer';
 import { SendEmailMiddleware } from './../core/middleware/send-email.middleware';
 import { throws } from 'assert';
+import { isBoolean } from 'class-validator';
 
 const fs = require('fs');
 @Injectable()
@@ -14,44 +15,30 @@ export class TemplatesService {
   constructor(
     @InjectModel('Template') private templateModel: Model<Template>,
   ) {}
-  async getTemplates() {
-    return this.templateModel.find();
+  async getTemplates(filter) {
+    let filters: any = {};
+    if(filter && Object.keys(filter).length){
+      filters.activeStatus = filter.status == 'true' ? true : false;
+    }
+    return await this.templateModel.find(filter);
   }
   async updateTemplate(id: any, templateDto: CreateTemplateDto, req: any) {
     let userid = req.user.user._id;
 
-    let name = templateDto.name.replace(/[^a-zA-Z]/g, '');
     let filecontent: any = await this.templateModel.findOne({ _id: id });
-    let deletePath;
-    if (filecontent && filecontent._id) {
-      deletePath = filecontent.filepath;
-      (filecontent.filepath = name),
-        (filecontent.name = templateDto.name),
-        (filecontent.modifiedBy = userid),
-        (filecontent.content = ''),
-        (filecontent.activeStatus = templateDto.activeStatus);
-      let user = await filecontent.save();
-      if (!user) {
-        return new BadRequestException("File didn't create");
-      } else {
-        let filedata: any = await this.updateFileContent(
-          deletePath,
-          user.filepath,
-          templateDto.template,
-        );
 
-        return user.toObject({ versionKey: false });
-      }
+    if (!filecontent) {
+      Object.assign(filecontent, templateDto);
+      filecontent.modifiedBy = userid;
+    
+      return await this.createnewTemplate(templateDto, req);
     } else {
-      return new BadRequestException('Invalid template');
+      let user = await filecontent.save();
+      return user.toObject({ versionKey: false });
     }
   }
   async getTemplateData(id: any) {
     let template: any = await this.templateModel.findOne({ _id: id });
-    let content: any = await this.readtheFile(
-      './src/mail/templates/' + template.filepath + '.hbs',
-    );
-    template.content = content;
     return template.toObject({ versionKey: false });
   }
   async updateFileContent(delete_file, filepath, content) {
@@ -77,24 +64,11 @@ export class TemplatesService {
   }
   async createnewTemplate(templateDto: CreateTemplateDto, req: any) {
     let userid = req.user.user._id;
-    let name = templateDto.name.replace(/[^a-zA-Z]/g, '');
-    const newUser = new this.templateModel({
-      filepath: name,
-      content: '',
-      name: templateDto.name,
-      createdBy: userid,
-      modifiedBy: userid,
-      activeStatus: templateDto.activeStatus,
-    });
+    const newUser = new this.templateModel(templateDto);
+    newUser.createdBy = userid;
+    newUser.modifiedBy = userid;
     return await newUser.save().then(
       (user) => {
-        fs.writeFile(
-          './src/mail/templates/' + name + '.hbs',
-          templateDto.template,
-          function (err) {
-            if (err) return new BadRequestException("File didn't create");
-          },
-        );
         return user.toObject({ versionKey: false });
       },
       (error) => {
@@ -103,5 +77,17 @@ export class TemplatesService {
         return new BadRequestException(msg);
       },
     );
+  }
+  async deleteTemplateData(id: any) {
+    let template: any = await this.templateModel.findOne({ _id: id });
+    if(!template){
+      return new BadRequestException("Template not found!");
+    }
+    template.activeStatus = false;
+    template.save();
+    return template.toObject({ versionKey: false });
+  }
+  async getTemplateByQuery(query: any){
+    return await this.templateModel.findOne(query);
   }
 }
