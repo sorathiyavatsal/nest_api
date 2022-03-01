@@ -18,6 +18,18 @@ export const UserSchema = new mongoose.Schema(
         partialFilterExpression: { email: { $type: 'string' } },
       },
     },
+    gender: {
+      type: String,
+    },
+    dateofbirth: {
+      type: Date,
+    },
+    profilePhoto: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
@@ -49,12 +61,6 @@ export const UserSchema = new mongoose.Schema(
     verifyType: {
       type: String,
       default: 'email',
-    },
-    firstName: {
-      type: String,
-    },
-    lastName: {
-      type: String,
     },
     phoneNumber: {
       type: String,
@@ -89,15 +95,21 @@ export const UserSchema = new mongoose.Schema(
     deviceId: {
       type: String,
     },
-    savedAddress: [{
-      lat: { type: String, required: true },
-      lng: { type: String, required: true },
-      address: { type: String, required: false },
-      landMark: { type: String, required: false },
-      fullName: { type: String, required: false },
-      phoneNumber: { type: String, required: false },
-      label: { type: String, required: false, enum: ['SHOP', 'HOME', 'OFFICE'],}
-    }]
+    savedAddress: [
+      {
+        lat: { type: String, required: true },
+        lng: { type: String, required: true },
+        address: { type: String, required: false },
+        landMark: { type: String, required: false },
+        fullName: { type: String, required: false },
+        phoneNumber: { type: String, required: false },
+        label: {
+          type: String,
+          required: false,
+          enum: ['SHOP', 'HOME', 'OFFICE'],
+        },
+      },
+    ],
   },
   { timestamps: true },
 );
@@ -133,8 +145,10 @@ export interface User extends mongoose.Document {
   _id: string;
   email: string;
   emailVerified: Boolean;
-  firstName: string;
-  lastName: string;
+  gender: string;
+  dateofbirth: Date;
+  profilePhoto: string;
+  address: string;
   phoneNumber: string;
   fullName: string;
   role: string;
@@ -154,14 +168,14 @@ export interface User extends mongoose.Document {
   verifyStatus: boolean;
   savedAddress: [
     {
-      _id: string,
-      lat: string,
-      lng: string,
-      address: string,
-      landMark: string,
-      fullName: string,
-      phoneNumber: string,
-      label: string
-    }
+      _id: string;
+      lat: string;
+      lng: string;
+      address: string;
+      landMark: string;
+      fullName: string;
+      phoneNumber: string;
+      label: string;
+    },
   ];
 }

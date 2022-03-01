@@ -17,6 +17,15 @@ export const VariantOptionsSchema = new mongoose.Schema(
     text: {
       type: String,
     },
+    mrpprice: {
+      type: Number,
+    },
+    salepprice: {
+      type: Number,
+    },
+    qty: {
+      type: Number,
+    },
     status: {
       type: Boolean,
     },
@@ -30,5 +39,8 @@ export interface VariantOptions extends mongoose.Document {
   value: string;
   image: string;
   text: string;
+  mrpprice: number;
+  salepprice: number;
+  qty: number;
   status: string;
 }

@@ -13,10 +13,110 @@ export class ProductService {
     @InjectModel('Products') private ProductsModel: Model<Product>,
   ) {}
 
-  async getAllProducts() {
-    return await this.ProductsModel.find({
-      status: true,
-    });
+  async getAllProducts(filter: any) {
+    return await this.ProductsModel.aggregate([
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'store',
+          foreignField: '_id',
+          as: 'stores',
+        },
+      },
+      { $unwind: '$stores' },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categories',
+        },
+      },
+      { $unwind: '$categories' },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'collections',
+          foreignField: '_id',
+          as: 'collection',
+        },
+      },
+      { $unwind: '$collection' },
+      {
+        $lookup: {
+          from: 'menus',
+          localField: 'menu',
+          foreignField: '_id',
+          as: 'menu',
+        },
+      },
+      // { $unwind: '$menu' },
+      {
+        $lookup: {
+          from: 'brands',
+          localField: 'brand',
+          foreignField: '_id',
+          as: 'brand',
+        },
+      },
+      { $unwind: '$brand' },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: 'review',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+      {
+        $match: {
+          name: {
+            $regex: filter.name ? filter.name : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          secondary_name: {
+            $regex: filter.name ? filter.name : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          pageTitle: {
+            $regex: filter.title ? filter.title : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'stores.categoryName': {
+            $regex: filter.store ? filter.store : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'categories.categoryName': {
+            $regex: filter.category ? filter.category : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'collection.categoryName': {
+            $regex: filter.collection ? filter.collection : '',
+            $options: 'i',
+          },
+        },
+      },
+    ]);
   }
 
   async getProducts(productId: string) {
@@ -40,8 +140,15 @@ export class ProductService {
       category: productDto.category,
       collections: productDto.collection,
       brand: productDto.brand,
+      keywords: productDto.keywords,
+      type: productDto.type,
       status: productDto.status,
     };
+
+    if (productDto.menu) {
+      productCollection['menu'] = productDto.menu;
+    }
+
     const product = await new this.ProductsModel(productCollection);
     return await product.save();
   }
@@ -89,6 +196,18 @@ export class ProductService {
       productCollection['status'] = productDto.status;
     }
 
+    if (productDto.keywords) {
+      productCollection['keywords'] = productDto.keywords;
+    }
+
+    if (productDto.menu) {
+      productCollection['menu'] = productDto.menu;
+    }
+
+    if (productDto.type) {
+      productCollection['type'] = productDto.type;
+    }
+
     return await this.ProductsModel.findByIdAndUpdate(
       { _id: productId },
       {
@@ -100,10 +219,10 @@ export class ProductService {
 
   async postVariant(metaDto: any) {
     const variant = await new this.VariantModel({
-      meta_key: metaDto.metakey,
-      meta_value: metaDto.metavalue,
-      meta_type: metaDto.metatype,
-      meta_status: true,
+      name: metaDto.name,
+      type: metaDto.type,
+      image: metaDto.image,
+      status: true,
     });
 
     return await variant.save();
@@ -115,8 +234,8 @@ export class ProductService {
     });
 
     if (
-      (optionsDto.optionsImage && variant.meta_type == true) ||
-      (optionsDto.optionsText && variant.meta_type == false)
+      (optionsDto.optionsImage && variant.type == true) ||
+      (optionsDto.optionsText && variant.type == false)
     ) {
       let optionPayload = {
         variant_id: optionsDto.variantId,
@@ -141,7 +260,7 @@ export class ProductService {
         },
         {
           $push: {
-            meta_options: options._id,
+            options: options._id,
           },
         },
       );
