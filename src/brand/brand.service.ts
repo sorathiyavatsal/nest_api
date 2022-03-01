@@ -1,22 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Product } from 'src/product/product.model';
 import { Brands } from './brand.model';
 @Injectable()
 export class BrandService {
-  constructor(@InjectModel('Brands') private BrandModel: Model<Brands>) {}
+  constructor(
+    @InjectModel('Brands') private BrandModel: Model<Brands>,
+    @InjectModel('Products') private ProductsModel: Model<Product>,
+  ) {}
 
   async getAllBrand() {
-    return await this.BrandModel.find({
-      status: true,
-    });
+    let brand = JSON.parse(
+      JSON.stringify(
+        await this.BrandModel.find({
+          status: true,
+        }),
+      ),
+    );
+
+    for (let i = 0; i < brand.length; i++) {
+      brand[i]['products'] = await this.ProductsModel.find({
+        brand: brand[i]._id,
+      }).count();
+    }
+
+    return brand;
   }
 
   async getBrand(brandId: string) {
-    return await this.BrandModel.findOne({
-      _id: brandId,
-      status: true,
-    });
+    let brand = JSON.parse(
+      JSON.stringify(
+        await this.BrandModel.findOne({
+          _id: brandId,
+          status: true,
+        }),
+      ),
+    );
+    brand['products'] = await this.ProductsModel.find({
+      brand: brand._id,
+    }).count();
+
+    return brand;
   }
 
   async postBrand(brandDto: any) {

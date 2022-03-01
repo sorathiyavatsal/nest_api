@@ -41,6 +41,9 @@ import { OrderModule } from './order/order.module';
 import { TaxModule } from './tax/tax.module';
 import { PushNotificationModule } from './push-notification/push-notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserDataModule } from './user-data/user-data.module';
+import { CatalogueModule } from './catalogue/catalogue.module';
+import { ReviewsModule } from './reviews/reviews.module';
 @Module({
   imports: [
     MulterModule.register({
@@ -103,6 +106,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     OrderModule,
     TaxModule,
     PushNotificationModule,
+    UserDataModule,
+    CatalogueModule,
+    ReviewsModule,
   ],
   controllers: [],
   providers: [

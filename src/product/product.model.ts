@@ -30,20 +30,37 @@ export const ProductSchema = new mongoose.Schema(
       type: Array,
     },
     store: {
-      type: String,
+      type: ObjectId,
       $ref: 'categories',
     },
     category: {
-      type: String,
+      type: ObjectId,
       $ref: 'categories',
     },
     collections: {
-      type: String,
+      type: ObjectId,
       $ref: 'categories',
     },
     brand: {
-      type: String,
+      type: ObjectId,
       $ref: 'brand',
+    },
+    keywords: {
+      type: String,
+    },
+    menu: {
+      type: ObjectId,
+      $ref: 'menu',
+      required: false,
+    },
+    type: {
+      type: String,
+    },
+    review: {
+      type: Array,
+    },
+    avgreview: {
+      type: Number,
     },
     status: {
       type: Boolean,
@@ -62,9 +79,14 @@ export interface Product extends mongoose.Document {
   metaDescription: string;
   urlHandle: string;
   productImage: [];
-  store: string;
-  category: string;
-  collections: string;
-  brand: string;
+  store: mongoose.ObjectId;
+  category: mongoose.ObjectId;
+  collections: mongoose.ObjectId;
+  brand: mongoose.ObjectId;
   status: boolean;
+  keywords: string;
+  menu: string;
+  type: string;
+  review: [];
+  avgreview: number;
 }

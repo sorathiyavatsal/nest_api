@@ -1,16 +1,28 @@
-import { Controller, Post, UseGuards, Request, Get, UseInterceptors, Body, Response } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+  UseInterceptors,
+  Response,
+  UploadedFiles,
+  Param,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiParam,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles.decorator';
 import { StoreService } from './store.service';
-import { CreateStoreDto } from './dto/create-store'
 import { diskStorage } from 'multer';
 
 @Controller('store')
@@ -18,36 +30,75 @@ import { diskStorage } from 'multer';
 @ApiBearerAuth()
 @ApiSecurity('api_key')
 export class StoreController {
-  constructor(private StoreService: StoreService) { }
+  constructor(private StoreService: StoreService) {}
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  async getAllStore(@Request() request) {
-    return await this.StoreService.getAllStore();
+  async getAllStore(@Response() response) {
+    response.json(await this.StoreService.getAllStore());
+  }
+
+  @Get('/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('ADMIN')
+  @ApiParam({ name: 'id', required: true })
+  async getStore(@Param() params, @Response() response) {
+    response.json(await this.StoreService.getStore(params.id));
   }
 
   @Post('/add')
   @UseGuards(AuthGuard('jwt'))
-  @ApiConsumes('multipart/form-data', 'application/json')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'storeImage', maxCount: 1 },
+        { name: 'merchant_profilePic', maxCount: 1 },
+        { name: 'aadhar_card_pic', maxCount: 1 },
+        { name: 'pan_card_pic', maxCount: 1 },
+        { name: 'store_licences_pic', maxCount: 1 },
+        { name: 'licences_pic', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './public/uploads/documents',
+          filename: function (req, file, cb) {
+            let extArray = file.mimetype.split('/');
+            let extension = extArray[extArray.length - 1];
+            cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+          },
+        }),
+      },
+    ),
+  )
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        'profilePic': {
+        shopName: {
+          type: 'string',
+        },
+        storeImage: {
           type: 'string',
           format: 'binary',
         },
-        Name: {
+        merchant_profilePic: {
+          type: 'string',
+          format: 'binary',
+        },
+        merchant_name: {
           type: 'string',
         },
-        Gender: {
+        merchant_gender: {
           type: 'string',
         },
-        dateOfBirth: {
+        merchant_dateOfBirth: {
           type: 'string',
         },
-        shopName: {
+        merchant_phoneNumber: {
+          type: 'string',
+        },
+        merchant_Address: {
           type: 'string',
         },
         shopAddress: {
@@ -56,7 +107,7 @@ export class StoreController {
         shop_Lat_Long: {
           type: 'string',
         },
-        sell: {
+        category: {
           type: 'string',
         },
         aadhar_card_pic: {
@@ -83,11 +134,16 @@ export class StoreController {
         store_licences_number: {
           type: 'string',
         },
-        service_area_Lat_Long: {
+        licences_pic: {
+          type: 'string',
+          format: 'binary',
+          description: 'iffsc and drug licence',
+        },
+        licences_number: {
           type: 'string',
         },
-        service_area_address: {
-          type: 'string',
+        service_area_zipcode: {
+          type: 'array',
         },
         bank_account_no: {
           type: 'string',
@@ -101,64 +157,24 @@ export class StoreController {
         ifsc_code: {
           type: 'string',
         },
-        phone_number: {
+        delegate_access: {
           type: 'array',
         },
         primary_language: {
-          type: 'array',
+          type: 'string',
         },
         secondary_language: {
+          type: 'string',
+        },
+        store_timing: {
           type: 'array',
         },
       },
-    }
+    },
   })
-  @UseInterceptors(
-    FilesInterceptor('profilePic', 20, {
-      storage: diskStorage({
-        destination: './public/profile',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-    }),
-    FilesInterceptor('aadhar_card_pic', 20, {
-      storage: diskStorage({
-        destination: './public/documents',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-    }),
-    FilesInterceptor('pan_card_pic', 20, {
-      storage: diskStorage({
-        destination: './public/documents',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-    }),
-    FilesInterceptor('store_licences_pic', 20, {
-      storage: diskStorage({
-        destination: './public/documents',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-    }),
-  )
-  async postStore(
-    @Request() request,
-    @Response() response,) {
-    const data = await this.StoreService.postStore();
-    response.json(data)
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async postStore(@Request() request, @UploadedFiles() files) {
+    const data = await this.StoreService.postStore(files, request);
+    return data;
   }
 }

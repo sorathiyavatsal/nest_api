@@ -10,6 +10,7 @@ import {
   Put,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -17,6 +18,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiParam,
+  ApiQuery,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -35,8 +37,17 @@ export class ProductController {
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  async getAllProducts(@Request() request, @Response() response) {
-    response.json(await this.ProductService.getAllProducts());
+  @ApiQuery({ name: 'category', type: 'string', required: false })
+  @ApiQuery({ name: 'store', type: 'string', required: false })
+  @ApiQuery({ name: 'collection', type: 'string', required: false })
+  @ApiQuery({ name: 'name', type: 'string', required: false })
+  @ApiQuery({ name: 'title', type: 'string', required: false })
+  async getAllProducts(
+    @Request() request,
+    @Response() response,   
+    @Query() query,
+  ) {
+    response.json(await this.ProductService.getAllProducts(query));
   }
 
   @Get('/:id')
@@ -49,24 +60,46 @@ export class ProductController {
 
   @Post('/meta')
   @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FilesInterceptor('image', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product/variants',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        metakey: {
+        name: {
           type: 'string',
         },
-        metavalue: {
-          type: 'string',
-        },
-        metatype: {
+        type: {
           type: 'boolean',
+        },
+        image: {
+          type: 'string',
+          format: 'binary',
         },
       },
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async postVariant(@Request() request) {
+  async postVariant(@Request() request, @UploadedFiles() files) {
+    const response = [];
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        const fileReponse = file.path;
+        response.push(fileReponse);
+      });
+    }
+    request.body.image = response[0];
     return await this.ProductService.postVariant(request.body);
   }
 
@@ -177,6 +210,16 @@ export class ProductController {
         brand: {
           type: 'string',
         },
+        keywords: {
+          type: 'string',
+        },
+        menu: {
+          type: 'string',
+        },
+        type: {
+          type: 'string',
+          enum: ['product', 'addon'],
+        },
         status: {
           type: 'boolean',
         },
@@ -255,6 +298,16 @@ export class ProductController {
         },
         brand: {
           type: 'string',
+        },
+        keywords: {
+          type: 'string',
+        },
+        menu: {
+          type: 'string',
+        },
+        type: {
+          type: 'string',
+          enum: ['product', 'addon'],
         },
         status: {
           type: 'boolean',
