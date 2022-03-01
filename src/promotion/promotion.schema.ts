@@ -5,7 +5,7 @@ let Schema = mongoose.Types,
 export const PromotionSchema = new mongoose.Schema(
   {
     promotion_name: {
-      type: Object,
+      type: String,
     },
     promotion_description: {
       type: String,
@@ -90,6 +90,9 @@ export const PromotionSchema = new mongoose.Schema(
     promotion_end_date: {
       type: Date,
     },
+    fixed_percentage_discount:{
+      type: Number
+    },
     createdBy: {
       type: ObjectId,
       ref: 'Users',
@@ -111,6 +114,8 @@ export interface Promotion extends mongoose.Document {
   coupoun_code: string;
   promotion_id: string;
   applicable_price: number;
+  fixed_percentage_discount: number;
   coupon_id: object;
+  promotion_start_date: Date
   promotion_end_date: Date;
 }

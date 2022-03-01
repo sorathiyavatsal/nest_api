@@ -1,6 +1,7 @@
 import {
   IsString,
   IsEmail,
+  IsArray,
   IsNotEmpty,
   IsBoolean,
   IsNumber,
@@ -16,4 +17,15 @@ export class EditRoleDto {
   @IsNotEmpty()
   @ApiProperty()
   activeStatus: boolean;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ApiProperty()
+ permissions: Array<object>;
+
+ operations:string
+ operationAccess:string
+ IsEdit:boolean
+ IsView:boolean
+ IsDelete:boolean
 }

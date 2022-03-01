@@ -30,7 +30,7 @@ import {
   FilesInterceptor,
   FileFieldsInterceptor,
 } from '@nestjs/platform-express';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import {
   ApiTags,
   ApiProperty,
@@ -41,6 +41,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { response } from 'express';
+import Api from 'twilio/lib/rest/Api';
 @Controller('promotion')
 @ApiTags('Promotion')
 @ApiBearerAuth()
@@ -69,7 +70,31 @@ export class PromotionController {
   }
 
   //{update promotion by id here}
+  @ApiParam({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiOperation({summary:"update all diffrent sections as their type suggested,provide couponId in params nd that couponId will added into promotion"})
+  
   @Put('/updatePromotion/:id')
+  @ApiBody({  
+    schema: {
+      properties: {
+        promotion_name: { type: 'String' },
+        promotion_description: { type: 'String' },
+        promotion_image: { type: 'String' },
+        promotion_content_type: { type: 'String' },
+        promotion_target_type: { type: 'String' },
+        promotion_Device_type: { type: 'String' },
+        promotion_type: { type: 'String' },
+        promotion_target_filters:{ type: 'String' },
+        promotion_target_users_by:{ type: 'String' },
+        promotion_start_date:{type:'Date'},
+        promotion_end_date:{type:'Date'},
+        coupon_id:{ type: 'ObjectId' },
+        marchent_id:{ type: 'ObjectId' } ,
+
+      },
+    },
+  })
   async updatePromotion(@Param() params, @Request() request) {
     return await this.PromotionService.updatePromotion(
       params.id,
@@ -77,14 +102,31 @@ export class PromotionController {
       request.user,
     );
   }
+
   @Patch('/applyPromotion/:coupon_id')
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiOperation({summary:"promotion type means it can be flat or percentage"})
+  
+ 
+  @ApiParam({name:'coupon_id' ,required:true})
+  @ApiBody({
+    schema: {
+      properties: {
+        promotion_type:{type:'string'},
+       
+        orderPrice:{type:'number'}
+      },
+    },
+  })
   async applyPromotion(@Param() params, @Request() request) {
     return await this.PromotionService.applyPromotion(
       params.coupon_id,
       request.body,
       request.user,
+      
     );
   }
+ 
   ////delete
   @Delete('/deletePromotion/:id')
   async deleteCoupon(@Param() params, @Request() request) {
@@ -96,10 +138,24 @@ export class PromotionController {
   @Roles(Role.ADMIN)
   @Post('/addPromotions')
   @UseInterceptors(FileInterceptor('image'))
-  @ApiBody({
+  @ApiBody({  
     schema: {
-      type: 'object',
-      properties: {},
+      properties: {
+        promotion_name: { type: 'String' },
+        promotion_description: { type: 'String' },
+        promotion_image: { type: 'String' },
+        promotion_content_type: { type: 'String' },
+        promotion_target_type: { type: 'String' },
+        promotion_Device_type: { type: 'String' },
+        promotion_type: { type: 'String' },
+        promotion_target_filters:{ type: 'String' },
+        promotion_target_users_by:{ type: 'String' },
+        promotion_start_date:{type:'Date'},
+        promotion_end_date:{type:'Date'},
+        coupon_id:{ type: 'ObjectId' },
+        marchent_id:{ type: 'ObjectId' } ,
+
+      },
     },
   })
   @ApiConsumes('multipart/form-data')

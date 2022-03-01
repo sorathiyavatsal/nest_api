@@ -39,6 +39,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { error } from 'console';
+import { identity } from 'rxjs';
 
 @Controller('coupons')
 @ApiTags('Coupons')
@@ -53,11 +54,17 @@ export class CouponsController {
   }
   //{get SingleCouponById here}
   @Get('/singleCoupon/:id')
+  @ApiParam({name:'id',required:true})
   async getSingleCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.getCouponbyId(params.id, request.user);
   }
   //{update promotion by id here}
+  @ApiParam({name:'id',required:true})
   @Put('/updateCoupon/:id')
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiBody({
+    schema: { properties: {coupon_name:{type:"String"}} },
+  })
   async updateCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.updateCoupon(
       params.id,
@@ -67,6 +74,7 @@ export class CouponsController {
   }
   ///delete api
   @Delete('/deleteCoupon/:id')
+  @ApiParam({name:'id',required:true})
   async deleteCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.deleteCoupon(params.id);
   }

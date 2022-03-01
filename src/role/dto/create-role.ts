@@ -1,6 +1,7 @@
 import {
   IsString,
   IsEmail,
+  IsArray,
   IsNotEmpty,
   IsBoolean,
   IsNumber,
@@ -16,4 +17,9 @@ export class CreateRoleDto {
   @IsNotEmpty()
   @ApiProperty()
   activeStatus: boolean;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ApiProperty()
+ permissions: Array<object>;
 }
