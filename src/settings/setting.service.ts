@@ -18,17 +18,15 @@ export class SettingsService {
     @InjectModel('Settings') private SettingsModel: Model<Settings>,
   ) {}
 
-  async getAllSettings(id:string,user: any, securityDto: any,zip_code:any) {
-    let query = zip_code !== undefined
+  async getAllSettings(id: string, user: any, securityDto: any, zip_code: any) {
+    let query =
+      zip_code !== undefined
         ? {
             _id: id,
-            'metaValue.zipcode': {$in: [zip_code]},
+            'metaValue.zipcode': { $in: [zip_code] },
           }
         : { _id: id };
-        console.log(zip_code)
-      
-      console.log(query)
-      const settings = await this.SettingsModel.findOne(query)
+    const settings = await this.SettingsModel.findOne(query);
     return this.SettingsModel.find(query);
   }
   async getSettingsDetail(id: any) {
@@ -72,7 +70,6 @@ export class SettingsService {
     user: any,
   ) {
     try {
-      console.log(zip_code);
       let query =
         zip_code !== undefined
           ? {
@@ -80,7 +77,6 @@ export class SettingsService {
               'metaValue.zipcode': zip_code,
             }
           : { _id: id };
-      console.log(query);
       if (zip_code !== undefined) {
         const response = await this.SettingsModel.updateOne(query, {
           $set: {
@@ -89,7 +85,6 @@ export class SettingsService {
         });
         return response;
       } else {
-        console.log('hello');
         const response1 = await this.SettingsModel.updateOne(
           { _id: id },
           {
@@ -102,7 +97,6 @@ export class SettingsService {
             },
           },
         );
-        console.log(response1);
         return response1;
       }
     } catch (error) {
@@ -130,74 +124,77 @@ export class SettingsService {
     return await this.SettingsModel.findByIdAndRemove(id);
   }
   async taxSettings(_id: string, securityDto: any) {
-    console.log(_id)
-    console.log(securityDto)
     return await this.SettingsModel.updateOne(
       { _id: _id },
       {
-       
-          'metaValue.name': securityDto.name,
-          'metaValue.type': securityDto.type,
-          'metaValue.value': securityDto.value,      },
+        'metaValue.name': securityDto.name,
+        'metaValue.type': securityDto.type,
+        'metaValue.value': securityDto.value,
+      },
     );
-    
-}
+  }
 
-
-  async updatecharges(id: string, securityDto: EditSettingsDto ,zip_code:any) {
+  async updatecharges(id: string, securityDto: EditSettingsDto, zip_code: any) {
     try {
-      console.log(zip_code)
-      let query = zip_code !== undefined
-        ? {
-            _id: id,
-            'metaValue.zipcode': {$in: [zip_code]},
-          }
-        : { _id: id };
+      let query =
+        zip_code !== undefined
+          ? {
+              _id: id,
+              'metaValue.zipcode': { $in: [zip_code] },
+            }
+          : { _id: id };
 
-        
-      
-      console.log(query)
-      const settings = await this.SettingsModel.findOne(query)
+      const settings = await this.SettingsModel.findOne(query);
       if (zip_code !== undefined) {
-        const {zipcode}:any = settings.metaValue[0]
-        
-        const res = await this.SettingsModel.updateOne(query,{
+        const { zipcode }: any = settings.metaValue[0];
+
+        const res = await this.SettingsModel.updateOne(query, {
           $set: {
-            'metaValue.$.zipcode':[...zipcode,securityDto.zipcode],
+            'metaValue.$.zipcode': [...zipcode, securityDto.zipcode],
             'metaValue.$.fuelCharged.default_km': securityDto.default_km,
-            'metaValue.$.fuelCharged.default_km_charge': securityDto.default_km_charge,
-            'metaValue.$.fuelCharged.addition_charge': securityDto.addition_charge,
-            'metaValue.$.weather_charge.default_m':securityDto.default_weather_m,
-            'metaValue.$.weather_charge.meter_charge':securityDto.meter_wether_charge,
-            'metaValue.$.traffic_charge.default_m':securityDto.default_traffic_m,
-            'metaValue.$.traffic_charge.meter_charge':securityDto.meter_traffice_charge,
+            'metaValue.$.fuelCharged.default_km_charge':
+              securityDto.default_km_charge,
+            'metaValue.$.fuelCharged.addition_charge':
+              securityDto.addition_charge,
+            'metaValue.$.weather_charge.default_m':
+              securityDto.default_weather_m,
+            'metaValue.$.weather_charge.meter_charge':
+              securityDto.meter_wether_charge,
+            'metaValue.$.traffic_charge.default_m':
+              securityDto.default_traffic_m,
+            'metaValue.$.traffic_charge.meter_charge':
+              securityDto.meter_traffice_charge,
           },
-        },
-      );
-        return res
+        });
+        return res;
       } else {
         const response1 = await this.SettingsModel.updateOne(
           { _id: id },
           {
             $push: {
-
               metaValue: {
                 zipcode: securityDto.zipcode,
-                fuelCharged:{"default_km": securityDto.default_km,"default_km_charge": securityDto.default_km_charge,"addition_charge": securityDto.addition_charge},
-                weather_charge:{"default_m": securityDto.default_weather_m,"meter_charge": securityDto.meter_wether_charge},
-                traffic_charge:{"default_m": securityDto.default_traffic_m,"meter_charge": securityDto.meter_traffice_charge},
-
+                fuelCharged: {
+                  default_km: securityDto.default_km,
+                  default_km_charge: securityDto.default_km_charge,
+                  addition_charge: securityDto.addition_charge,
                 },
+                weather_charge: {
+                  default_m: securityDto.default_weather_m,
+                  meter_charge: securityDto.meter_wether_charge,
+                },
+                traffic_charge: {
+                  default_m: securityDto.default_traffic_m,
+                  meter_charge: securityDto.meter_traffice_charge,
+                },
+              },
             },
           },
         );
-        console.log(response1);
         return response1;
       }
-      
     } catch (e) {
-      console.log('hello');
-       console.log(e);
+      console.log(e);
     }
   }
 
@@ -207,5 +204,9 @@ export class SettingsService {
       { _id: id },
       { ...CreateOrderSettingsDto },
     );
+  }
+
+  async getDelieveryAssociates() {
+    return this.SettingsModel.find({});
   }
 }
