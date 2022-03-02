@@ -39,7 +39,7 @@ import { GoodsModule } from './goods/goods.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { TaxModule } from './tax/tax.module';
-import { PushNotificationModule } from './push-notification/push-notification.module';
+import { SocketModule } from './sockets/sockets.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserDataModule } from './user-data/user-data.module';
 import { CatalogueModule } from './catalogue/catalogue.module';
@@ -105,7 +105,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     PromotionModule,
     OrderModule,
     TaxModule,
-    PushNotificationModule,
+    SocketModule,
     UserDataModule,
     CatalogueModule,
     ReviewsModule,

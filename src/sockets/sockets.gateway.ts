@@ -10,7 +10,7 @@ import delay from 'delay';
 @WebSocketGateway(5001, {
   cors: true,
 })
-export class NotificationGateway {
+export class SocketGateway {
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('AppGateway');
