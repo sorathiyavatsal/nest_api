@@ -168,4 +168,21 @@ export class SocketGateway {
       extraData: payload.extraData,
     });
   }
+
+  @SubscribeMessage('getDelievryAssociates')
+  async getDeliveyBoyNear(client: Socket, payload: any): Promise<Object> {
+    try {
+      return await axios.post(
+        `http://3.134.140.172:5000/api/delivery-fleet/find-near-delivery-boy`,
+        payload.params,
+        {
+          headers: {
+            Authorization: `Bearer ${payload.token}`,
+          },
+        },
+      );
+    } catch (e) {
+      return e;
+    }
+  }
 }

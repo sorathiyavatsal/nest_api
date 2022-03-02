@@ -133,6 +133,8 @@ export class DeliveryFleetService {
 
     return { boys: deliveryBoy, dto: order, max: maxDis };
   }
+
+  
   async updateLocationDeliveryFleet(id: any, dto: any, req: any, user: any) {
     let today = new Date();
     today.setHours(23);

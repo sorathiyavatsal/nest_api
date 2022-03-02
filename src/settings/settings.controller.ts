@@ -84,7 +84,10 @@ export class SettingsController {
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
-  @ApiOperation({description: 'metaValue is an array while creating objects inside for [ (service area) we are adding three parameter required for each {1.zipcode,2.areaName,3.status} ], and for [ (fleet_tax)  we are adding three parameter{1.name,2.type,3.value} ] , and for [ (order_settings) we are adding three parameter{1.order_switch,2.operation_time,3.otp_verification_time} ]'})
+  @ApiOperation({
+    description:
+      'metaValue is an array while creating objects inside for [ (service area) we are adding three parameter required for each {1.zipcode,2.areaName,3.status} ], and for [ (fleet_tax)  we are adding three parameter{1.name,2.type,3.value} ] , and for [ (order_settings) we are adding three parameter{1.order_switch,2.operation_time,3.otp_verification_time} ]',
+  })
   @Post('/add')
   @UseInterceptors(
     FilesInterceptor('image', 20, {
@@ -225,5 +228,10 @@ export class SettingsController {
       request.params.id,
       CreateOrderSettingsDto,
     );
+  }
+
+  @Get()
+  async getDA(@Request() request) {
+    return await this.securityService.getDelieveryAssociates();
   }
 }
