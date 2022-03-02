@@ -21,8 +21,39 @@ export class RoleService {
   async getRoleDetail(id: any) {
     return this.RoleModel.findById(id);
   }
-  async updateRole(id: string, RoleDto: EditRoleDto, user: any) {
-    return this.RoleModel.findById({ _id: id }).then((data) => {});
+  async updateRole(id: string, operationName: any, RoleDto: any, user: any) {
+    console.log(id);
+    console.log(RoleDto);
+    console.log(user);
+    if (operationName !== undefined) {
+      return await this.RoleModel.updateOne(
+        { _id: id, 'permissions.operation': operationName },
+        {
+          $set: {
+            role: RoleDto.role,
+            activeStatus: RoleDto.activeStatus,
+            'permissions.$.operations': RoleDto.operations,
+            'permissions.$.operationAccess.IsEdit': RoleDto.isEdit,
+            'permissions.$.operationAccess.IsDelete': RoleDto.isDelete,
+            'permissions.$.operationAccess.IsView': RoleDto.isView,
+          },
+        },
+      );
+    } else {
+      return await this.RoleModel.updateOne(
+        { _id: id },
+        {
+          $push: {
+            permissions: {
+              operations: RoleDto.operations,
+              IsEdit: RoleDto.isEdit,
+              IsDelete: RoleDto.isDelete,
+              IsView: RoleDto.isView,
+            },
+          },
+        },
+      );
+    }
   }
 
   async createRole(RoleDto: CreateRoleDto, user: any) {

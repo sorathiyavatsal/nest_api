@@ -13,6 +13,10 @@ export const RoleSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    permissions:{
+      type:Array
+    },
+
     createdBy: {
       type: ObjectId,
       ref: 'Users',
@@ -29,6 +33,7 @@ export interface Role extends mongoose.Document {
   _id: string;
   role: string;
   activeStatus: boolean;
+  permissions:Array<object>;
   updatedAt: Date;
   createdAt: Date;
   createdBy: string;
