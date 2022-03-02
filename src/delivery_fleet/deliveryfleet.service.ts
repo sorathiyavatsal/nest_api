@@ -103,35 +103,26 @@ export class DeliveryFleetService {
   }
   async getDeliveyBoyNear(order: any) {
     let settings = await this.settingsData();
-    let maxDis: any = 10;
-    let minDis: any = 0;
 
-    let max_dis_data: any = settings.find(
-      (s: any) => s.column_key == 'max_distance_find',
+    let radius = settings.find(
+      (s: any) => s.metaKey == 'radius',
     );
-    if (max_dis_data) {
-      maxDis = max_dis_data.column_value;
-    }
-    let min_dis_data: any = settings.find(
-      (s: any) => s.column_key == 'min_distance_find',
-    );
-    if (min_dis_data) {
-      minDis = min_dis_data.column_value;
-    }
-
-    let deliveryBoy = await this.UserModel.find({
-      role: 'DELIVERY',
-      loc: {
-        $geoWithin: {
-          $centerSphere: [
-            [parseFloat(order.fromLat), parseFloat(order.fromLng)],
-            maxDis / 3963.2,
-          ],
+   
+    if (radius) {
+      let radiusmeter: any = radius.metaValue
+      let deliveryBoy = await this.UserModel.find({
+        role: 'DELIVERY',
+        loc: {
+          $geoWithin: {
+            $centerSphere: [
+              [parseFloat(order.fromLat), parseFloat(order.fromLng)],
+              (radiusmeter / 3963.2),
+            ],
+          },
         },
-      },
-    });
-
-    return { boys: deliveryBoy, dto: order, max: maxDis };
+      });
+      return { boys: deliveryBoy, dto: order, radius };
+    }
   }
 
   
