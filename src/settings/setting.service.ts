@@ -9,7 +9,7 @@ import { ConfigService } from 'src/core/config/config.service';
 import { SendEmailMiddleware } from './../core/middleware/send-email.middleware';
 import { CreateTaxSettingsDto } from './dto/tax-settings';
 import { ThisMonthInstance } from 'twilio/lib/rest/api/v2010/account/usage/record/thisMonth';
-import e from 'express';
+import express from 'express';
 @Injectable()
 export class SettingsService {
   constructor(
@@ -18,19 +18,34 @@ export class SettingsService {
     @InjectModel('Settings') private SettingsModel: Model<Settings>,
   ) {}
 
-  async getAllSettings(id: string, user: any, securityDto: any, zip_code: any) {
-    let query =
-      zip_code !== undefined
-        ? {
-            _id: id,
-            'metaValue.zipcode': { $in: [zip_code] },
-          }
-        : { _id: id };
-    const settings = await this.SettingsModel.findOne(query);
-    return this.SettingsModel.find(query);
+  // async getAllSettings(id: string, user: any, securityDto: any, zip_code: any) {
+  //   let query =
+  //     zip_code !== undefined
+  //       ? {
+  //           _id: id,
+  //           'metaValue.zipcode': { $in: [zip_code] },
+  //         }
+  //       : { _id: id };
+  //   const settings = await this.SettingsModel.findOne(query);
+  //   return this.SettingsModel.find(query);
+  // }
+  async getSettings(securityDto: any) {
+try {
+  const metaKey = await securityDto.metakey
+  console.log(metaKey)
+  if(!metaKey){
+    const withoutBody = await this.SettingsModel.find({})
+    return withoutBody
   }
-  async getSettingsDetail(id: any) {
-    return this.SettingsModel.findById(id);
+  else{
+    const withBody= await this.SettingsModel.findOne({metaKey:metaKey})
+    return withBody
+  
+  }
+  
+} catch (error) {
+  console.log(error)
+}
   }
   // async updateSettings(
   //   id: string,
