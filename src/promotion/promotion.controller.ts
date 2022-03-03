@@ -50,18 +50,32 @@ export class PromotionController {
   constructor(private PromotionService: PromotionService) {}
 
   ///{get AllPromotion here}
-  @Get('/allPromotions')
+  @ApiOperation({summary:"in this section you can get all the promotions existing in database by simply clicking on execute button"})
+
+  @Get('/')
   async getAllPromotions(@Request() request) {
     return await this.PromotionService.getAllPromotion(request.user);
   }
   ///{get User Promotions here}
-  @Post('/allUserPromotions')
+  @ApiBody({
+    schema:{
+      properties:{
+         promotion_target_location:{type:'String'},
+          promotion_target_gender:{type:'String'},
+           promotion_target_age:{type:'String'}
+      }
+    }
+  })
+  @ApiOperation({summary:"in this section we can get promotion on the bases of age/gender/location all filters OR you want to get promotion on the bases of just location so you can remove others from body"})
+  @Post('/')
   async getUserPromotions(@Request() request) {
     return await this.PromotionService.getPromotionsForUser(request.body);
   }
 
   //{get SinglePromotionBYId here}
-  @Get('/SinglePromotion/:id')
+  @ApiParam({name:"id",required:true})
+ @ApiOperation({summary:"in this section we can get single promotion on the bases of id. add id into the param section nd this will return promotion based on id"})
+  @Get('/:id')
   async getSinglePromotion(@Param() params, @Request() request) {
     return await this.PromotionService.getPromotionbyId(
       params.id,
@@ -74,7 +88,7 @@ export class PromotionController {
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({summary:"update all diffrent sections as their type suggested,provide couponId in params nd that couponId will added into promotion"})
   
-  @Put('/updatePromotion/:id')
+  @Put('/:id')
   @ApiBody({  
     schema: {
       properties: {
@@ -103,7 +117,7 @@ export class PromotionController {
     );
   }
 
-  @Patch('/applyPromotion/:coupon_id')
+  @Patch('/:coupon_id')
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({summary:"promotion type means it can be flat or percentage"})
   
@@ -128,7 +142,9 @@ export class PromotionController {
   }
  
   ////delete
-  @Delete('/deletePromotion/:id')
+ @ApiOperation({summary:"delete will work when we put id of object in param section"})
+@ApiParam({name:'id',required:true})
+@Delete('/:id')
   async deleteCoupon(@Param() params, @Request() request) {
     return await this.PromotionService.deletePromotion(params.id);
   }
@@ -136,7 +152,7 @@ export class PromotionController {
   //{create promotion}
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @Post('/addPromotions')
+  @Post('/')
   @UseInterceptors(FileInterceptor('image'))
   @ApiBody({  
     schema: {

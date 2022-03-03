@@ -48,19 +48,19 @@ import { identity } from 'rxjs';
 export class CouponsController {
   constructor(private CouponsService: CouponsService) {}
   //find all coupons here
-  @Get('/allCoupons')
+  @Get('/')
   async getAllCoupons(@Request() request) {
     return await this.CouponsService.getAllCoupons(request.user);
   }
   //{get SingleCouponById here}
-  @Get('/singleCoupon/:id')
+  @Get('/:id')
   @ApiParam({name:'id',required:true})
   async getSingleCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.getCouponbyId(params.id, request.user);
   }
   //{update promotion by id here}
   @ApiParam({name:'id',required:true})
-  @Put('/updateCoupon/:id')
+  @Put('/:id')
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
     schema: { properties: {coupon_name:{type:"String"}} },
@@ -73,7 +73,7 @@ export class CouponsController {
     );
   }
   ///delete api
-  @Delete('/deleteCoupon/:id')
+  @Delete('/:id')
   @ApiParam({name:'id',required:true})
   async deleteCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.deleteCoupon(params.id);
@@ -82,7 +82,7 @@ export class CouponsController {
   //{create promotion}
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
-  @Post('/createCoupon')
+  @Post('/')
   @UseInterceptors(FileInterceptor('image'))
   @ApiBody({
     schema: {
