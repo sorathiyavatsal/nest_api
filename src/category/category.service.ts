@@ -167,7 +167,7 @@ export class CategoryService {
     };
 
     if (categoryDto.parent) {
-      categoryData['parent'] = categoryDto.parent;
+      categoryData['parent'] = ObjectId(categoryDto.parent);
     }
 
     const newCategory = await new this.CategoryModel(categoryDto);

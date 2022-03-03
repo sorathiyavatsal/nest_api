@@ -15,7 +15,7 @@ export const CategoriesSchema = new mongoose.Schema(
             type: String
         },
         parent: {
-            type: String,
+            type: ObjectId,
             ref: 'Category',
         },
         status: {
