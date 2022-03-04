@@ -4,6 +4,7 @@ import { Model, Mongoose } from 'mongoose';
 import { Variant } from './variant.model';
 import { VariantOptions } from './variantOptions.model';
 import { Product } from './product.model';
+let ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class ProductService {
   constructor(
@@ -146,7 +147,7 @@ export class ProductService {
 
   async getProducts(productId: string) {
     return await this.ProductsModel.findOne({
-      _id: productId,
+      _id: ObjectId(productId),
       status: true,
     });
   }
