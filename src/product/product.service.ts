@@ -17,13 +17,18 @@ export class ProductService {
     return await this.ProductsModel.aggregate([
       {
         $lookup: {
-          from: 'categories',
+          from: 'userdatas',
           localField: 'store',
           foreignField: '_id',
           as: 'stores',
         },
       },
-      { $unwind: '$stores' },
+      {
+        $unwind: {
+          path: '$stores',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'categories',
@@ -32,7 +37,12 @@ export class ProductService {
           as: 'categories',
         },
       },
-      { $unwind: '$categories' },
+      {
+        $unwind: {
+          path: '$categories',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'categories',
@@ -41,7 +51,12 @@ export class ProductService {
           as: 'collection',
         },
       },
-      { $unwind: '$collection' },
+      {
+        $unwind: {
+          path: '$collection',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'menus',
@@ -50,7 +65,12 @@ export class ProductService {
           as: 'menu',
         },
       },
-      // { $unwind: '$menu' },
+      {
+        $unwind: {
+          path: '$menu',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'brands',
@@ -59,7 +79,12 @@ export class ProductService {
           as: 'brand',
         },
       },
-      { $unwind: '$brand' },
+      {
+        $unwind: {
+          path: '$brand',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'reviews',
@@ -94,7 +119,7 @@ export class ProductService {
       },
       {
         $match: {
-          'stores.categoryName': {
+          'stores.shop_name': {
             $regex: filter.store ? filter.store : '',
             $options: 'i',
           },
