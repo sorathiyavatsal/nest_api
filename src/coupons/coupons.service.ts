@@ -27,6 +27,8 @@ export class CouponsService {
     const newPromo = new this.CouponsSchema({
       coupoun_name: securityDto.name,
       coupoun_code: coupon,
+      coupon_usablenumber: securityDto.cnumber,
+      coupon_expiration: securityDto.cexpdate,
       createdBy: user._id,
       modifiedBy: user._id,
     });
