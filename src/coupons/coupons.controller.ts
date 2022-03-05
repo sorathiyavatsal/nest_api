@@ -52,18 +52,20 @@ export class CouponsController {
   async getAllCoupons(@Request() request) {
     return await this.CouponsService.getAllCoupons(request.user);
   }
+
   //{get SingleCouponById here}
   @Get('/:id')
-  @ApiParam({name:'id',required:true})
+  @ApiParam({ name: 'id', required: true })
   async getSingleCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.getCouponbyId(params.id, request.user);
   }
+
   //{update promotion by id here}
-  @ApiParam({name:'id',required:true})
+  @ApiParam({ name: 'id', required: true })
   @Put('/:id')
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
-    schema: { properties: {coupon_name:{type:"String"}} },
+    schema: { properties: { coupon_name: { type: 'String' } } },
   })
   async updateCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.updateCoupon(
@@ -72,9 +74,10 @@ export class CouponsController {
       request.user,
     );
   }
-  ///delete api
+
+  //delete api
   @Delete('/:id')
-  @ApiParam({name:'id',required:true})
+  @ApiParam({ name: 'id', required: true })
   async deleteCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.deleteCoupon(params.id);
   }
@@ -90,10 +93,14 @@ export class CouponsController {
       properties: {
         name: { type: 'string' },
         coupon_code: { type: 'string' },
+        coupon_expiration: {type: 'string'},
+        coupon_usablenumber: { type: 'number' },
+        createdBy:{ type: 'string' },
+        modifiedBy: { type: 'string' },
       },
     },
   })
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({
     summary:
       'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
@@ -102,7 +109,7 @@ export class CouponsController {
     if (file) {
       request.body.image = await toBase64(file);
     }
-    console.log('boydydyddyd', request.body);
+    console.log('body', request.body);
 
     return await this.CouponsService.createCoupon(request.body, request.user);
   }

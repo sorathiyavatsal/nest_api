@@ -13,11 +13,13 @@ export const CouponsSchema = new mongoose.Schema(
     coupon_expiration: {
       type: Date,
     },
+    coupon_usablenumber:{
+      type: Number,
+    },
     createdBy: {
       type: ObjectId,
       ref: 'Users',
     },
-
     modifiedBy: {
       type: ObjectId,
       ref: 'Users',
@@ -30,4 +32,6 @@ export const CouponsSchema = new mongoose.Schema(
 export interface Coupons extends mongoose.Document {
   coupoun_name: string;
   coupoun_code: string;
+  coupon_expiration: string;
+  coupon_usablenumber:number;
 }
