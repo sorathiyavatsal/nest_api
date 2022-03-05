@@ -32,6 +32,6 @@ export const CouponsSchema = new mongoose.Schema(
 export interface Coupons extends mongoose.Document {
   coupoun_name: string;
   coupoun_code: string;
-  coupon_expiration: string,
+  coupon_expiration: string;
   coupon_usablenumber:number;
 }

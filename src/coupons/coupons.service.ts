@@ -24,15 +24,16 @@ export class CouponsService {
 
   async createCoupon(securityDto: any, user: any) {
     const coupon = randomstring.generate(7);
-    const newPromo = new this.CouponsSchema({
+    const coupon_details = { 
       coupoun_name: securityDto.name,
       coupoun_code: coupon,
-      coupon_usablenumber: securityDto.cnumber,
-      coupon_expiration: securityDto.cexpdate,
-      createdBy: user._id,
-      modifiedBy: user._id,
-    });
-    console.log(securityDto);
+      coupon_usablenumber: securityDto.coupon_usablenumber,
+      coupon_expiration: securityDto.coupon_expiration,
+    }
+    console.log(coupon_details)
+    const newPromo = new this.CouponsSchema(coupon_details);
+
+    console.log(newPromo);
     return await newPromo.save().then(
       (user: any) => {
         return user.toObject({ versionKey: false });

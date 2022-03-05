@@ -109,7 +109,7 @@ export class CouponsController {
     if (file) {
       request.body.image = await toBase64(file);
     }
-    console.log('boydydyddyd', request.body);
+    console.log('body', request.body);
 
     return await this.CouponsService.createCoupon(request.body, request.user);
   }
