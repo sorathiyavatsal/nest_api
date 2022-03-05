@@ -577,7 +577,7 @@ export class AuthService {
                 .findByIdAndUpdate(userToAttempt._id, {
                   emailVerified: true,
                   phoneVerified: true,
-                  deviceId: userToAttempt.deviceId,
+                  deviceId: emailVerifyCredentialsDto.deviceId,
                 }, { upsert: true })
                 .exec();
               if(userData && savedAddress){
