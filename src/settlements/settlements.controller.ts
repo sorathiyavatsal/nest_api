@@ -51,7 +51,7 @@ export class SettlementsController {
     schema: {
       type: 'object',
       properties: {
-        daName: {
+        deliveryBoy: {
           type: 'string',
         },
         workInHours: {
@@ -79,14 +79,14 @@ export class SettlementsController {
           type: 'number',
         },
         receiptId: {
-          type: 'number',
+          type: 'string',
         },
       },
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
   async postSettlements(@Request() request) {
-    return await this.SettlementsService.postSettlements();
+    return await this.SettlementsService.postSettlements(request.Body);
   }
 
   @Post('/downloadCSV')
@@ -126,26 +126,7 @@ export class SettlementsController {
       },
     ];
 
-    const data = [
-      {
-        ID: 1,
-        Date: 'Angel',
-        Hours:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        Distance: 'Angel',
-        Earning_Balance:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      },
-      {
-        ID: 1,
-        Date: 'Angel',
-        Hours:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        Distance: 'Angel',
-        Earning_Balance:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      },
-    ];
+    const data = await this.SettlementsService.postSettlements({})
 
     return await this.SettlementsService.downloadResource(
       res,
