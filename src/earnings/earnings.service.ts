@@ -1,108 +1,120 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order } from 'src/order/order.model';
+import { Earning } from './earnings.model';
 let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class EarningsService {
-    constructor(@InjectModel('Order') private OrderModel: Model<Order>) {}
+  constructor(@InjectModel('Earning') private EarningModel: Model<Earning>) {}
 
-  async getAllOrder() {
-    return await this.OrderModel.aggregate([
+  async getAllEarning() {
+    return await this.EarningModel.aggregate([
+      {
+        $lookup: {
+          from: 'deliveryfleets',
+          localField: 'JobId',
+          foreignField: '_id',
+          as: 'deliveryfleetsDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$deliveryfleetsDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'users',
-          localField: 'shippingId',
+          localField: 'deliveryBoyId',
           foreignField: '_id',
-          as: 'shippingDetails',
+          as: 'deliveryBoyDetails',
         },
       },
       {
         $unwind: {
-          path: '$shippingDetails',
+          path: '$deliveryBoyDetails',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
-          from: 'invoices',
-          localField: 'paymentTransactionId',
+          from: 'settlements',
+          localField: 'settlmentId',
           foreignField: '_id',
-          as: 'paymentTransactionDetails',
+          as: 'settlementsDetails',
         },
       },
       {
         $unwind: {
-          path: '$paymentTransactionDetails',
+          path: '$settlementsDetails',
           preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'coupons',
-          localField: 'copouns',
-          foreignField: '_id',
-          as: 'couponsDetails',
         },
       },
     ]);
   }
 
-  async getOrder(orderId: String) {
-    return await this.OrderModel.aggregate([
+  async getEarning(earningId: String) {
+    return await this.EarningModel.aggregate([
+      {
+        $lookup: {
+          from: 'deliveryfleets',
+          localField: 'JobId',
+          foreignField: '_id',
+          as: 'deliveryfleetsDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$deliveryfleetsDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'users',
-          localField: 'shippingId',
+          localField: 'deliveryBoyId',
           foreignField: '_id',
-          as: 'shippingDetails',
+          as: 'deliveryBoyDetails',
         },
       },
       {
         $unwind: {
-          path: '$shippingDetails',
+          path: '$deliveryBoyDetails',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
-          from: 'invoices',
-          localField: 'paymentTransactionId',
+          from: 'settlements',
+          localField: 'settlmentId',
           foreignField: '_id',
-          as: 'paymentTransactionDetails',
+          as: 'settlementsDetails',
         },
       },
       {
         $unwind: {
-          path: '$paymentTransactionDetails',
+          path: '$settlementsDetails',
           preserveNullAndEmptyArrays: true,
         },
       },
-      {
-        $lookup: {
-          from: 'coupons',
-          localField: 'copouns',
-          foreignField: '_id',
-          as: 'couponsDetails',
-        },
-      },
-      { $match: { _id: ObjectId(orderId) } },
+      { $match: { _id: ObjectId(earningId) } },
     ]);
   }
 
-  async postOrder(orderDto: any) {
-    let order = {
-      orderType: orderDto.orderType,
-      orderDate: orderDto.orderDate,
-      subTotal: orderDto.subTotal,
-      tax: orderDto.tax,
-      shipingAddress: orderDto.shipingAddress,
-      billingAddress: orderDto.billingAddress,
-      shippingId: ObjectId(orderDto.shippingId),
-      paymentTransactionId: ObjectId(orderDto.paymentTransactionId),
+  async postEarning(EarningDto: any) {
+    let Earning = {
+      JobId: EarningDto.JobId,
+      deliveryBoyId: EarningDto.deliveryBoyId,
+      workedHours: EarningDto.workedHours,
+      travelledKMs: EarningDto.travelledKMs,
+      amount: EarningDto.amount,
+      startDateTime: EarningDto.startDateTime,
+      endDateTime: EarningDto.endDateTime,
+      settlmentId: EarningDto.settlmentId,
     };
 
-    return await new this.OrderModel(order).save();
+    return await new this.EarningModel(Earning).save();
   }
 }

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Parser } from 'json2csv';
 import { Model } from 'mongoose';
 import { Settlement } from './settlements.model';
+let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class SettlementsService {
@@ -11,7 +12,42 @@ export class SettlementsService {
   ) {}
 
   async getAllSettlements() {
-    return await this.SettlementModel.find({});
+    return await this.SettlementModel.aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'deliveryBoy',
+            foreignField: '_id',
+            as: 'deliveryBoyDetails',
+          },
+        },
+        {
+          $unwind: {
+            path: '$deliveryBoyDetails',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ]);
+  }
+
+  async getSettlements(SettlementId: String) {
+    return await this.SettlementModel.aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'deliveryBoy',
+            foreignField: '_id',
+            as: 'deliveryBoyDetails',
+          },
+        },
+        {
+          $unwind: {
+            path: '$deliveryBoyDetails',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        { $match: { _id: ObjectId(SettlementId) } },
+      ]);
   }
 
   async postSettlements(settlementDto: any) {

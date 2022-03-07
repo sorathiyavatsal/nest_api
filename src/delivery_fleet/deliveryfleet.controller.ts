@@ -62,8 +62,12 @@ export class DeliveryFleetController {
   @Get('/')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  async getDeliveryFleet(@Req() req) {
-    return await this.deliveryService.getDeliveryFleet(req.user);
+  @ApiParam({ name: 'merchantid', required: true })
+  async getDeliveryFleet(@Req() req, @Param() params) {
+    return await this.deliveryService.getDeliveryFleet(
+      req.user,
+      params.merchantid,
+    );
   }
 
   @Get('/:id')

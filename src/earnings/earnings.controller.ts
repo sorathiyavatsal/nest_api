@@ -16,20 +16,20 @@ export class EarningsController {
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
   async getAllOrders(@Request() request) {
-    return await this.EarningsService.getAllOrder();
+    return await this.EarningsService.getAllEarning();
   }
 
   @ApiParam({ name: 'id', required: true })
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
   async getOrder(@Param() params, @Request() request: any) {
-    return await this.EarningsService.getOrder(params.id);
+    return await this.EarningsService.getEarning(params.id);
   }
 
   @Post('/add')
   @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data', 'application/json')
   async postOrder(@Body() earningDto: EarningDto, @Request() request) {
-    return await this.EarningsService.postOrder(earningDto);
+    return await this.EarningsService.postEarning(earningDto);
   }
 }
