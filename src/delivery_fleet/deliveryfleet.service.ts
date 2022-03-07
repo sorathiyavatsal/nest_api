@@ -465,7 +465,7 @@ export class DeliveryFleetService {
 
   async getDeliveryFleet(user: any, merchant_id: String) {
     let where: any = {};
-    if (merchant_id) where.createdBy = merchant_id;
+    if (merchant_id) where.createdBy = ObjectId(merchant_id);
     return this.deliveryfleetModel.find(where);
   }
 
