@@ -44,6 +44,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UserDataModule } from './user-data/user-data.module';
 import { CatalogueModule } from './catalogue/catalogue.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { InvoiceModule } from './invoice/invoice.module';
+import { EarningsModule } from './earnings/earnings.module';
 @Module({
   imports: [
     MulterModule.register({
@@ -109,6 +111,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     UserDataModule,
     CatalogueModule,
     ReviewsModule,
+    InvoiceModule,
+    EarningsModule,
   ],
   controllers: [],
   providers: [

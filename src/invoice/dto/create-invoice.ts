@@ -1,100 +1,62 @@
 import {
-  IsString,
-  IsEmail,
-  IsNotEmpty,
-  IsBoolean,
-  IsNumber,
-  IsDateString,
+  IsArray,
   IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsString,
 } from 'class-validator';
 import { ApiProperty, ApiParam } from '@nestjs/swagger';
+import { ObjectId } from 'mongoose';
 
-export class CreateInvoiceDto {
+export class InvoiceDistanceDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
-  fromAddress: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  fromZipcode: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  fromLat: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  fromLng: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  fromPhone: string;
+  @ApiProperty({ enum: [ 'CARD', 'UPI' ] })
+  method: String;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  toAddress: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  toZipcode: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  toLat: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  toLng: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  toPhone: string;
+  transationId: String;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  goods: string;
+  paymentGatewayId: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ enum: [ 'PENDDING', 'SUCCESS', 'FAILED' ] })
+  paymentGatewayStatus: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  paidId: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ enum: [ 'CONSUMER', 'MERCHANT' ] })
+  paidBy: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  receiveId: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ enum: [ 'DELIVERYBOY', 'MARCHANT' ] })
+  receiceBy: String;
 
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  numberofPack: number;
+  amount: Number;
 
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  weightPack: number;
-
-  @IsString()
-  @ApiProperty()
-  pickupType: string;
-
-  @IsDate()
-  @ApiProperty()
-  pickupDate: Date;
-
-  @IsString()
-  @ApiProperty()
-  pickupTime: string;
-
-  @IsString()
-  @ApiProperty()
-  cor: string;
-
-  @IsBoolean()
-  @IsNotEmpty()
-  @ApiProperty()
-  deliverChargeType: boolean;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  invoiceStatus: string;
-
-  @IsBoolean()
-  @IsNotEmpty()
-  @ApiProperty()
-  activeStatus: boolean;
+  charges: Number;
 }
