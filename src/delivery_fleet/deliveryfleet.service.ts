@@ -39,7 +39,7 @@ export class DeliveryFleetService {
     @InjectModel('DeliveryLocation')
     private LocationModel: Model<DeliveryLocation>,
     @InjectModel('UserLogin') private UserLogin: Model<UserLogin>,
-  ) { }
+  ) {}
   async createnewDeliveryFleet(files: any, req: any) {
     let today = new Date();
     today.setHours(23);
@@ -104,19 +104,17 @@ export class DeliveryFleetService {
   async getDeliveyBoyNear(order: any) {
     let settings = await this.settingsData();
 
-    let radius = settings.find(
-      (s: any) => s.metaKey == 'radius',
-    );
-   
+    let radius = settings.find((s: any) => s.metaKey == 'radius');
+
     if (radius) {
-      let radiusmeter: any = radius.metaValue
+      let radiusmeter: any = radius.metaValue;
       let deliveryBoy = await this.UserModel.find({
         role: 'DELIVERY',
         loc: {
           $geoWithin: {
             $centerSphere: [
               [parseFloat(order.fromLat), parseFloat(order.fromLng)],
-              (radiusmeter / 3963.2),
+              radiusmeter / 3963.2,
             ],
           },
         },
@@ -125,7 +123,6 @@ export class DeliveryFleetService {
     }
   }
 
-  
   async updateLocationDeliveryFleet(id: any, dto: any, req: any, user: any) {
     let today = new Date();
     today.setHours(23);
@@ -247,15 +244,15 @@ export class DeliveryFleetService {
       { $set: updateObj },
       { upsert: true },
     );
-    
+
     const mailOptions = {
       name: 'DELIVERY_FLEET_ORDER_ACCEPTED',
       type: 'SMS',
       device: req.headers.OsName || 'ANDROID',
       phone: delivery.userId.phoneNumber,
-    }
+    };
     this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
-    
+
     // //let smsData:any=await this.loginVerificationSmsOtp(delivery.userId)
     // let message: string = 'Byecom delivery accept your delivery  fleet order';
     // this.sendEmailMiddleware.sensSMSdelivery(req, delivery.userId.phoneNumber, message);
@@ -321,8 +318,8 @@ export class DeliveryFleetService {
           type: 'SMS',
           device: req.headers.OsName || 'ANDROID',
           phone: data.userId.phoneNumber,
-        }
-        this.sendEmailMiddleware.sendEmailOrSms(mailOptions);    
+        };
+        this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
         // message = message + ' boy start from pickup location';
         // this.sendEmailMiddleware.sensSMSdelivery(req, data.userId.phoneNumber, message);
@@ -350,7 +347,7 @@ export class DeliveryFleetService {
           type: 'SMS',
           device: req.headers.OsName || 'ANDROID',
           phone: data.userId.phoneNumber,
-        }
+        };
         this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
         // message = message + ' boy deliver the package to drop location';
@@ -383,7 +380,7 @@ export class DeliveryFleetService {
         device: req.headers.OsName || 'ANDROID',
         phone: data.fromPhone,
         otp: code,
-      }
+      };
       this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
       // message = message + ' boy delivery pickup otp ' + code;
@@ -402,7 +399,7 @@ export class DeliveryFleetService {
         device: req.headers.OsName || 'ANDROID',
         phone: data.fromPhone,
         otp: code,
-      }
+      };
       this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
       // message = message + ' boy delivery delivered otp ' + code;
@@ -466,9 +463,9 @@ export class DeliveryFleetService {
     );
   }
 
-  async getDeliveryFleet(user: any) {
+  async getDeliveryFleet(user: any, merchant_id: String) {
     let where: any = {};
-    if (user.role == 'merchant') where.createdBy = user._id;
+    if (merchant_id) where.createdBy = ObjectId(merchant_id);
     return this.deliveryfleetModel.find(where);
   }
 
@@ -491,7 +488,7 @@ export class DeliveryFleetService {
     return invoice.toObject({ versionKey: false });
   }
 
-  async getDeliveryCharges(Dto: DeliveryChargesDto ) {
+  async getDeliveryCharges(Dto: DeliveryChargesDto) {
     try {
       let category = Dto.category;
       let weight = Dto.weight;
@@ -499,40 +496,63 @@ export class DeliveryFleetService {
       let distenance = Dto.distenance;
       let weather = Dto.weather;
       let traffic = Dto.traffic;
-      console.log(category)
-      console.log(weight)
-      console.log(packages)
-      console.log(distenance)
-      console.log(weather)
-      console.log(traffic)
-     let fleet_tax= await this.SettingsModel.findOne({ "metaKey": "fleet_tax"})
-      let settings = await this.SettingsModel.findOne({ "metaKey": "fuel_charge","metaValue.zipcode":{$in:[Dto.zipcode]} });
-      console.log(settings)
-      let zipSettings = settings["metaValue"].find(s => s['zipcode'].includes(Dto.zipcode))
+      console.log(category);
+      console.log(weight);
+      console.log(packages);
+      console.log(distenance);
+      console.log(weather);
+      console.log(traffic);
+      let fleet_tax = await this.SettingsModel.findOne({
+        metaKey: 'fleet_tax',
+      });
+      let settings = await this.SettingsModel.findOne({
+        metaKey: 'fuel_charge',
+        'metaValue.zipcode': { $in: [Dto.zipcode] },
+      });
+      console.log(settings);
+      let zipSettings = settings['metaValue'].find((s) =>
+        s['zipcode'].includes(Dto.zipcode),
+      );
       if (!zipSettings) {
-        zipSettings = settings["metaValue"].find(s => s['zipcode'].filter((zip) => zip == 0) )
+        zipSettings = settings['metaValue'].find((s) =>
+          s['zipcode'].filter((zip) => zip == 0),
+        );
       }
-      console.log(zipSettings)
+      console.log(zipSettings);
 
-      let weight_collection = await this.WeightsModel.findOne({ "from_weight": {$lte: weight},"to_weight":{$gte: weight},"category": category,  "activeStatus": true })
+      let weight_collection = await this.WeightsModel.findOne({
+        from_weight: { $lte: weight },
+        to_weight: { $gte: weight },
+        category: category,
+        activeStatus: true,
+      });
       let weight_price = weight_collection.rate;
 
-      let packages_collection = await this.PackagesModel.findOne({ "from_pack": {$lte: packages},"to_pack":{$gte: packages},"category": category,  "activeStatus": true })
-      
-      console.log(packages_collection,"collection")
+      let packages_collection = await this.PackagesModel.findOne({
+        from_pack: { $lte: packages },
+        to_pack: { $gte: packages },
+        category: category,
+        activeStatus: true,
+      });
+
+      console.log(packages_collection, 'collection');
       let packages_price = packages_collection.rate;
-      
-      let default_km_charge = zipSettings["fuelCharged"].default_km_charge
-      let default_km = zipSettings["fuelCharged"].default_km
-      let tax = fleet_tax.metaValue['value']
-      let taxType = fleet_tax.metaValue['type']
-      let additional_km_charge = 0
+
+      let default_km_charge = zipSettings['fuelCharged'].default_km_charge;
+      let default_km = zipSettings['fuelCharged'].default_km;
+      let tax = fleet_tax.metaValue['value'];
+      let taxType = fleet_tax.metaValue['type'];
+      let additional_km_charge = 0;
       if (distenance > default_km) {
-        let additional_m = distenance - default_km
-        additional_km_charge = (additional_m * 1000 /100) * zipSettings["fuelCharged"].addition_charge
+        let additional_m = distenance - default_km;
+        additional_km_charge =
+          ((additional_m * 1000) / 100) *
+          zipSettings['fuelCharged'].addition_charge;
       }
 
-      let packaging = await this.PackagingsModel.findOne({category: category})
+      let packaging = await this.PackagingsModel.findOne({
+        category: category,
+      });
       let packaging_price = packaging.rate;
       let response = {
         default_km_price: default_km_charge,
@@ -541,42 +561,46 @@ export class DeliveryFleetService {
         packaging_price: packaging_price,
         weather_price: 0,
         traffic_price: 0,
-        tax:0,
-        subtotal:0,
+        tax: 0,
+        subtotal: 0,
         total: 0,
-      }
+      };
 
-      console.log(default_km_charge ,
-        additional_km_charge ,
-        weight_price ,
-        packages_price ,
-        packaging_price)
-      console.log(default_km_charge)
+      console.log(
+        default_km_charge,
+        additional_km_charge,
+        weight_price,
+        packages_price,
+        packaging_price,
+      );
+      console.log(default_km_charge);
       let price =
         default_km_charge +
         additional_km_charge +
         weight_price +
         packages_price +
         packaging_price;
-        console.log(price)
+      console.log(price);
       if (weather) {
-        let km_m = (distenance * 1000) / zipSettings["weather_charge"].default_m
-        let weather_price = km_m * zipSettings["weather_charge"].meter_charge
+        let km_m =
+          (distenance * 1000) / zipSettings['weather_charge'].default_m;
+        let weather_price = km_m * zipSettings['weather_charge'].meter_charge;
         price = price + weather_price;
-        response.weather_price = weather_price
+        response.weather_price = weather_price;
       }
       if (traffic) {
-        let km_m = (distenance * 1000) / zipSettings["traffic_charge"].default_m
-        let traffic_price = km_m * zipSettings["traffic_charge"].meter_charge
+        let km_m =
+          (distenance * 1000) / zipSettings['traffic_charge'].default_m;
+        let traffic_price = km_m * zipSettings['traffic_charge'].meter_charge;
         price = price + traffic_price;
-        response.traffic_price = traffic_price
+        response.traffic_price = traffic_price;
       }
       response.subtotal = price;
       response.tax = taxType == 'flat' ? tax : tax / 100;
       response.total = taxType == 'flat' ? price + tax : price + tax / 100;
       return response;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 }

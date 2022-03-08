@@ -45,13 +45,20 @@ export class SettlementsController {
     return await this.SettlementsService.getAllSettlements();
   }
 
+  @ApiParam({ name: 'id', required: true })
+  @Get('/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async getSettlment(@Param() params, @Request() request: any) {
+    return await this.SettlementsService.getSettlements(params.id);
+  }
+
   @Post('/add')
   @UseGuards(AuthGuard('jwt'))
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        daName: {
+        deliveryBoy: {
           type: 'string',
         },
         workInHours: {
@@ -73,20 +80,20 @@ export class SettlementsController {
           type: 'string',
         },
         inputDate: {
-          type: 'date',
+          type: 'string',
         },
         amountPay: {
           type: 'number',
         },
         receiptId: {
-          type: 'number',
+          type: 'string',
         },
       },
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
   async postSettlements(@Request() request) {
-    return await this.SettlementsService.postSettlements();
+    return await this.SettlementsService.postSettlements(request.body);
   }
 
   @Post('/downloadCSV')
@@ -106,46 +113,32 @@ export class SettlementsController {
     const fields = [
       {
         label: 'ID',
-        value: 'ID',
+        value: '_id',
       },
       {
         label: 'Date',
-        value: 'Date',
+        value: 'inputDate',
       },
       {
         label: 'Hours',
-        value: 'Hours',
+        value: 'workInHours',
       },
       {
         label: 'Distance',
-        value: 'Distance',
+        value: 'travelledKM',
       },
       {
         label: 'Earning	Balance',
-        value: 'Earning_Balance',
+        value: 'payAmount',
       },
     ];
 
-    const data = [
-      {
-        ID: 1,
-        Date: 'Angel',
-        Hours:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        Distance: 'Angel',
-        Earning_Balance:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      },
-      {
-        ID: 1,
-        Date: 'Angel',
-        Hours:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-        Distance: 'Angel',
-        Earning_Balance:
-          'https://byecom.in/_next/image?url=%2Fbyecom-logo.png&w=256&q=75',
-      },
-    ];
+    let data = {}
+    if(request.body.settlementId) {
+        data = await this.SettlementsService.getSettlements(request.body.settlementId);
+    } else {
+        data = await this.SettlementsService.getAllSettlements()
+    }
 
     return await this.SettlementsService.downloadResource(
       res,

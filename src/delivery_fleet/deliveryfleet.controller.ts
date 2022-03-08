@@ -24,6 +24,7 @@ import {
   ApiParam,
   ApiConsumes,
   ApiOperation,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
@@ -62,8 +63,12 @@ export class DeliveryFleetController {
   @Get('/')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  async getDeliveryFleet(@Req() req) {
-    return await this.deliveryService.getDeliveryFleet(req.user);
+  @ApiQuery({ name: 'merchantid', required: true })
+  async getDeliveryFleet(@Req() req, @Query() query) {
+    return await this.deliveryService.getDeliveryFleet(
+      req.user,
+      query.merchantid,
+    );
   }
 
   @Get('/:id')
