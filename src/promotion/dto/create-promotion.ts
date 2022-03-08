@@ -1,52 +1,74 @@
-// import {
-//     IsString,
-//     IsNotEmpty,
-//     IsNumber,
-//     IsArray,
-//     IsOptional,
-//   } from 'class-validator';
-//   import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+    IsString,
+    IsNotEmpty,
+    IsNumber,
+    IsArray,
+    IsOptional,
+    IsObject,
+  } from 'class-validator';
+  import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
   
-//   export class CreatePromotionDto {
-//     @IsString()
-//     @ApiProperty()
-//     name: string;
+
+  //This is the body of API that we will put data into
+  export class CreatePromotionDto {
+    @IsString()
+    @ApiProperty()
+    name: string;
   
-//     @IsNumber()
-//     @ApiProperty()
-//     Contact: number;
+    @IsString()
+    @ApiProperty()
+    description: string;
   
-//     @IsString()
-//     @IsNotEmpty()
-//     @ApiProperty()
-//     Street: string;
+    @IsString()
+    @ApiProperty()
+    image: string;
 
-//     @IsString()
-//     @ApiPropertyOptional()
-//     Street2: string;
+    @IsArray()
+    @ApiProperty()
+    device: Array<string>;
 
-//     @IsString()
-//     @ApiProperty()
-//     Landmark: string;
+    @IsArray()
+    @ApiProperty()
+    area: Array<string>;
 
-//     @IsString()
-//     @ApiProperty()
-//     City: string;
+    @IsString()
+    @ApiPropertyOptional()
+    promotion_for_coupon: string;
 
-//     @IsString()
-//     @ApiProperty()
-//     State: string;
+    @IsObject()
+    @ApiProperty()
+    merchant: object;
 
-//     @IsNumber()
-//     @ApiProperty()
-//     ZipCode: number;
+    @IsObject()
+    @ApiProperty()
+    consumer: object;
 
-//     @IsArray()
-//     @ApiProperty()
-//     DAs: Array<string>;
+    @IsObject()
+    @ApiProperty()
+    da: object;
 
-//     @IsArray()
-//     @ApiProperty()
-//     AllocatedZipCodes: Array<number>;
-//   }
+    @IsString()
+    @ApiProperty()
+    type: string;
+
+    @IsObject()
+    @ApiProperty()
+    start_date: string;
+
+    @IsObject()
+    @ApiProperty()
+    end_date: string;
+
+    @IsObject()
+    @ApiProperty()
+    placement: object;
+
+    // @IsArray()
+    // @ApiProperty()
+    // DAs: Array<string>;
+
+    // @IsArray()
+    // @ApiProperty()
+    // AllocatedZipCodes: Array<number>;
+  }
   

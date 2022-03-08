@@ -21,27 +21,27 @@ export class PromotionService {
   async getPromotionbyId(id: any, user: any) {
     return this.PromotionSchema.findOne({});
   }
-  async getPromotionsForUser(promotionDto: any) {
-    let query = promotionDto.age
-      ? { promotion_target_age: promotionDto.age }
-      : promotionDto.gender
-      ? { promotion_target_gender: promotionDto.gender }
-      : promotionDto.location
-      ? { promotion_target_location: promotionDto.location }
-      : {
-          promotion_target_location: promotionDto.location,
-          promotion_target_gender: promotionDto.gender,
-          promotion_target_age: promotionDto.age,
-        };
-    const Promotions = await this.PromotionSchema.aggregate([
-      {
-        $match: query,
-      },
-    ]);
-    return await this.PromotionSchema.populate(Promotions, {
-      path: 'coupon_id',
-    });
-  }
+  // async getPromotionsForUser(promotionDto: any) {
+  //   let query = promotionDto.age
+  //     ? { promotion_target_age: promotionDto.age }
+  //     : promotionDto.gender
+  //     ? { promotion_target_gender: promotionDto.gender }
+  //     : promotionDto.location
+  //     ? { promotion_target_location: promotionDto.location }
+  //     : {
+  //         promotion_target_location: promotionDto.location,
+  //         promotion_target_gender: promotionDto.gender,
+  //         promotion_target_age: promotionDto.age,
+  //       };
+  //   const Promotions = await this.PromotionSchema.aggregate([
+  //     {
+  //       $match: query,
+  //     },
+  //   ]);
+  //   return await this.PromotionSchema.populate(Promotions, {
+  //     path: 'coupon_id',
+  //   });
+  // }
   async updatePromotion(_id: string, securityDto: any, user: any) {
     try {
       let id = { _id };
@@ -69,80 +69,31 @@ export class PromotionService {
     }
   }
 ​
-  // async applyPromotion(coupon_id: string, couponBody: any, user: any) {
-  //   let message;
-  //   try {
-  //     let offer_price, final_price;
-  //     console.log(couponBody)
-  //     const promotion = await this.PromotionSchema.findOne({
-  //       coupon_id,
-  //     }).populate('coupon_id');
-  //     console.log(promotion.coupon_id)
-  //     let promotion_enddate:any = new Date(promotion.promotion_end_date)
-  //     let couponexpiration: any = new Date(promotion.coupon_id['coupon_expiration'])
-  //     let currentDate = new Date()
-  //     console.log(promotion_enddate.toISOString())
-  //     console.log(couponexpiration.toISOString())
-  //     console.log(currentDate.toISOString())
-  //     if (
-  //       promotion_enddate.toISOString() > currentDate.toISOString() ||
-  //       couponexpiration.toISOString() > currentDate.toISOString()
-  //     ) {
-  //       console.log("hello")
-  //       if (promotion.promotion_type == 'flat') {
-  //         offer_price = promotion.promotion_flat_offer;
-  //         if (promotion.applicable_price <= couponBody.orderPrice) {
-  //           final_price = couponBody.orderPrice - offer_price;
-  //           return {
-  //             status: 200,
-  //             final_discount: final_price,
-  //           };  
-  //         } else {
-  //           message = 'Coupon is Not valid for this order';
-  //           return new BadRequestException(message);
-  //         }
-  //       } else if (promotion.promotion_type == 'percentage') {
-  //         offer_price = promotion.promotion_percentage_offer;
-  //         if (promotion.applicable_price >= couponBody.orderPrice) {
-  //           final_price =
-  //             couponBody.orderPrice -
-  //             (couponBody.orderPrice * offer_price) / 100;
-  //           return {
-  //             status: 200,
-  //             final_discount: final_price,
-  //           };
-  //         } else if(promotion.applicable_price <= couponBody.orderPrice) {
-  //           final_price = couponBody.orderPrice - promotion.fixed_percentage_discount
-  //           return {
-  //             status: 200,
-  //             final_discount: final_price,
-  //           };
-  //         } else {
-  //           message = 'Coupon is Not valid for this order';
-  //         }
-  //       }
-  //     } else {
-​
-  //       message = 'Coupon is Expired';
-  //       return message
-  //     }
-  //   } catch (e) {
-  //     console.log(e)
-  //     return new BadRequestException(message);
-  //   }
-  // }
-​
-  async createPromotion(securityDto: any, user: any) {
+  
+  //The format here is same as the format in Mongo
+  async createPromotion(securityDto: any) {
     const newPromo = new this.PromotionSchema({
-      promotion_name: securityDto.promotion_name,
-      promotion_description: securityDto.promotion_description,
-      promotion_image: securityDto.promotion_image,
-      promotion_target: securityDto.promotion_target,
-      promotion_content_type: securityDto.promotion_content_type,
-      promotion_type: securityDto.promotion_type,
-      promotion_start_date:securityDto.promotion_start_date,
-      promotion_end_date:securityDto.promotion_end_date,
-      promotion_placement: securityDto.promotion_placement,
+      name: securityDto.name,
+      description: securityDto.description,
+      image: securityDto.image,
+      target: { 
+        device_based: securityDto.device ,
+        area_based: securityDto.area,
+        user_based: { 
+          merchant : securityDto.merchant,
+          consumer: securityDto.consumer,
+          da: securityDto.da
+        }
+      },
+      // promotion_content_type: securityDto.promotion_content_type,
+      promotion_for_coupon: securityDto.promotion_for_coupon,
+      type: securityDto.type,
+      placement: securityDto.placement,
+      date: { 
+        start_date: securityDto.start_date,
+        end_date: securityDto.end_date
+      },
+      
       createdBy: securityDto.createdBy,
       modifiedBy: securityDto.modifiedBy,
     });
