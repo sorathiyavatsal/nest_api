@@ -163,7 +163,11 @@ export class PromotionController {
         promotion_type: { type: 'string' },
         promotion_start_date:{type:'string'},
         promotion_end_date:{type:'string'},
-        promotion_placement: { type: 'object' }
+        promotion_placement: { type: 'object',
+        properties: {
+          // min_cart_value:{type: 'number'}, 
+          // max_discount_limit: { type: 'number'},
+        } }
       },
     },
   })

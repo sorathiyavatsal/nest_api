@@ -106,7 +106,7 @@ export interface Promotion extends mongoose.Document {
   _id: string;
   promotion_description: string,
   promotion_image: string,
-  promotion_target: Array<Object>,
+  promotion_target: Array<object>,
   promotion_content_type: string,
   promotion_type: string;
   promotion_start_date: Date
