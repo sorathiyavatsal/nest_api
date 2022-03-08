@@ -35,33 +35,79 @@ import {
     @ApiPropertyOptional()
     promotion_for_coupon: string;
 
-    @IsObject()
-    @ApiProperty()
-    merchant: object;
 
-    @IsObject()
-    @ApiProperty()
-    consumer: object;
+    @IsNumber()
+    @ApiPropertyOptional()
+    merchant_monthly_revenue: number;
 
-    @IsObject()
-    @ApiProperty()
-    da: object;
+    @IsNumber()
+    @ApiPropertyOptional()
+    merchant_number_of_products: number;
+
+    @IsString()
+    @ApiPropertyOptional()
+    consumer_gender: string;
+
+    @IsNumber()
+    @ApiPropertyOptional()
+    consumer_age: number;
+
+    @IsString()
+    @ApiPropertyOptional()
+    consumer_login_statistics: string;
+
+    @IsString()
+    @ApiPropertyOptional()
+    consumer_product_category: string;
+
+    @IsNumber()
+    @ApiPropertyOptional()
+    da_hours_worked_day: number;
+
+    @IsNumber()
+    @ApiPropertyOptional()
+    da_hours_worked_month: number;
+    // @IsObject()
+    // @ApiProperty()
+    // merchant: object;
+
+    // @IsObject()
+    // @ApiProperty()
+    // consumer: object;
+
+    // @IsObject()
+    // @ApiProperty()
+    // da: object;
 
     @IsString()
     @ApiProperty()
     type: string;
+    
+    @IsNumber()
+    @ApiProperty()
+    page_number: number;
 
-    @IsObject()
+
+    @IsNumber()
+    @ApiProperty()
+    section: string;
+
+
+    @IsString()
     @ApiProperty()
     start_date: string;
 
-    @IsObject()
+    @IsString()
     @ApiProperty()
     end_date: string;
 
-    @IsObject()
-    @ApiProperty()
-    placement: object;
+    
+
+    // @IsObject()
+    // @ApiProperty()
+    // placement: object;
+
+
 
     // @IsArray()
     // @ApiProperty()

@@ -15,9 +15,13 @@ export class PromotionService {
   constructor(
     @InjectModel('Promotion') private PromotionSchema: Model<Promotion>,
   ) {}
+
+  
   async getAllPromotion(user: any) {
     return this.PromotionSchema.find({});
   }
+
+
   async getPromotionbyId(id: any, user: any) {
     return this.PromotionSchema.findOne({});
   }
@@ -57,6 +61,9 @@ export class PromotionService {
     }
   }
 ​
+
+
+
   async deletePromotion(_id: string) {
     try {
       let uniqueId = { _id };
@@ -69,6 +76,7 @@ export class PromotionService {
     }
   }
 ​
+
   
   //The format here is same as the format in Mongo
   async createPromotion(securityDto: any) {
@@ -80,15 +88,30 @@ export class PromotionService {
         device_based: securityDto.device ,
         area_based: securityDto.area,
         user_based: { 
-          merchant : securityDto.merchant,
-          consumer: securityDto.consumer,
-          da: securityDto.da
+          merchant : {
+            merchant_monthly_revenue: securityDto.merchant_monthly_revenue,
+            merchant_number_of_products : securityDto.merchant_number_of_products
+          },
+          consumer: {
+            consumer_gender: securityDto.consumer_gender,
+            consumer_age: securityDto.consumer_age,
+            consumer_login_statistics: securityDto.consumer_login_statistics,
+            consumer_product_category: securityDto.consumer_product_category
+          },
+          da: {
+            da_hours_worked_day: securityDto.da_hours_worked_day,
+            da_hours_worked_month: securityDto.da_hours_worked_month,
+          }
         }
       },
       // promotion_content_type: securityDto.promotion_content_type,
       promotion_for_coupon: securityDto.promotion_for_coupon,
       type: securityDto.type,
-      placement: securityDto.placement,
+      placement: { 
+        page_number: securityDto.page_number,
+        section: securityDto.section
+      },
+      
       date: { 
         start_date: securityDto.start_date,
         end_date: securityDto.end_date
@@ -109,4 +132,6 @@ export class PromotionService {
       },
     );
   }
+
+
 }

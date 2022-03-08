@@ -14,7 +14,7 @@ export const PromotionSchema = new mongoose.Schema(
       type: String,
     },
     target: {
-      type: Array,
+      type: Object,
     },
     promotion_for_coupon: {
       type: String,
@@ -24,7 +24,7 @@ export const PromotionSchema = new mongoose.Schema(
     },
     
     placement: { type: Object },
-    
+    date: { type: Object },
     createdBy: {
       type: ObjectId,
       ref: 'Users',
