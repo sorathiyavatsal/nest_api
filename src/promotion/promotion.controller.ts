@@ -48,10 +48,10 @@ import Api from 'twilio/lib/rest/Api';
 @ApiSecurity('api_key')
 export class PromotionController {
   constructor(private PromotionService: PromotionService) {}
-
+​
   ///{get AllPromotion here}
   @ApiOperation({summary:"in this section you can get all the promotions existing in database by simply clicking on execute button"})
-
+​
   @Get('/')
   async getAllPromotions(@Request() request) {
     return await this.PromotionService.getAllPromotion(request.user);
@@ -71,7 +71,7 @@ export class PromotionController {
   async getUserPromotions(@Request() request) {
     return await this.PromotionService.getPromotionsForUser(request.body);
   }
-
+​
   //{get SinglePromotionBYId here}
   @ApiParam({name:"id",required:true})
  @ApiOperation({summary:"in this section we can get single promotion on the bases of id. add id into the param section nd this will return promotion based on id"})
@@ -82,7 +82,7 @@ export class PromotionController {
       request.user,
     );
   }
-
+​
   //{update promotion by id here}
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
@@ -105,7 +105,7 @@ export class PromotionController {
         promotion_end_date:{type:'Date'},
         coupon_id:{ type: 'ObjectId' },
         marchent_id:{ type: 'ObjectId' } ,
-
+​
       },
     },
   })
@@ -116,39 +116,37 @@ export class PromotionController {
       request.user,
     );
   }
-
-  @Patch('/:coupon_id')
-  @ApiConsumes('multipart/form-data', 'application/json')
-  @ApiOperation({summary:"promotion type means it can be flat or percentage"})
-  
- 
-  @ApiParam({name:'coupon_id' ,required:true})
-  @ApiBody({
-    schema: {
-      properties: {
-        promotion_type:{type:'string'},
+​
+  // @Patch('/:coupon_id')
+  // @ApiConsumes('multipart/form-data', 'application/json')
+  // @ApiOperation({summary:"promotion type means it can be flat or percentage"})
+  // @ApiParam({name:'coupon_id' ,required:true})
+  // @ApiBody({
+  //   schema: {
+  //     properties: {
+  //       promotion_type:{type:'string'},
        
-        orderPrice:{type:'number'}
-      },
-    },
-  })
-  async applyPromotion(@Param() params, @Request() request) {
-    return await this.PromotionService.applyPromotion(
-      params.coupon_id,
-      request.body,
-      request.user,
+  //       orderPrice:{type:'number'}
+  //     },
+  //   },
+  // })
+  // async applyPromotion(@Param() params, @Request() request) {
+  //   return await this.PromotionService.applyPromotion(
+  //     params.coupon_id,
+  //     request.body,
+  //     request.user,
       
-    );
-  }
+  //   );
+  // }
  
-  ////delete
+  //delete
  @ApiOperation({summary:"delete will work when we put id of object in param section"})
 @ApiParam({name:'id',required:true})
 @Delete('/:id')
   async deleteCoupon(@Param() params, @Request() request) {
     return await this.PromotionService.deletePromotion(params.id);
   }
-
+​
   //{create promotion}
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
@@ -157,20 +155,15 @@ export class PromotionController {
   @ApiBody({  
     schema: {
       properties: {
-        promotion_name: { type: 'String' },
-        promotion_description: { type: 'String' },
-        promotion_image: { type: 'String' },
-        promotion_content_type: { type: 'String' },
-        promotion_target_type: { type: 'String' },
-        promotion_Device_type: { type: 'String' },
-        promotion_type: { type: 'String' },
-        promotion_target_filters:{ type: 'String' },
-        promotion_target_users_by:{ type: 'String' },
-        promotion_start_date:{type:'Date'},
-        promotion_end_date:{type:'Date'},
-        coupon_id:{ type: 'ObjectId' },
-        marchent_id:{ type: 'ObjectId' } ,
-
+        promotion_name: { type: 'string' },
+        promotion_description: { type: 'string' },
+        promotion_image: { type: 'string' },
+        promotion_target: { type: 'array' },
+        promotion_content_type: { type: 'string' },
+        promotion_type: { type: 'string' },
+        promotion_start_date:{type:'string'},
+        promotion_end_date:{type:'string'},
+        promotion_placement: { type: 'object' }
       },
     },
   })

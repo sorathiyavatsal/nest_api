@@ -16,6 +16,19 @@ export const CouponsSchema = new mongoose.Schema(
     coupon_usablenumber:{
       type: Number,
     },
+    discount_amount: {
+      type: Number,
+    },
+    discount_type: {
+      type: String,
+    },
+    coupon_conditional: { type: Boolean},
+    coupon_condition_percent:{
+      type: Object,
+    },
+    coupon_condition_flat:{
+      type: Object,
+    },
     createdBy: {
       type: ObjectId,
       ref: 'Users',
@@ -32,6 +45,11 @@ export const CouponsSchema = new mongoose.Schema(
 export interface Coupons extends mongoose.Document {
   coupoun_name: string;
   coupoun_code: string;
-  coupon_expiration: string;
   coupon_usablenumber:number;
+  coupon_expiration: string;
+  discount_amount: number;
+  discount_type: string;
+  coupon_conditional:boolean;
+  coupon_condition_percent: object;
+  coupon_condition_flat: object;
 }
