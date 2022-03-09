@@ -93,10 +93,30 @@ export class CouponsController {
       properties: {
         name: { type: 'string' },
         coupon_code: { type: 'string' },
-        coupon_expiration: {type: 'string'},
+        coupon_expiration: { type: 'string' },
         coupon_usablenumber: { type: 'number' },
-        createdBy:{ type: 'string' },
+        createdBy: { type: 'string' },
         modifiedBy: { type: 'string' },
+        discount_type: {
+          type: 'boolean',
+        },
+        discount_amount: {
+          type: 'number',
+        },
+        coupon_conditional: { type: 'boolean'},
+        coupon_condition_percent: {
+          type: 'object',
+          properties: {
+            min_cart_value:{type: 'number'}, 
+            max_discount_limit: { type: 'number'},
+          }
+        },
+        coupon_condition_flat: {
+          type: 'object',
+          properties: {
+            min_cart_value:{type: 'number'}, 
+          }
+        },
       },
     },
   })

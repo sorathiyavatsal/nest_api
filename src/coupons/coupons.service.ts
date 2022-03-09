@@ -11,9 +11,11 @@ export class CouponsService {
   async getAllCoupons(user: any) {
     return this.CouponsSchema.find({});
   }
+
   async getCouponbyId(id: any, user: any) {
     return this.CouponsSchema.findOne({});
   }
+
   async updateCoupon(_id: string, couponDto: any, user: any) {
     let uniqueId = { _id };
     let updateBody = couponDto;
@@ -26,9 +28,14 @@ export class CouponsService {
     const coupon = randomstring.generate(7);
     const coupon_details = { 
       coupoun_name: securityDto.name,
-      coupoun_code: coupon,
+      coupoun_code: securityDto.coupon_code!=""? securityDto.coupon_code : coupon,
       coupon_usablenumber: securityDto.coupon_usablenumber,
       coupon_expiration: securityDto.coupon_expiration,
+      discount_type: securityDto.discount_type,
+      discount_amount: securityDto.discount_amount,
+      coupon_conditional: securityDto.coupon_conditional,
+      coupon_condition_percent:  securityDto.coupon_conditional && securityDto.discount_type?securityDto.coupon_condition_percent:null,
+      coupon_condition_flat:  securityDto.coupon_conditional && (securityDto.discount_type==false)?securityDto.coupon_condition_flat:null,
     }
     console.log(coupon_details)
     const newPromo = new this.CouponsSchema(coupon_details);
