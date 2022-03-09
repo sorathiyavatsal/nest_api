@@ -34,8 +34,14 @@ export class CouponsService {
       discount_type: securityDto.discount_type,
       discount_amount: securityDto.discount_amount,
       coupon_conditional: securityDto.coupon_conditional,
-      coupon_condition_percent:  securityDto.coupon_conditional && securityDto.discount_type?securityDto.coupon_condition_percent:null,
-      coupon_condition_flat:  securityDto.coupon_conditional && (securityDto.discount_type==false)?securityDto.coupon_condition_flat:null,
+      coupon_condition_percent:  securityDto.coupon_conditional && securityDto.discount_type?{
+        min_cart_value: securityDto.min_cart_value,
+        max_discount_limit: securityDto.max_discount_limit,
+
+      }:null,
+      coupon_condition_flat:  securityDto.coupon_conditional && (securityDto.discount_type==false)?{
+        min_cart_value_flat: securityDto.min_cart_value_flat,
+      }:null,
     }
     console.log(coupon_details)
     const newPromo = new this.CouponsSchema(coupon_details);
