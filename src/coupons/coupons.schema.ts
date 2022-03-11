@@ -24,10 +24,10 @@ export const CouponsSchema = new mongoose.Schema(
     },
     coupon_conditional: { type: Boolean},
     coupon_condition_percent:{
-      type: Object,
+      type: Object 
     },
     coupon_condition_flat:{
-      type: Object,
+      type: Object
     },
     createdBy: {
       type: ObjectId,

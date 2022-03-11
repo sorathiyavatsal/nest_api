@@ -95,8 +95,6 @@ export class CouponsController {
         coupon_code: { type: 'string' },
         coupon_expiration: { type: 'string' },
         coupon_usablenumber: { type: 'number' },
-        createdBy: { type: 'string' },
-        modifiedBy: { type: 'string' },
         discount_type: {
           type: 'boolean',
         },
@@ -104,22 +102,18 @@ export class CouponsController {
           type: 'number',
         },
         coupon_conditional: { type: 'boolean'},
-        coupon_condition_percent: {
-          type: 'object',
-          properties: {
-            min_cart_value:{type: 'number'}, 
-            max_discount_limit: { type: 'number'},
-          }
-        },
-        coupon_condition_flat: {
-          type: 'object',
-          properties: {
-            min_cart_value:{type: 'number'}, 
-          }
-        },
+        
+        min_cart_value:{type: 'number'}, 
+        max_discount_limit: { type: 'number'},
+        min_cart_value_flat:{type: 'number'}, 
+        
+
       },
     },
   })
+
+
+
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({
     summary:
