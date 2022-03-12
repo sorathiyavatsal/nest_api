@@ -6,4 +6,5 @@ export enum Role {
   DELIVERY = 'DELIVERY',
   SUPPORT = 'SUPPORT',
   MANAGER = 'MANAGER',
+  PARTNER = 'PARTNER',
 }

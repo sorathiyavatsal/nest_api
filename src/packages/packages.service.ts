@@ -16,10 +16,10 @@ export class PackageService {
   ) {}
 
   async getAllPackages(user: any) {
-    return this.PackagesModel.find({}).populate('category', 'name');
+    return this.PackagesModel.find({}).populate('category', 'name svgImage');
   }
   async getPackgesDetail(id: any) {
-    return this.PackagesModel.findById(id);
+    return this.PackagesModel.findById(id).populate('category', 'name svgImage');
   }
   async updatePackages(id: string, packagesDto: EditPackagesDto, user: any) {
     return this.PackagesModel.findById({ _id: id }).then(

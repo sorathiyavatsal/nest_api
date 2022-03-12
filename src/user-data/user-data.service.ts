@@ -9,6 +9,7 @@ let ObjectId = require('mongodb').ObjectId;
 export class UserDataService {
   constructor(
     @InjectModel('UserData') private UserDataModel: Model<UserData>,
+    @InjectModel('User') private UserModel: Model<User>,
   ) {}
 
   async getAllProfile(user: any) {
@@ -32,17 +33,17 @@ export class UserDataService {
           data.adharcard_no = profileDto.adharcard_no;
           data.pancard_no = profileDto.pancard_no;
           data.gst_no = profileDto.gst_no;
-          if (files.profile_photo) data.profile_photo = files.profile_photo;
-          if (files.store_license_image)
+          if (files?.profile_photo) data.profile_photo = files.profile_photo;
+          if (files?.store_license_image)
             data.store_license_image = files.store_license_image;
-          if (files.aadhar_card_image)
+          if (files?.aadhar_card_image)
             data.aadhar_card_image = files.aadhar_card_image;
-          if (files.pan_card_image) data.pan_card_image = files.pan_card_image;
+          if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
           data.bank_details = {
-            bank_account_holer_name: profileDto.bank_account_holer_name,
-            bank_account_no: profileDto.bank_account_no,
-            bank_name: profileDto.bank_name,
-            ifsc_code: profileDto.ifsc_code,
+            bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+            bank_account_no: profileDto.bank_details.bank_account_no,
+            bank_name: profileDto.bank_details.bank_name,
+            ifsc_code: profileDto.bank_details.ifsc_code,
           };
           data.store_license_image = files.store_license;
           data.modifiedBy = user._id;
@@ -67,13 +68,13 @@ export class UserDataService {
           data.pancard_no = profileDto.pancard_no;
           data.driving_card = profileDto.driving_card;
           data.vehicle_type = profileDto.vehicle_type;
-          if (files.profile_photo) data.profile_photo = files.profile_photo;
-          if (files.vehicle_image) data.vehicle_image = files.vehicle_image;
-          if (files.aadhar_card_image)
+          if (files?.profile_photo) data.profile_photo = files.profile_photo;
+          if (files?.vehicle_image) data.vehicle_image = files.vehicle_image;
+          if (files?.aadhar_card_image)
             data.aadhar_card_image = files.aadhar_card_image;
-          if (files.driving_card_image)
+          if (files?.driving_card_image)
             data.driving_card_image = files.driving_card_image;
-          if (files.pan_card_image) data.pan_card_image = files.pan_card_image;
+          if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
           data.modifiedBy = user._id;
           data.save();
           return data.toObject({ versionKey: false });
@@ -95,7 +96,8 @@ export class UserDataService {
     if (userProfile && userProfile._id) {
       return new BadRequestException('Profile is already created');
     }
-    if (user.user.role == 'MERCHANT') {
+    const userData = await this.UserModel.findOne({_id: new ObjectId(data.userId)});
+    if (userData.role == 'MERCHANT') {
       data.profile_type = 'User';
       data.gender = profileDto.gender;
       data.fullName = profileDto.fullName;
@@ -106,23 +108,24 @@ export class UserDataService {
       data.adharcard_no = profileDto.adharcard_no;
       data.pancard_no = profileDto.pancard_no;
       data.gst_no = profileDto.gst_no;
-      if (files.profile_photo) data.profile_photo = files.profile_photo;
-      if (files.store_license_image)
+      if (files?.profile_photo) data.profile_photo = files.profile_photo;
+      if (files?.store_license_image)
         data.store_license_image = files.store_license_image;
-      if (files.aadhar_card_image)
+      if (files?.aadhar_card_image)
         data.aadhar_card_image = files.aadhar_card_image;
-      if (files.pan_card_image) data.pan_card_image = files.pan_card_image;
+      if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
       data.bank_details = {
-        bank_account_holer_name: profileDto.bank_account_holer_name,
-        bank_account_no: profileDto.bank_account_no,
-        bank_name: profileDto.bank_name,
-        ifsc_code: profileDto.ifsc_code,
+        bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+        bank_account_no: profileDto.bank_details.bank_account_no,
+        bank_name: profileDto.bank_details.bank_name,
+        ifsc_code: profileDto.bank_details.ifsc_code,
       };
-      data.store_license_image = files.store_license;
+      data.store_license_image = files?.store_license;
       data.modifiedBy = user.user._id;
       data.createdBy = user.user._id;
+      data.services_area = profileDto.services_area || [];
     }
-    if (user.user.role == 'DELIVERY') {
+    if (userData.role == 'DELIVERY') {
       data.profile_type = 'User';
       data.gender = profileDto.gender;
       data.dob = profileDto.dob;
@@ -133,15 +136,49 @@ export class UserDataService {
       data.driving_card = profileDto.driving_card;
       data.vehicle_type = profileDto.vehicle_type;
       data.job_type = profileDto.job_type;
-      if (files.profile_photo) data.profile_photo = files.profile_photo;
-      if (files.vehicle_image) data.vehicle_image = files.vehicle_image;
-      if (files.aadhar_card_image)
+      if (files?.profile_photo) data.profile_photo = files.profile_photo;
+      if (files?.vehicle_image) data.vehicle_image = files.vehicle_image;
+      if (files?.aadhar_card_image)
         data.aadhar_card_image = files.aadhar_card_image;
-      if (files.driving_card_image)
+      if (files?.driving_card_image)
         data.driving_card_image = files.driving_card_image;
-      if (files.pan_card_image) data.pan_card_image = files.pan_card_image;
+      if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
       data.modifiedBy = user.user._id;
       data.createdBy = user.user._id;
+      data.partnerId = profileDto.partnerId;
+      data.bank_details = {
+        bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+        bank_account_no: profileDto.bank_details.bank_account_no,
+        bank_name: profileDto.bank_details.bank_name,
+        ifsc_code: profileDto.bank_details.ifsc_code,
+      };
+      data.services_area = profileDto.services_area || [];
+    }
+    if(userData.role == 'PARTNER'){
+      data.profile_type = 'User';
+      data.gender = profileDto.gender;
+      data.fullName = profileDto.fullName;
+      data.dob = profileDto.dob;
+      data.shop_name = profileDto.shop_name;
+      data.shop_address = profileDto.shop_address;
+      data.adharcard_no = profileDto.adharcard_no;
+      data.pancard_no = profileDto.pancard_no;
+      data.gst_no = profileDto.gst_no;
+      if (files?.profile_photo) data.profile_photo = files.profile_photo;
+      if (files?.store_license_image)
+        data.store_license_image = files.store_license_image;
+      if (files?.aadhar_card_image)
+        data.aadhar_card_image = files.aadhar_card_image;
+      if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
+      data.bank_details = {
+        bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+        bank_account_no: profileDto.bank_details.bank_account_no,
+        bank_name: profileDto.bank_details.bank_name,
+        ifsc_code: profileDto.bank_details.ifsc_code,
+      };
+      data.modifiedBy = user.user._id;
+      data.createdBy = user.user._id;
+      data.services_area = profileDto.services_area || [];
     }
     
     let newProfile = new this.UserDataModel(data);

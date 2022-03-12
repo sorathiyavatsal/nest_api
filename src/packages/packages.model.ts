@@ -5,7 +5,7 @@ export const PackagesSchema = new mongoose.Schema(
     category: {
       type: ObjectId,
       required: true,
-      ref: 'Category',
+      ref: 'Goods',
     },
     from_pack: {
       type: Number,

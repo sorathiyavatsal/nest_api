@@ -55,6 +55,7 @@ export const UserSchema = new mongoose.Schema(
         'DELIVERY',
         'SUPPORT',
         'MANAGER',
+        'PARTNER'
       ],
       default: 'USER',
     },

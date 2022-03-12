@@ -19,10 +19,10 @@ export class WeightsService {
     return await this.WeightsModel.findOne({ apiKey: key, activeStatus: true });
   }
   async getAllWeights(user: any) {
-    return this.WeightsModel.find({}).populate('category', 'name');
+    return this.WeightsModel.find({}).populate('category', 'name svgImage');
   }
   async getWeightsDetail(id: any) {
-    return this.WeightsModel.findById(id);
+    return this.WeightsModel.findById(id).populate('category', 'name svgImage');
   }
   async updateWeights(id: string, weightDto: EditWeightsDto, user: any) {
     return this.WeightsModel.findOne({ _id: id }).then(

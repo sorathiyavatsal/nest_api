@@ -5,27 +5,30 @@ import { CreatePartnerDto } from './dto/create-partners'
 import { GetPartnerDto } from './dto/get-partners'
 import { EditPartnerDto } from './dto/edit-partners'
 import { Partners } from './partners.model';
+import { UserData } from 'src/user-data/user-data.model';
 @Injectable()
 export class PartnersService {
 
   constructor(
     @InjectModel('Partners') private PartnersModel: Model<Partners>,
+    @InjectModel('UserData') private UserDataModel: Model<UserData>,
   ) { }
 
-  async getAllPartners(getPartnerDto: GetPartnerDto) {
-    let partners = {}
-    if (getPartnerDto.partner) {
-      partners = await this.PartnersModel.find({
-        '_id': {
-          $in: getPartnerDto.partner
-        },
-        status: true
-      })
-    } else {
-      partners = await this.PartnersModel.find({ status: true })
-    }
+  async getAllPartners() {
+    const partnersCount = await this.UserDataModel.aggregate([
+      { $match: { partnerId: { $exists: true } } },
+      { $group: { _id: '$partnerId', count: { $sum: 1 } } },
+    ]);
+    const partnersContObj = {};
+    const partnerIds = partnersCount.map(x => { partnersContObj[x._id.toString()] = x.count; return x._id });
+    
+    const partners = await this.UserDataModel.find({
+      userId: { $in: partnerIds }
+    })
 
-    return partners
+    return partners.map(data => {
+      return { ...data.toObject({versionKey: false}), DA: partnersContObj[data.userId.toString()] }
+    })
   }
 
   async postPartners(createPartnerDto: CreatePartnerDto) {

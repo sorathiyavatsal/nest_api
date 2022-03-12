@@ -8,7 +8,7 @@ export const WeightsSchema = new mongoose.Schema(
     category: {
       type: ObjectId,
       required: true,
-      ref: 'Category',
+      ref: 'Goods',
     },
     from_weight: {
       type: Number,

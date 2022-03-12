@@ -204,6 +204,7 @@ export interface DeliveryFleet extends mongoose.Document {
   deliverChargeType: string;
   invoiceStatus: string;
   activeStatus: Boolean;
+  deliveryBoy: mongoose.ObjectId;
   updatedAt: Date;
   createdAt: Date;
   totalHrs: string;

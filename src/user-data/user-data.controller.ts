@@ -89,11 +89,11 @@ export class UserDataController {
         fullName: { type: 'string' },
         shop_name: {
           type: 'string',
-          description: 'required only merchant profile',
+          description: 'required only merchant and partner profile',
         },
         shop_address: {
           type: 'string',
-          description: 'required only merchant profile',
+          description: 'required only merchant and partner profile',
         },
         sell_items: {
           type: 'object',
@@ -103,11 +103,11 @@ export class UserDataController {
         pancard_no: { type: 'string' },
         gst_no: {
           type: 'string',
-          description: 'required only merchant profile',
+          description: 'required only merchant and partner profile',
         },
         bank_details: {
           type: 'object',
-          description: 'required only merchant profile',
+          description: 'required for all profile',
         },
         driving_card: {
           type: 'string',
@@ -127,8 +127,11 @@ export class UserDataController {
           description: 'required only merchant profile',
         },
         services_area: {
-          type: 'string',
-          description: 'required only merchant profile',
+          type: 'array',
+          description: 'required only merchant and partner profile',
+          items: {
+            type: 'string',
+          },
         },
         profile_photo: {
           type: 'string',
@@ -181,6 +184,10 @@ export class UserDataController {
             format: 'binary',
           },
         },
+        partnerId: {
+          type: 'string',
+          description: 'user collection Id and required only DA profile',
+        }
       },
     },
   })
@@ -236,11 +243,11 @@ export class UserDataController {
         fullName: { type: 'string' },
         shop_name: {
           type: 'string',
-          description: 'required only merchant profile',
+          description: 'required only merchant and partner profile',
         },
         shop_address: {
           type: 'string',
-          description: 'required only merchant profile',
+          description: 'required only merchant and partner profile',
         },
         sell_items: {
           type: 'object',
@@ -250,11 +257,11 @@ export class UserDataController {
         pancard_no: { type: 'string' },
         gst_no: {
           type: 'string',
-          description: 'required only merchant profile',
+          description: 'required only merchant and partner profile',
         },
         bank_details: {
           type: 'object',
-          description: 'required only merchant profile',
+          description: 'required for all profile',
         },
         driving_card: {
           type: 'string',
@@ -270,8 +277,11 @@ export class UserDataController {
           description: 'required only merchant profile',
         },
         services_area: {
-          type: 'string',
-          description: 'required only merchant profile',
+          type: 'array',
+          description: 'required only merchant and partner profile',
+          items: {
+            type: 'string',
+          },
         },
         profile_photo: {
           type: 'string',
@@ -324,6 +334,10 @@ export class UserDataController {
             format: 'binary',
           },
         },
+        partnerId: {
+          type: 'string',
+          description: 'user collection Id and required only DA profile',
+        }
       },
     },
   })

@@ -7,6 +7,7 @@ export const PackagingsSchema = new mongoose.Schema(
     category: {
       type: ObjectId,
       required: true,
+      ref: 'Goods',
     },
     rate: {
       type: Number,

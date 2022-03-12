@@ -17,10 +17,10 @@ export class PackagingsService {
   ) {}
 
   async getAllPackagings(user: any) {
-    return this.PackagingsModel.find({});
+    return this.PackagingsModel.find({}).populate('category', 'name svgImage');
   }
   async getPackagingsDetail(id: any) {
-    return this.PackagingsModel.findById(id);
+    return this.PackagingsModel.findById(id).populate('category', 'name svgImage');
   }
   async updatePackagings(
     id: string,

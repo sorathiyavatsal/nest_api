@@ -138,6 +138,11 @@ export const UserDataSchema = new mongoose.Schema(
     avgreview: {
       type: Number,
     },
+    partnerId: {
+      type: ObjectId,
+      required: false,
+      ref: 'Users',
+    },
   },
   { timestamps: true },
 );
@@ -157,7 +162,7 @@ export interface UserData extends mongoose.Document {
   gst_no: string;
   store_license: string;
   bank_details: object;
-  services_area: object;
+  services_area: [];
   activeStatus: boolean;
   updatedAt: Date;
   createdAt: Date;
@@ -179,4 +184,5 @@ export interface UserData extends mongoose.Document {
   store_timing: [];
   review: [];
   avgreview: number;
+  userId: mongoose.ObjectId;
 }
