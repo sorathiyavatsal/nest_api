@@ -47,7 +47,7 @@ export const UserDataSchema = new mongoose.Schema(
     },
     job_type: {
       type: String,
-      enum: ['FULLTIME', 'PARTTIME'],
+      enum: ['FULLTIME', 'HOURLY', 'FLAT'],
     },
     profile_type: {
       type: String,
@@ -185,4 +185,5 @@ export interface UserData extends mongoose.Document {
   review: [];
   avgreview: number;
   userId: mongoose.ObjectId;
+  partnerId: mongoose.ObjectId
 }

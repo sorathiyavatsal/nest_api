@@ -76,101 +76,108 @@ export class SettingsController {
 //   }
   
   @ApiOperation({
-    summary:"get settings on the bases of id and query"
+    summary:"Update or Add new service area"
   })
  @ApiBody({
    schema:{
      properties:{
-       metakey:{type:'string'}
+      zipcode:{type:'string'},
+      areaName: {type: 'string'},
+      status: {type: 'string', description: 'Active or Deactive'}
      }
    }
  })
   @Post('/serviceAreas')
-  async getSettingsDetail( @Request() request: any) {
-    return await this.securityService.getSettings(request.body);
+  async addServiceAreaSettingsDetail(@Request() request: any) {
+    return await this.securityService.addServiceAreaSettingsDetail(request.body);
   }
+
+  // @UseGuards(AuthGuard('jwt'))
+  // @Roles(Role.ADMIN)
+  // @ApiConsumes('multipart/form-data', 'application/json')
+  // @ApiOperation({
+  //   summary:
+  //     'metaValue is an array while creating objects inside for [ (service area) we are adding three parameter required for each {1.zipcode,2.areaName,3.status} ], and for [ (fleet_tax)  we are adding three parameter{1.name,2.type,3.value} ] , and for [ (order_settings) we are adding three parameter{1.order_switch,2.operation_time,3.otp_verification_time} ]',
+  // })
+  // @Post('/add')
+  // @UseInterceptors(
+  //   FilesInterceptor('image', 20, {
+  //     storage: diskStorage({
+  //       destination: './public/uploads',
+  //     }),
+  //   }),
+  // )
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       metaKey: {
+  //         type: 'String',
+  //       },
+  //       metaValue: { type: 'Array' },
+  //     },
+  //   },
+  // })
+  // async addSettings(
+  //   @Body() createSecurityDto: CreateSettingsDto,
+  //   @Request() request,
+  // ) {
+  //   return await this.securityService.createSettings(
+  //     createSecurityDto,
+  //     request.user,
+  //   );
+  // }
+
+  // @UseGuards(AuthGuard('jwt'))
+  // @Roles(Role.ADMIN)
+  // @ApiParam({ name: 'id', required: true })
+  // @ApiQuery({ name: 'zip_code' })
+  // @ApiOperation({summary:"update status of service area on the bases of query and id "})
+
+  // @ApiConsumes('multipart/form-data', 'application/json')
+  // @Put('/UpdateServiceAreas/:id')
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       status: { type: 'string' },
+  //     },
+  //   },
+  // })
+
+  // @ApiConsumes('multipart/form-data', 'application/json')
+  // @ApiOperation({
+  // summary:"update status of serviece area"
+  // })
+  // async updateSettings(
+  //   @Param() params,
+  //   @Query() query,
+  //   @Body() editSecurityDto: EditSettingsDto,
+  //   @Request() request: any,
+  // ) {
+  //   return await this.securityService.updateSettings(
+  //     params.id,
+  //     query.zip_code,
+  //     editSecurityDto,
+  //     request.user,
+  //   );
+  // }
 
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
+  @ApiOperation({summary:"update or add fuel charges"})
   @ApiConsumes('multipart/form-data', 'application/json')
-  @ApiOperation({
-    summary:
-      'metaValue is an array while creating objects inside for [ (service area) we are adding three parameter required for each {1.zipcode,2.areaName,3.status} ], and for [ (fleet_tax)  we are adding three parameter{1.name,2.type,3.value} ] , and for [ (order_settings) we are adding three parameter{1.order_switch,2.operation_time,3.otp_verification_time} ]',
-  })
-  @Post('/add')
-  @UseInterceptors(
-    FilesInterceptor('image', 20, {
-      storage: diskStorage({
-        destination: './public/uploads',
-      }),
-    }),
-  )
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        metaKey: {
-          type: 'String',
+        _id: {type: 'string', description: "fuelcharges objectId, use only for update"},
+        zipcode: { 
+          type: 'array',
+          items: {
+            type: 'string',
+          },
         },
-        metaValue: { type: 'Array' },
-      },
-    },
-  })
-  async addSettings(
-    @Body() createSecurityDto: CreateSettingsDto,
-    @Request() request,
-  ) {
-    return await this.securityService.createSettings(
-      createSecurityDto,
-      request.user,
-    );
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
-  @ApiParam({ name: 'id', required: true })
-  @ApiQuery({ name: 'zip_code' })
-  @ApiOperation({summary:"update status of service area on the bases of query and id "})
-
-  @ApiConsumes('multipart/form-data', 'application/json')
-  @Put('/UpdateServiceAreas/:id')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        status: { type: 'string' },
-      },
-    },
-  })
-
-  @ApiConsumes('multipart/form-data', 'application/json')
-  @ApiOperation({
-  summary:"update status of serviece area"
-  })
-  async updateSettings(
-    @Param() params,
-    @Query() query,
-    @Body() editSecurityDto: EditSettingsDto,
-    @Request() request: any,
-  ) {
-    return await this.securityService.updateSettings(
-      params.id,
-      query.zip_code,
-      editSecurityDto,
-      request.user,
-    );
-  }
-  @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
-  @ApiParam({ name: 'id', required: true })
-  @ApiOperation({summary:"first thing we are putting zipcode in query and object id in param section and the update will happendon the bases of id and if there is no zipcode in query it will add an element to the object with new zipcode and its properties"})
-  @ApiQuery({ name: 'zipcode' })
-  @ApiConsumes('multipart/form-data', 'application/json')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        zipcode: { type: 'string' },
         default_km: { type: 'number' },
         default_km_charge: { type: 'number' },
         addition_charge: { type: 'number' },
@@ -181,19 +188,10 @@ export class SettingsController {
       },
     },
   })
-  @Put('/updateFuelCharges/:id')
-  async updateCharge(
-    @Param() params,
-    @Query() query,
-    @Body() EditSettingsDto: EditSettingsDto,
-    @Request() request: any,
-  ) {
-    await this.securityService.updatecharges(
-      params.id,
-      EditSettingsDto,
-      query.zipcode,
-    );
-  }
+  @Post('/fuelCharges')
+  async addOrUpdateFuelCharges(@Request() request: any) {
+    return await this.securityService.addOrUpdateFuelCharges(request.body);
+  };
 
   // @UseGuards(AuthGuard('jwt'))
   // @Roles(Role.ADMIN)
@@ -208,49 +206,44 @@ export class SettingsController {
   @Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({
-    summary: "value has a data type of number and the rest are string and they all will uodate on the bases of id in params"
+    summary: "add or update setting, those have metaValue type is string or object"
   })
-  @ApiParam({ name: 'id', required: true })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        value: { type: 'number' },
-        type: { type: 'string' },
-        name: { type: 'string' },
+        metaKey: {type: 'string'},
+        metaValue: {type: 'object'}
       },
     },
   })
-  @Put('/tax/:id')
-  async taxSettings(
-    @Param() params,
-    @Body() CreateTaxSettingsDto: EditSettingsDto,
+  @Post()
+  async addNewSetting(
     @Request() request: any,
   ) {
-    return await this.securityService.taxSettings(
-      params.id,
-      CreateTaxSettingsDto,
+    return await this.securityService.addNewSetting(
+      request.body,
     );
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
-  @ApiConsumes('multipart/form-data', 'application/json')
-   @ApiOperation({
-    summary: "order_switch has a data type of true/flase and the rest are number and they all will uodate on the bases of id in params"
-  })
-  @ApiParam({ name: 'id', required: true })
-  @Put('/fleetOrder/:id')
-  async orderSettings(
-    @Param() params,
-    @Body() CreateOrderSettingsDto: CreateOrderSettingsDto,
-    @Request() request: any,
-  ) {
-    return await this.securityService.orderSettings(
-      request.params.id,
-      CreateOrderSettingsDto,
-    );
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Roles(Role.ADMIN)
+  // @ApiConsumes('multipart/form-data', 'application/json')
+  //  @ApiOperation({
+  //   summary: "order_switch has a data type of true/flase and the rest are number and they all will uodate on the bases of id in params"
+  // })
+  // @ApiParam({ name: 'id', required: true })
+  // @Put('/fleetOrder/:id')
+  // async orderSettings(
+  //   @Param() params,
+  //   @Body() CreateOrderSettingsDto: CreateOrderSettingsDto,
+  //   @Request() request: any,
+  // ) {
+  //   return await this.securityService.orderSettings(
+  //     request.params.id,
+  //     CreateOrderSettingsDto,
+  //   );
+  // }
 
   @Get()
   async getDA(@Request() request) {

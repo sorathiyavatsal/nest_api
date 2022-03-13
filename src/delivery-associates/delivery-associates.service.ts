@@ -20,15 +20,21 @@ export class DeliveryAssociatesService {
       daDutyStatus[x._id.toString()] = x.liveStatus;
       return x._id;
     });
-    const deliveryfleetData = await this.deliveryfleetModel.find({deliveryBoy: {$in: daUserIds}, invoiceStatus: "progress"});
+    const deliveryfleetData = await this.deliveryfleetModel.find({deliveryBoy: {$in: daUserIds}, invoiceStatus: {$nin: ['complete', 'cancelled', 'faliure']}});
     const daCurrentJobStatus = {};
     deliveryfleetData.map(x => {
       daCurrentJobStatus[x.deliveryBoy.toString()] = true;
     })
 
-    const daUserData = await this.UserDataModel.find({userId: {$in: daUserIds}}).populate('partnerId', 'fullName');
+    const daUserData = await this.UserDataModel.find({userId: {$in: daUserIds}}).populate('userId', 'loc');
+    const partnerIds = daUserData.map(x=> x.partnerId);
+    const partnerData = await this.UserDataModel.find({userId: {$in: partnerIds}});
+    const partnerFullName = {};
+    partnerData.map(x=>{
+      partnerFullName[x.userId.toString()] = x.fullName;
+    })
     return daUserData.map(x => {
-      return {...x.toObject({ versionKey: false }), currentJobStatus: daCurrentJobStatus[x.userId.toString()] || false, dutyStatus: daDutyStatus[x.userId.toString()]}
+      return {...x.toObject({ versionKey: false }), partnerId: {_id: x.partnerId, fullName: partnerFullName[x.partnerId.toString()]}, currentJobStatus: daCurrentJobStatus[x.userId.toString()] || false, dutyStatus: daDutyStatus[x.userId.toString()]}
     });
   }
 }
