@@ -1,10 +1,18 @@
 import * as mongoose from 'mongoose';
 let ObjectId = mongoose.Types.ObjectId;
-export const InvoiceSchema = new mongoose.Schema(
+export const PurchaseInvoiceSchema = new mongoose.Schema(
   {
+    invoiceId: {
+        type: String,
+        required: true,
+    },
     method: {
       type: String,
       required: true,
+    },
+    invoiceStatus : {
+        type: String,
+        required: true
     },
     transationId: {
       type: String,
@@ -39,8 +47,10 @@ export const InvoiceSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export interface Invoice extends mongoose.Document {
+export interface PurchaseInvoice extends mongoose.Document {
   _id: string;
+  invoiceId: string;
+  invoiceStatus: string;
   method: string;
   transationId: string;
   paymentGatewayId: string;

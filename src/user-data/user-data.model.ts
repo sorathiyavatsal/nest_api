@@ -35,7 +35,7 @@ export const UserDataSchema = new mongoose.Schema(
       required: false,
     },
     sell_items: {
-      type: Object,
+      type: Array,
     },
 
     adharcard_no: {
@@ -113,7 +113,7 @@ export const UserDataSchema = new mongoose.Schema(
       type: ObjectId,
       ref: 'Users',
     },
-    shop_Lat_Long: {
+    shop_located_at: {
       type: Array,
     },
     categoryId: {
@@ -156,7 +156,7 @@ export interface UserData extends mongoose.Document {
   fullName: string;
   shop_name: string;
   shop_address: string;
-  sell_items: string;
+  sell_items: [];
   adharcard_no: string;
   pancard_no: string;
   gst_no: string;
@@ -176,7 +176,7 @@ export interface UserData extends mongoose.Document {
   vehicle_type: string;
   vehicle_image: object;
   driving_card_image: object;
-  shop_Lat_Long: [];
+  shop_located_at: [];
   categoryId: String;
   delegate_access: [];
   primary_language: String;

@@ -29,6 +29,7 @@ export class UserDataService {
           data.dob = profileDto.dob;
           data.shop_name = profileDto.shop_name;
           data.shop_address = profileDto.shop_address;
+          data.shop_located_at = profileDto.shop_located_at;
           data.sell_items = profileDto.sell_items;
           data.adharcard_no = profileDto.adharcard_no;
           data.pancard_no = profileDto.pancard_no;

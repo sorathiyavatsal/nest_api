@@ -104,14 +104,6 @@ export class ProductService {
       },
       {
         $match: {
-          secondary_name: {
-            $regex: filter.name ? filter.name : '',
-            $options: 'i',
-          },
-        },
-      },
-      {
-        $match: {
           pageTitle: {
             $regex: filter.title ? filter.title : '',
             $options: 'i',

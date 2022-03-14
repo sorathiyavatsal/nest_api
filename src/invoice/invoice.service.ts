@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Invoice } from './invoice.model';
+import { PurchaseInvoice } from './invoice.model';
 let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class InvoiceService {
-  constructor(@InjectModel('Invoice') private InvoiceModel: Model<Invoice>) {}
+  constructor(
+    @InjectModel('PurchaseInvoice')
+    private InvoiceModel: Model<PurchaseInvoice>,
+  ) {}
 
   async getAllInvoices() {
     return await this.InvoiceModel.aggregate([
@@ -56,7 +59,26 @@ export class InvoiceService {
   }
 
   async addInvoice(invoiceDto: any, user: any) {
+    let InvoiceNo = '';
+
+    const InvoiceCount = await this.InvoiceModel.find({}).count();
+
+    if (InvoiceCount >= 0 || InvoiceCount < 10) {
+      InvoiceNo = '#00000' + InvoiceCount + 1;
+    } else if (InvoiceCount >= 0 || InvoiceCount < 10) {
+      InvoiceNo = '#0000' + InvoiceCount + 1;
+    } else if (InvoiceCount >= 0 || InvoiceCount < 10) {
+      InvoiceNo = '#000' + InvoiceCount + 1;
+    } else if (InvoiceCount >= 0 || InvoiceCount < 10) {
+      InvoiceNo = '#00' + InvoiceCount + 1;
+    } else if (InvoiceCount >= 0 || InvoiceCount < 10) {
+      InvoiceNo = '#0' + InvoiceCount + 1;
+    } else {
+      InvoiceNo = '#' + InvoiceCount + 1;
+    }
+
     let invoice = {
+      invoiceId: InvoiceNo,
       method: invoiceDto.method,
       transationId: invoiceDto.transationId,
       paymentGatewayId: invoiceDto.paymentGatewayId,

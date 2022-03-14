@@ -14,5 +14,6 @@ export class AuthCredentialsDto {
 
   @ApiProperty()
   @IsOptional()
+  @ApiProperty({required: false})
   deviceId: string;
 }

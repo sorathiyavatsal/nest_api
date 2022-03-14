@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UploadedFiles,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,6 +21,7 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { CatalogueService } from './catalogue.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -150,12 +152,12 @@ export class CatalogueController {
   @ApiOperation({ summary: 'Get Catalogue By Id' })
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  @ApiParam({ name: 'storeid', required: true })
-  @ApiParam({ name: 'productid', required: true })
+  @ApiQuery({ name: 'storeid', required: true })
+  @ApiQuery({ name: 'productid', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Get('/:storeid/:productid')
-  async getcatalogueById(@Param() params, @Request() req) {
-    return await this.catalogueService.getcatalogueById(params);
+  async getcatalogueById(@Query() query, @Request() req) {
+    return await this.catalogueService.getcatalogueById(query);
   }
 
   @ApiOperation({ summary: 'Add Catalogue' })
