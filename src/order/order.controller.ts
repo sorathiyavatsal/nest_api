@@ -6,6 +6,7 @@ import {
   Get,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -13,6 +14,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiParam,
+  ApiQuery,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -29,8 +31,12 @@ export class OrderController {
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  async getAllOrders(@Request() request) {
-    return await this.OrderService.getAllOrder();
+  @ApiQuery({ name: 'id', required: false })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'to_date', required: false })
+  @ApiQuery({ name: 'from_date', required: false })
+  async getAllOrders(@Query() query) {
+    return await this.OrderService.getAllOrder(query);
   }
 
   @ApiParam({ name: 'id', required: true })

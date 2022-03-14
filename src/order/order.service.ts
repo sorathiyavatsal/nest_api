@@ -1,40 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { User } from 'src/auth/user.model';
+import { catalogue } from 'src/catalogue/catalogue.model';
+import { Product } from 'src/product/product.model';
+import { UserData } from 'src/user-data/user-data.model';
 import { PruchaseOrder } from './order.model';
 let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel('PruchaseOrder') private OrderModel: Model<PruchaseOrder>) {}
+  constructor(
+    @InjectModel('PruchaseOrder') private OrderModel: Model<PruchaseOrder>,
+    @InjectModel('catalogue') private catalogueModel: Model<catalogue>,
+    @InjectModel('Products') private ProductsModel: Model<Product>,
+    @InjectModel('User') private userModel: Model<User>,
+    @InjectModel('UserData') private userDataModel: Model<UserData>,
+  ) {}
 
-  async getAllOrder() {
-    return await this.OrderModel.aggregate([
+  async getAllOrder(OrderDto: any) {
+    var orders = await this.OrderModel.aggregate([
       {
         $lookup: {
           from: 'users',
-          localField: 'shippingId',
+          localField: 'consumerId',
           foreignField: '_id',
-          as: 'shippingDetails',
+          as: 'consumerDetails',
         },
       },
       {
         $unwind: {
-          path: '$shippingDetails',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'invoices',
-          localField: 'paymentTransactionId',
-          foreignField: '_id',
-          as: 'paymentTransactionDetails',
-        },
-      },
-      {
-        $unwind: {
-          path: '$paymentTransactionDetails',
+          path: '$consumerDetails',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -47,35 +43,34 @@ export class OrderService {
         },
       },
     ]);
+
+    for (let i = 0; i < orders.length; i++) {
+      for (let j = 0; j < orders[i].orders.length; j++) {
+        var data = await this.catalogueModel.findById(orders[i].orders[j].id);
+        var store = await this.userDataModel.findById(data.storeId)
+        var product = await this.ProductsModel.findById(data.productId)
+        orders[i].orders[j]['details'] = data;
+        orders[i].orders[j]['store'] = store;
+        orders[i].orders[j]['product'] = product;
+      }
+    }
+
+    return orders;
   }
 
   async getOrder(orderId: String) {
-    return await this.OrderModel.aggregate([
+    var orders = await this.OrderModel.aggregate([
       {
         $lookup: {
           from: 'users',
-          localField: 'shippingId',
+          localField: 'consumerId',
           foreignField: '_id',
-          as: 'shippingDetails',
+          as: 'consumerDetails',
         },
       },
       {
         $unwind: {
-          path: '$shippingDetails',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'invoices',
-          localField: 'paymentTransactionId',
-          foreignField: '_id',
-          as: 'paymentTransactionDetails',
-        },
-      },
-      {
-        $unwind: {
-          path: '$paymentTransactionDetails',
+          path: '$consumerDetails',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -89,6 +84,18 @@ export class OrderService {
       },
       { $match: { _id: ObjectId(orderId) } },
     ]);
+
+    for (let i = 0; i < orders.length; i++) {
+        for (let j = 0; j < orders[i].orders.length; j++) {
+          var data = await this.catalogueModel.findById(orders[i].orders[j].id);
+          var store = await this.userDataModel.findById(data.storeId)
+          var product = await this.ProductsModel.findById(data.productId)
+          orders[i].orders[j]['details'] = data;
+          orders[i].orders[j]['store'] = store;
+          orders[i].orders[j]['product'] = product;
+        }
+      }
+    return orders[0];
   }
 
   async postOrder(orderDto: any) {
@@ -99,7 +106,7 @@ export class OrderService {
           id: ObjectId(order.id),
           quantity: order.quantity,
           sellPrice: order.sellPrice,
-          discount: order.discount,
+          discount: order.Discount,
         });
       });
     }
@@ -112,6 +119,7 @@ export class OrderService {
     }
 
     let order = {
+      consumerId: orderDto.consumerId,
       orderType: orderDto.orderType,
       orderDate: orderDto.orderDate,
       orders: orders_details,

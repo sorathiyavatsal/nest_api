@@ -43,6 +43,10 @@ export const PurchaseInvoiceSchema = new mongoose.Schema(
     charges: {
       type: Number,
     },
+    orderId: {
+        type: ObjectId,
+        $ref: 'pruchaseorders'
+    }
   },
   { timestamps: true },
 );
