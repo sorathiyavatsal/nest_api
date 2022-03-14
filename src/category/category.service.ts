@@ -13,12 +13,14 @@ export class CategoryService {
     @InjectModel('UserData') private UserDataModel: Model<UserData>,
   ) {}
 
-  async getAllCategory() {
+  async getAllCategory(categoryDto: any) {
     const category = JSON.parse(
       JSON.stringify(
         await this.CategoryModel.aggregate([
           {
-            $match: { status: true },
+            $match: {
+              status: categoryDto.status == 'true' ? true : false,
+            },
           },
           {
             $lookup: {
@@ -63,7 +65,7 @@ export class CategoryService {
         await this.CategoryModel.aggregate([
           {
             $match: {
-              $and: [{ _id: ObjectId(categoryId) }, { status: true }],
+              $and: [{ _id: ObjectId(categoryId) }],
             },
           },
           {
@@ -104,7 +106,6 @@ export class CategoryService {
   }
 
   async getTypeCategory(categoryDto: any) {
-      console.log(categoryDto)
     const category = JSON.parse(
       JSON.stringify(
         await this.CategoryModel.aggregate([

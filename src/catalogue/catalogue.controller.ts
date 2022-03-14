@@ -80,7 +80,7 @@ export class CatalogueController {
       });
     }
     request.body.metaImage = response[0];
-    console.log(request.body)
+    console.log(request.body);
     return await this.catalogueService.postVariant(request.body);
   }
 
@@ -110,8 +110,11 @@ export class CatalogueController {
           type: 'string',
         },
         optionsImage: {
-          type: 'string',
-          format: 'binary',
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
         },
         optionsText: {
           type: 'string',
@@ -144,10 +147,21 @@ export class CatalogueController {
   @ApiOperation({ summary: 'Get All Catalgoue' })
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  @Get('/')
+  @Get('/all')
   async getAllcatalogue(@Request() req) {
     return await this.catalogueService.getAllcatalogue();
   }
+
+  @ApiOperation({ summary: 'Get Catalogue By Id' })
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('ADMIN')
+  @ApiQuery({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @Get('/:id')
+  async getcatalogueId(@Query() query) {
+    return await this.catalogueService.getcatalogueId(query);
+  }
+
 
   @ApiOperation({ summary: 'Get Catalogue By Id' })
   @UseGuards(AuthGuard('jwt'))

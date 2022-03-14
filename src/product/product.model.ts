@@ -62,6 +62,12 @@ export const ProductSchema = new mongoose.Schema(
     avgreview: {
       type: Number,
     },
+    parentId: {
+      type: String,
+    },
+    addon: {
+      type: Array,
+    },
     status: {
       type: Boolean,
     },
@@ -88,5 +94,7 @@ export interface Product extends mongoose.Document {
   menu: string;
   type: string;
   review: [];
+  addon: [];
+  parentId: string;
   avgreview: number;
 }

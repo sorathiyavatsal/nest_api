@@ -12,7 +12,7 @@ export const VariantOptionsSchema = new mongoose.Schema(
       type: String,
     },
     image: {
-      type: String,
+      type: Array,
     },
     text: {
       type: String,
@@ -37,7 +37,7 @@ export interface VariantOptions extends mongoose.Document {
   _id: string;
   variant_id: string;
   value: string;
-  image: string;
+  image: [];
   text: string;
   mrpprice: number;
   salepprice: number;

@@ -18,4 +18,5 @@ import { VariantOptionsSchema } from 'src/product/variantOptions.model';
   controllers: [CatalogueController],
   providers: [CatalogueService],
 })
+
 export class CatalogueModule {}

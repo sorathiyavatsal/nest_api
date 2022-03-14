@@ -15,7 +15,7 @@ export class CatalogueService {
     @InjectModel('catalogue') private catalogueModel: Model<catalogue>,
   ) {}
   async getAllcatalogue() {
-    return await this.catalogueModel.aggregate([
+    var catalogue = await this.catalogueModel.aggregate([
       {
         $lookup: {
           from: 'products',
@@ -52,17 +52,83 @@ export class CatalogueService {
         },
       },
     ]);
+
+    for (let i = 0; i < catalogue.length; i++) {
+      catalogue[i].variantsDetails['variantoptionDetails'] =
+        catalogue[i].variantoptionDetails;
+      delete catalogue[i].variantoptionDetails;
+    }
+
+    return catalogue;
+  }
+
+  async getcatalogueId(catlog: any) {
+    var catalogue = await this.catalogueModel.aggregate([
+      {
+        $match: {
+          _id: ObjectId(catlog.id),
+        },
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'productId',
+          foreignField: '_id',
+          as: 'products',
+        },
+      },
+      {
+        $lookup: {
+          from: 'userdatas',
+          localField: 'storeId',
+          foreignField: '_id',
+          as: 'stores',
+        },
+      },
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'variants',
+          foreignField: '_id',
+          as: 'variantsDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$variantsDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'variantoptions',
+          localField: 'variantsDetails.options',
+          foreignField: '_id',
+          as: 'variantoptionDetails',
+        },
+      },
+    ]);
+
+    for (let i = 0; i < catalogue.length; i++) {
+      if (catalogue[i] ?? catalogue[i].variantoptionDetails) {
+        catalogue[i].variantsDetails['variantoptionDetails'] =
+          catalogue[i].variantoptionDetails;
+        delete catalogue[i].variantoptionDetails;
+      }
+    }
+
+    return catalogue;
   }
 
   async getcatalogueById(product: any) {
     let condition = {};
 
-    if(product.productid) {
-        condition['productId'] = ObjectId(product.productid)
+    if (product.productid) {
+      condition['productId'] = ObjectId(product.productid);
     }
 
-    if(product.storeid) {
-        condition['storeId'] = ObjectId(product.storeid)
+    if (product.storeid) {
+      condition['storeId'] = ObjectId(product.storeid);
     }
 
     return await this.catalogueModel.find(condition);
@@ -74,7 +140,6 @@ export class CatalogueService {
       storeId: ObjectId(dto.storeId),
       catalogueStatus: dto.catalogueStatus,
       variants: dto.variants.map((s) => ObjectId(s)),
-      variantoptions: dto.variantoptions.map((s) => ObjectId(s)),
     };
     return await new this.catalogueModel(newcatalogue).save();
   }

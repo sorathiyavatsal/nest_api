@@ -23,8 +23,4 @@ export class catalogueDto {
   @ApiProperty({ type: Array })
   @IsNotEmpty()
   variants: [];
-
-  @ApiProperty({ type: Array })
-  @IsNotEmpty()
-  variantoptions: [];
 }
