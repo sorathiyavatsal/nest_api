@@ -62,6 +62,7 @@ export class SettlementsService {
       inputDate: settlementDto.inputDate,
       amountPay: settlementDto.amountPay,
       receiptId: settlementDto.receiptId,
+      status: 'paid'
     };
 
     return await new this.SettlementModel(Settlement).save();
