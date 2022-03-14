@@ -32,6 +32,9 @@ export const SettlementSchema = new mongoose.Schema(
     receiptId: {
         type: ObjectId
     },
+    status: {
+        type: String
+    }
   },
   { timestamps: true },
 );
@@ -48,4 +51,5 @@ export interface Settlement extends mongoose.Document {
   inputDate: Date;
   amountPay: number;
   receiptId: mongoose.ObjectId;
+  status: string;
 }
