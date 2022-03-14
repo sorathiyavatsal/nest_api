@@ -57,6 +57,7 @@ export class UserDataController {
         { name: 'vehicle_image', maxCount: 5 },
         { name: 'store_no_image', maxCount: 5 },
         { name: 'aadhar_card_image', maxCount: 2 },
+        { name: 'gst_image', maxCount: 2 },
         { name: 'driving_card_image', maxCount: 2 },
         { name: 'pan_card_image', maxCount: 2 },
       ],
@@ -95,13 +96,21 @@ export class UserDataController {
           type: 'string',
           description: 'required only merchant and partner profile',
         },
+        shop_located_at: {
+          type: 'string',
+          description: 'required shop lat long',
+        },
         sell_items: {
-          type: 'object',
-          description: 'required only merchant profile',
+          type: 'array',
+          description: 'required items that sell buy shop',
         },
         adharcard_no: { type: 'string' },
         pancard_no: { type: 'string' },
         gst_no: {
+          type: 'string',
+          description: 'required only merchant and partner profile',
+        },
+        gst_image: {
           type: 'string',
           description: 'required only merchant and partner profile',
         },
@@ -126,6 +135,26 @@ export class UserDataController {
           type: 'string',
           description: 'required only merchant profile',
         },
+        store_license_image: {
+          type: 'array',
+          description: 'required only merchant profile',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        food_license: {
+          type: 'string',
+          description: 'required only merchant profile',
+        },
+        food_license_image: {
+          type: 'array',
+          description: 'required only merchant profile',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
         services_area: {
           type: 'array',
           description: 'required only merchant and partner profile',
@@ -135,16 +164,7 @@ export class UserDataController {
         },
         profile_photo: {
           type: 'string',
-
           format: 'binary',
-        },
-        store_license_image: {
-          type: 'array',
-          description: 'required only merchant profile',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
         },
         vehicle_image: {
           description: 'required only DA profile',
@@ -154,7 +174,7 @@ export class UserDataController {
             format: 'binary',
           },
         },
-        store_no_image: {
+        store_image: {
           description: 'required only merchant profile',
           type: 'array',
           items: {
@@ -187,7 +207,7 @@ export class UserDataController {
         partnerId: {
           type: 'string',
           description: 'user collection Id and required only DA profile',
-        }
+        },
       },
     },
   })
@@ -211,6 +231,7 @@ export class UserDataController {
         { name: 'vehicle_image', maxCount: 5 },
         { name: 'store_no_image', maxCount: 5 },
         { name: 'aadhar_card_image', maxCount: 2 },
+        { name: 'gst_image', maxCount: 2 },
         { name: 'driving_card_image', maxCount: 2 },
         { name: 'pan_card_image', maxCount: 2 },
       ],
@@ -249,13 +270,21 @@ export class UserDataController {
           type: 'string',
           description: 'required only merchant and partner profile',
         },
+        shop_located_at: {
+          type: 'string',
+          description: 'required shop lat long',
+        },
         sell_items: {
-          type: 'object',
-          description: 'required only merchant profile',
+          type: 'array',
+          description: 'required items that sell buy shop',
         },
         adharcard_no: { type: 'string' },
         pancard_no: { type: 'string' },
         gst_no: {
+          type: 'string',
+          description: 'required only merchant and partner profile',
+        },
+        gst_image: {
           type: 'string',
           description: 'required only merchant and partner profile',
         },
@@ -276,6 +305,26 @@ export class UserDataController {
           type: 'string',
           description: 'required only merchant profile',
         },
+        store_license_image: {
+          type: 'array',
+          description: 'required only merchant profile',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        food_license: {
+          type: 'string',
+          description: 'required only merchant profile',
+        },
+        food_license_image: {
+          type: 'array',
+          description: 'required only merchant profile',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
         services_area: {
           type: 'array',
           description: 'required only merchant and partner profile',
@@ -285,16 +334,7 @@ export class UserDataController {
         },
         profile_photo: {
           type: 'string',
-
           format: 'binary',
-        },
-        store_license_image: {
-          type: 'array',
-          description: 'required only merchant profile',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
         },
         vehicle_image: {
           description: 'required only DA profile',
@@ -304,7 +344,7 @@ export class UserDataController {
             format: 'binary',
           },
         },
-        store_no_image: {
+        store_image: {
           description: 'required only merchant profile',
           type: 'array',
           items: {
@@ -337,7 +377,7 @@ export class UserDataController {
         partnerId: {
           type: 'string',
           description: 'user collection Id and required only DA profile',
-        }
+        },
       },
     },
   })

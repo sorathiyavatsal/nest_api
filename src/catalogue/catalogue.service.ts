@@ -55,7 +55,17 @@ export class CatalogueService {
   }
 
   async getcatalogueById(product: any) {
-    return await this.catalogueModel.findById(product);
+    let condition = {};
+
+    if(product.productid) {
+        condition['productId'] = ObjectId(product.productid)
+    }
+
+    if(product.storeid) {
+        condition['storeId'] = ObjectId(product.storeid)
+    }
+
+    return await this.catalogueModel.find(condition);
   }
 
   async addNewcatalogue(dto: any) {

@@ -1,44 +1,47 @@
 import * as mongoose from 'mongoose';
 let ObjectId = mongoose.Types.ObjectId;
-export const OrderSchema = new mongoose.Schema(
+export const PruchaseOrderSchema = new mongoose.Schema(
   {
+    consumerId: {
+      type: ObjectId,
+      $ref: 'Users',
+    },
     orderType: {
-        type: String,
+      type: String,
     },
     orderDate: {
-        type: Date,
+      type: Date,
     },
     orders: {
-        type: Object,
+      type: Object,
     },
     subTotal: {
-        type: Number,
+      type: Number,
     },
     tax: {
-        type: Object,
+      type: Object,
     },
     copouns: {
-        type: Array,
+      type: Array,
     },
     shipingAddress: {
-        type: Object,
+      type: Object,
     },
     billingAddress: {
-        type: Object,
+      type: Object,
     },
     shippingId: {
-        type: ObjectId,
-        $ref: 'Users'
+      type: ObjectId,
+      $ref: 'Users',
     },
-    paymentTransactionId: {
-        type: ObjectId,
-        $ref: 'Invoices'
+    cor: {
+      type: Number,
     },
   },
   { timestamps: true },
 );
 
-export interface Order extends mongoose.Document {
+export interface PruchaseOrder extends mongoose.Document {
   _id: string;
   orderType: string;
   orderDate: Date;
@@ -49,5 +52,5 @@ export interface Order extends mongoose.Document {
   shipingAddress: object;
   billingAddress: object;
   shippingId: mongoose.ObjectId;
-  paymentTransactionId: mongoose.ObjectId;
+  cor: number;
 }

@@ -12,7 +12,12 @@ import { ObjectId } from 'mongoose';
 export class InvoiceDistanceDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ enum: [ 'CARD', 'UPI' ] })
+  @ApiProperty({ enum: ['PAID', 'REFUND', 'REPLACEMENT'] })
+  invoiceStatus: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ enum: ['CARD', 'UPI'] })
   method: String;
 
   @IsString()
@@ -27,7 +32,7 @@ export class InvoiceDistanceDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ enum: [ 'PENDDING', 'SUCCESS', 'FAILED' ] })
+  @ApiProperty({ enum: ['PENDDING', 'SUCCESS', 'FAILED'] })
   paymentGatewayStatus: String;
 
   @IsString()
@@ -37,7 +42,7 @@ export class InvoiceDistanceDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ enum: [ 'CONSUMER', 'MERCHANT' ] })
+  @ApiProperty({ enum: ['CONSUMER', 'MERCHANT'] })
   paidBy: String;
 
   @IsString()
@@ -47,7 +52,7 @@ export class InvoiceDistanceDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ enum: [ 'DELIVERYBOY', 'MARCHANT' ] })
+  @ApiProperty({ enum: ['DELIVERYBOY', 'MARCHANT'] })
   receiceBy: String;
 
   @IsNumber()

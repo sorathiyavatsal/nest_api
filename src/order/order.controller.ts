@@ -1,4 +1,12 @@
-import { Controller, Post, UseGuards, Request, Get, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
@@ -16,7 +24,7 @@ import { OrderDto } from './dto/create-order';
 @ApiBearerAuth()
 @ApiSecurity('api_key')
 export class OrderController {
-    constructor(private OrderService: OrderService) {}
+  constructor(private OrderService: OrderService) {}
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))

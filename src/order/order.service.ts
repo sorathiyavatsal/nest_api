@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order } from './order.model';
+import { PruchaseOrder } from './order.model';
 let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel('Order') private OrderModel: Model<Order>) {}
+  constructor(@InjectModel('PruchaseOrder') private OrderModel: Model<PruchaseOrder>) {}
 
   async getAllOrder() {
     return await this.OrderModel.aggregate([
