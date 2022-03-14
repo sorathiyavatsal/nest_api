@@ -34,14 +34,12 @@ export class StoreController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getAllStore(@Response() response) {
     response.json(await this.StoreService.getAllStore());
   }
 
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   async getStore(@Param() params, @Response() response) {
     response.json(await this.StoreService.getStore(params.id));

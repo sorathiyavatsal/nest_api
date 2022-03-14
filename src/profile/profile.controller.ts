@@ -52,7 +52,6 @@ export class ProfileController {
 
   @Get('/get-all-profile')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getProfile(@Request() request) {
     return await this.ProfileService.getAllProfile(request.user);
   }

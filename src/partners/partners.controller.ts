@@ -50,7 +50,6 @@ export class PartnersController {
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getAllPartners(
     // @Param() getPartnerDto: GetPartnerDto,
     @Response() response) {

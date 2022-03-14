@@ -38,7 +38,6 @@ export class CategoryController {
 
   @Get('/all/:status')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiQuery({ name: 'status', type: 'boolean', required: false })
   async getAllCategory(@Request() request, @Response() response,@Query() query) {
     response.json(await this.CategoryService.getAllCategory(query));
@@ -46,7 +45,6 @@ export class CategoryController {
 
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   async getCategory(@Param() params, @Response() response) {
     response.json(await this.CategoryService.getCategory(params.id));
@@ -54,7 +52,6 @@ export class CategoryController {
 
   @Get('/getByType/:type/:name')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiQuery({ name: 'type', type: 'string', required: true })
   @ApiQuery({ name: 'name', type: 'string', required: false })
   async getTypeCategory(@Query() query, @Response() response) {

@@ -30,7 +30,6 @@ export class OrderController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiQuery({ name: 'id', required: false })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'to_date', required: false })

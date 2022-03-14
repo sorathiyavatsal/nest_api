@@ -34,7 +34,6 @@ export class FleetCommissionController {
 
   @ApiOperation({ summary: 'Get All Fleet Commissions' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @Get('/')
   async getAllFleetCommission(@Query() filter: filterDto, @Req() req) {
     return await this.FleetCommissionService.getAllFleetCommission(filter);
@@ -42,7 +41,6 @@ export class FleetCommissionController {
 
   @ApiOperation({ summary: 'Get Fleet Commission By Id' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Get('/:id')
@@ -52,7 +50,6 @@ export class FleetCommissionController {
 
   @ApiOperation({ summary: 'Add New Fleet Commission' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiConsumes('multipart/form-data', 'application/json')
   @Post('/')
   async addNewFleetCommission(@Body() fleetCommission: fleetCommissionDto, @Req() req) {
@@ -61,7 +58,6 @@ export class FleetCommissionController {
 
   @ApiOperation({ summary: 'Update Existing Fleet Commission' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Put('/:id')

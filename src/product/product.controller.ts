@@ -36,7 +36,6 @@ export class ProductController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiQuery({ name: 'category', type: 'string', required: false })
   @ApiQuery({ name: 'store', type: 'string', required: false })
   @ApiQuery({ name: 'collection', type: 'string', required: false })
@@ -52,7 +51,6 @@ export class ProductController {
 
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', type: 'string', required: true })
   async getProducts(@Param() params, @Response() response) {
     response.json(await this.ProductService.getProducts(params.id));

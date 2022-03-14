@@ -34,7 +34,6 @@ export class UserDataController {
 
   @Get('/get-all-profile')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getProfile(@Request() request) {
     return await this.UserDataService.getAllProfile(request.user);
   }

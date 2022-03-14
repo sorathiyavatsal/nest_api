@@ -14,7 +14,6 @@ export class EarningsController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiQuery({ name: 'to_date', required: false })
   @ApiQuery({ name: 'from_date', required: false })
   @ApiQuery({ name: 'id', required: false })

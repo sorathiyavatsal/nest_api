@@ -40,7 +40,6 @@ export class SettlementsController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getAllSettlements(@Request() request) {
     return await this.SettlementsService.getAllSettlements();
   }
