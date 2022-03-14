@@ -59,7 +59,7 @@ export class OrderDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  userId: String;
+  consumerId: String;
 
   @IsString()
   @IsNotEmpty()
@@ -106,10 +106,10 @@ export class OrderDto {
   @ApiProperty({
     description: 'Delivery Fleet Id',
   })
-  shippingId: ObjectId;
+  shippingId: String;
 
   @IsNumber()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ required: false })
   cor: Number;
 }

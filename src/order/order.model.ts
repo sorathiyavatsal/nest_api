@@ -23,6 +23,7 @@ export const PruchaseOrderSchema = new mongoose.Schema(
     },
     copouns: {
       type: Array,
+      $ref: 'coupons',
     },
     shipingAddress: {
       type: Object,
@@ -32,7 +33,7 @@ export const PruchaseOrderSchema = new mongoose.Schema(
     },
     shippingId: {
       type: ObjectId,
-      $ref: 'Users',
+      $ref: 'deliveryfleets',
     },
     cor: {
       type: Number,
