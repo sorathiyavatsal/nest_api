@@ -19,6 +19,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiParam,
+  ApiQuery,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -50,13 +51,13 @@ export class CategoryController {
     response.json(await this.CategoryService.getCategory(params.id));
   }
 
-  @Get('/getByType/:type/:name')
+  @Get('/getByType')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  @ApiParam({ name: 'type', type: 'string', required: true })
-  @ApiParam({ name: 'name', type: 'string', required: false })
-  async getTypeCategory(@Param() params, @Response() response) {
-    response.json(await this.CategoryService.getTypeCategory(params));
+  @ApiQuery({ name: 'type', type: 'string', required: true })
+  @ApiQuery({ name: 'name', type: 'string', required: false })
+  async getTypeCategory(@Query() query, @Response() response) {
+    response.json(await this.CategoryService.getTypeCategory(query));
   }
 
   @Post('/add')
