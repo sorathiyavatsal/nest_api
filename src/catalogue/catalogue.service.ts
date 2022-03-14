@@ -122,16 +122,63 @@ export class CatalogueService {
 
   async getcatalogueById(product: any) {
     let condition = {};
-
     if (product.productid) {
       condition['productId'] = ObjectId(product.productid);
     }
+    condition['storeId'] = ObjectId(product.storeid);
+    console.log(condition)
+    
+    var catalogue = await this.catalogueModel.aggregate([
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'productId',
+          foreignField: '_id',
+          as: 'products',
+        },
+      },
+      {
+        $lookup: {
+          from: 'userdatas',
+          localField: 'storeId',
+          foreignField: '_id',
+          as: 'stores',
+        },
+      },
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'variants',
+          foreignField: '_id',
+          as: 'variantsDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$variantsDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'variantoptions',
+          localField: 'variantsDetails.options',
+          foreignField: '_id',
+          as: 'variantoptionDetails',
+        },
+      },
+      {
+        $match: condition,
+      },
+    ]);
 
-    if (product.storeid) {
-      condition['storeId'] = ObjectId(product.storeid);
+    for (let i = 0; i < catalogue.length; i++) {
+      catalogue[i].variantsDetails['variantoptionDetails'] =
+        catalogue[i].variantoptionDetails;
+      delete catalogue[i].variantoptionDetails;
     }
 
-    return await this.catalogueModel.find(condition);
+    return catalogue; //await this.catalogueModel.find(condition);
   }
 
   async addNewcatalogue(dto: any) {
