@@ -160,6 +160,7 @@ export class ProductService {
       brand: productDto.brand,
       keywords: productDto.keywords,
       type: productDto.type,
+      parentId: productDto.parentId,
       status: productDto.status,
     };
 
@@ -168,6 +169,15 @@ export class ProductService {
     }
 
     const product = await new this.ProductsModel(productCollection);
+
+    await this.ProductsModel.findOneAndUpdate(
+      { _id: productDto.parentId },
+      {
+        addon: product._id,
+      },
+      { upsert: true },
+    );
+
     return await product.save();
   }
 
@@ -220,6 +230,22 @@ export class ProductService {
 
     if (productDto.menu) {
       productCollection['menu'] = productDto.menu;
+    }
+
+    if (productDto.type) {
+      productCollection['type'] = productDto.type;
+    }
+
+    if (productDto.parentId) {
+      productCollection['parentId'] = productDto.parentId;
+
+      await this.ProductsModel.findOneAndUpdate(
+        { _id: productDto.parentId },
+        {
+          addon: productId,
+        },
+        { upsert: true },
+      );
     }
 
     if (productDto.type) {

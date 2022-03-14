@@ -1,6 +1,6 @@
-import { Body, Controller, Post, UseGuards,Request, Get, Param  } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards,Request, Get, Param, Query  } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiConsumes, ApiParam, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiParam, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { EarningsService } from './earnings.service';
 import { EarningDto } from './dto/earnings';
 import { Roles } from 'src/auth/roles.decorator';
@@ -15,8 +15,11 @@ export class EarningsController {
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  async getAllOrders(@Request() request) {
-    return await this.EarningsService.getAllEarning();
+  @ApiQuery({ name: 'to_date', required: false })
+  @ApiQuery({ name: 'from_date', required: false })
+  @ApiQuery({ name: 'id', required: false })
+  async getAllOrders(@Query() query) {
+    return await this.EarningsService.getAllEarning(query);
   }
 
   @ApiParam({ name: 'id', required: true })

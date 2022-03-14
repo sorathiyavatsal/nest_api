@@ -3,13 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Earning } from './earnings.model';
 let ObjectId = require('mongodb').ObjectId;
+var _ = require('underscore');
 
 @Injectable()
 export class EarningsService {
   constructor(@InjectModel('Earning') private EarningModel: Model<Earning>) {}
 
-  async getAllEarning() {
-    return await this.EarningModel.aggregate([
+  async getAllEarning(EarningDto: any) {
+    var earningResult = await this.EarningModel.aggregate([
       {
         $lookup: {
           from: 'deliveryfleets',
@@ -53,6 +54,29 @@ export class EarningsService {
         },
       },
     ]);
+
+    if (EarningDto.to_date) {
+      earningResult = _.filter(
+        earningResult,
+        (e) => new Date(e.startDateTime) >= new Date(EarningDto.to_date),
+      );
+    }
+
+    if (EarningDto.from_date) {
+      earningResult = _.filter(
+        earningResult,
+        (e) => new Date(e.startDateTime) <= new Date(EarningDto.from_date),
+      );
+    }
+
+    if(EarningDto.id) {
+        earningResult = _.filter(
+            earningResult,
+            (e) => e.deliveryBoyId == EarningDto.id,
+          );
+    }
+
+    return earningResult;
   }
 
   async getEarning(earningId: String) {

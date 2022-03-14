@@ -44,7 +44,7 @@ export class ProductController {
   @ApiQuery({ name: 'title', type: 'string', required: false })
   async getAllProducts(
     @Request() request,
-    @Response() response,   
+    @Response() response,
     @Query() query,
   ) {
     response.json(await this.ProductService.getAllProducts(query));
@@ -129,8 +129,11 @@ export class ProductController {
           type: 'string',
         },
         optionsImage: {
-          type: 'string',
-          format: 'binary',
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
         },
         optionsText: {
           type: 'string',
@@ -220,6 +223,9 @@ export class ProductController {
           type: 'string',
           enum: ['product', 'addon'],
         },
+        parentId: {
+          type: 'string',
+        },
         status: {
           type: 'boolean',
         },
@@ -308,6 +314,9 @@ export class ProductController {
         type: {
           type: 'string',
           enum: ['product', 'addon'],
+        },
+        parentId: {
+          type: 'string',
         },
         status: {
           type: 'boolean',

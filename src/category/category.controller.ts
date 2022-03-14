@@ -36,11 +36,12 @@ import { response } from 'express';
 export class CategoryController {
   constructor(private CategoryService: CategoryService) {}
 
-  @Get('/all')
+  @Get('/all/:status')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
-  async getAllCategory(@Request() request, @Response() response) {
-    response.json(await this.CategoryService.getAllCategory());
+  @ApiQuery({ name: 'status', type: 'boolean', required: false })
+  async getAllCategory(@Request() request, @Response() response,@Query() query) {
+    response.json(await this.CategoryService.getAllCategory(query));
   }
 
   @Get('/:id')
@@ -51,7 +52,7 @@ export class CategoryController {
     response.json(await this.CategoryService.getCategory(params.id));
   }
 
-  @Get('/getByType')
+  @Get('/getByType/:type/:name')
   @UseGuards(AuthGuard('jwt'))
   @Roles('ADMIN')
   @ApiQuery({ name: 'type', type: 'string', required: true })

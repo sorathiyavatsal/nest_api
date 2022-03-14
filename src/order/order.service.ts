@@ -75,13 +75,13 @@ export class OrderService {
     if (OrderDto.to_date) {
       orders = _.filter(
         orders,
-        (o) => new Date(o.orderDate) > new Date(OrderDto.to_date),
+        (o) => new Date(o.orderDate) >= new Date(OrderDto.to_date),
       );
     }
     if (OrderDto.from_date) {
       orders = _.filter(
         orders,
-        (o) => new Date(o.orderDate) < new Date(OrderDto.from_date),
+        (o) => new Date(o.orderDate) <= new Date(OrderDto.from_date),
       );
     }
 
