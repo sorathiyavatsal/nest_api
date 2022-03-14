@@ -152,15 +152,15 @@ export class CatalogueController {
     return await this.catalogueService.getAllcatalogue();
   }
 
-  @ApiOperation({ summary: 'Get Catalogue By Id' })
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
-  @ApiQuery({ name: 'id', required: true })
-  @ApiConsumes('multipart/form-data', 'application/json')
-  @Get('/:id')
-  async getcatalogueId(@Query() query) {
-    return await this.catalogueService.getcatalogueId(query);
-  }
+//   @ApiOperation({ summary: 'Get Catalogue By Id' })
+//   @UseGuards(AuthGuard('jwt'))
+//   @Roles('ADMIN')
+//   @ApiQuery({ name: 'id', required: true })
+//   @ApiConsumes('multipart/form-data', 'application/json')
+//   @Get('/:id')
+//   async getcatalogueId(@Query() query) {
+//     return await this.catalogueService.getcatalogueId(query);
+//   }
 
 
   @ApiOperation({ summary: 'Get Catalogue By Id' })
