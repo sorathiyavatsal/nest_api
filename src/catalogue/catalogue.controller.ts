@@ -155,7 +155,7 @@ export class CatalogueController {
   @ApiQuery({ name: 'storeid', required: true })
   @ApiQuery({ name: 'productid', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
-  @Get('/:storeid/:productid')
+  @Get('/')
   async getcatalogueById(@Query() query, @Request() req) {
     return await this.catalogueService.getcatalogueById(query);
   }

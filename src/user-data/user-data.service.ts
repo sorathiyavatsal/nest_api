@@ -105,10 +105,14 @@ export class UserDataService {
       data.dob = profileDto.dob;
       data.shop_name = profileDto.shop_name;
       data.shop_address = profileDto.shop_address;
+      data.shop_located_at = profileDto.shop_located_at;
       data.sell_items = profileDto.sell_items;
       data.adharcard_no = profileDto.adharcard_no;
       data.pancard_no = profileDto.pancard_no;
       data.gst_no = profileDto.gst_no;
+      data.gst_image = profileDto.gst_image;
+      data.food_license = profileDto.food_license;
+      if(files?.food_license_image) data.food_license_image = files.food_license_image; 
       if (files?.profile_photo) data.profile_photo = files.profile_photo;
       if (files?.store_license_image)
         data.store_license_image = files.store_license_image;
@@ -121,6 +125,7 @@ export class UserDataService {
         bank_name: profileDto.bank_details.bank_name,
         ifsc_code: profileDto.bank_details.ifsc_code,
       };
+      if(files?.store_image) data.store_image = files.store_image
       data.store_license_image = files?.store_license;
       data.modifiedBy = user.user._id;
       data.createdBy = user.user._id;

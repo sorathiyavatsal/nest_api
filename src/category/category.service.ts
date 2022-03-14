@@ -104,6 +104,7 @@ export class CategoryService {
   }
 
   async getTypeCategory(categoryDto: any) {
+      console.log(categoryDto)
     const category = JSON.parse(
       JSON.stringify(
         await this.CategoryModel.aggregate([
