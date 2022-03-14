@@ -35,14 +35,12 @@ export class BrandController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getAllBrand(@Response() response) {
     response.json(await this.BrandService.getAllBrand());
   }
 
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   async getBrand(@Param() params, @Response() response) {
     response.json(await this.BrandService.getBrand(params.id));

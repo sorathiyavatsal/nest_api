@@ -146,7 +146,6 @@ export class CatalogueController {
 
   @ApiOperation({ summary: 'Get All Catalgoue' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @Get('/all')
   async getAllcatalogue(@Request() req) {
     return await this.catalogueService.getAllcatalogue();
@@ -154,7 +153,7 @@ export class CatalogueController {
 
 //   @ApiOperation({ summary: 'Get Catalogue By Id' })
 //   @UseGuards(AuthGuard('jwt'))
-//   @Roles('ADMIN')
+//
 //   @ApiQuery({ name: 'id', required: true })
 //   @ApiConsumes('multipart/form-data', 'application/json')
 //   @Get('/:id')
@@ -165,7 +164,6 @@ export class CatalogueController {
 
   @ApiOperation({ summary: 'Get Catalogue By Id' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiQuery({ name: 'storeid', required: true })
   @ApiQuery({ name: 'productid', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
@@ -176,7 +174,6 @@ export class CatalogueController {
 
   @ApiOperation({ summary: 'Add Catalogue' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiConsumes('multipart/form-data', 'application/json')
   @Post('/')
   async addNewcatalogue(@Body() catalogue: catalogueDto, @Request() req) {
@@ -185,7 +182,6 @@ export class CatalogueController {
 
   @ApiOperation({ summary: 'Update Catalogue' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Put('/:id')

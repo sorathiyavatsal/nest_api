@@ -32,7 +32,6 @@ export class ReviewsController {
   constructor(private reviewsService: ReviewsService) {}
   @ApiOperation({ summary: 'Get All Reviews' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @Get('/')
   async getAllreviews(@Req() req) {
     return await this.reviewsService.getAllreviews();
@@ -40,7 +39,6 @@ export class ReviewsController {
 
   @ApiOperation({ summary: 'Get reviews By Id' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Get('/:id')
@@ -50,7 +48,6 @@ export class ReviewsController {
 
   @ApiOperation({ summary: 'Add reviews' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiConsumes('multipart/form-data', 'application/json')
   @Post('/')
   async addNewreviews(@Body() reviews: reviewsDto, @Req() req) {
@@ -59,7 +56,6 @@ export class ReviewsController {
 
   @ApiOperation({ summary: 'Update reviews' })
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Put('/:id')

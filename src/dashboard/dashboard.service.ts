@@ -55,6 +55,17 @@ export class DashboardService {
     ).toISOString();
   }
   async tripData(filter: any, user: any) {
+
+    const data = {"message": "Welcome Back!", 
+    "token": 
+    { 
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjIyZWY0MTdhZmU5YjRhMmVjMmQxNTkiLCJ1c2VySWQiOiIyMDIyMDMwNTYyIiwicGhvbmVOdW1iZXIiOiIrOTE3MjA2NzE1NTcwIiwicm9sZSI6Ik1FUkNIQU5UIiwiaWF0IjoxNjQ3MjgwODk0LCJleHAiOjE2NDg1NzY4OTR9.OuXts6SBnhSYfIkNT-pPidaoojvqUvX2DZVF7Y1vtdI"
+    }, 
+    "user": 
+    {"__v": 0, 
+    "_id": "622f82eda4c086714a242435", 
+    "createdAt": "2022-03-14T18:01:17.925Z", "createdBy": "6222ef417afe9b4a2ec2d159", "createdUser": "6222ef417afe9b4a2ec2d159", "modifiedBy": "6222ef417afe9b4a2ec2d159", "otp": "8606", "updatedAt": "2022-03-14T18:01:17.925Z", "verificationType": "sms", "verifiedStatus": true, "verifiedTemplate": "loginsms", "verifiedTime": "2022-03-14T18:01:34.564Z"}}
+
     if (filter && filter.startDate && filter.endDate) {
       await this.setDate(filter.startDate, filter.endDate);
     } else {

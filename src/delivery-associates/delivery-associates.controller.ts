@@ -13,7 +13,6 @@ export class DeliveryAssociatesController {
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
-  @Roles('ADMIN')
   async getAllDeliveryAssociates(
     @Response() response) {
     const data = await this.deliveryAssociatesService.getAllDeliveryAssociates();
