@@ -7,6 +7,7 @@ import { Product } from 'src/product/product.model';
 import { UserData } from 'src/user-data/user-data.model';
 import { PruchaseOrder } from './order.model';
 let ObjectId = require('mongodb').ObjectId;
+var _ = require('underscore');
 
 @Injectable()
 export class OrderService {
@@ -45,14 +46,47 @@ export class OrderService {
     ]);
 
     for (let i = 0; i < orders.length; i++) {
-      for (let j = 0; j < orders[i].orders.length; j++) {
+      const orderCount = orders[i].orders.length;
+      for (let j = 0; j < orderCount; j++) {
         var data = await this.catalogueModel.findById(orders[i].orders[j].id);
-        var store = await this.userDataModel.findById(data.storeId)
-        var product = await this.ProductsModel.findById(data.productId)
+        var store = await this.userDataModel.findById(data.storeId);
+        var product = await this.ProductsModel.findById(data.productId);
         orders[i].orders[j]['details'] = data;
         orders[i].orders[j]['store'] = store;
         orders[i].orders[j]['product'] = product;
+        if (!product.name.includes(OrderDto.name)) {
+          delete orders[i].orders[j];
+
+          orders[i].orders = orders[i].orders.filter((element) => {
+            return element !== null;
+          });
+
+          if (orders[i].orders.length <= 0) {
+            delete orders[i];
+          }
+        }
       }
+    }
+
+    orders = orders.filter((element) => {
+      return element !== null;
+    });
+
+    if (OrderDto.to_date) {
+      orders = _.filter(
+        orders,
+        (o) => new Date(o.orderDate) > new Date(OrderDto.to_date),
+      );
+    }
+    if (OrderDto.from_date) {
+      orders = _.filter(
+        orders,
+        (o) => new Date(o.orderDate) < new Date(OrderDto.from_date),
+      );
+    }
+
+    if (OrderDto.id) {
+      orders = _.filter(orders, (o) => o.consumerId == OrderDto.id);
     }
 
     return orders;
@@ -86,15 +120,15 @@ export class OrderService {
     ]);
 
     for (let i = 0; i < orders.length; i++) {
-        for (let j = 0; j < orders[i].orders.length; j++) {
-          var data = await this.catalogueModel.findById(orders[i].orders[j].id);
-          var store = await this.userDataModel.findById(data.storeId)
-          var product = await this.ProductsModel.findById(data.productId)
-          orders[i].orders[j]['details'] = data;
-          orders[i].orders[j]['store'] = store;
-          orders[i].orders[j]['product'] = product;
-        }
+      for (let j = 0; j < orders[i].orders.length; j++) {
+        var data = await this.catalogueModel.findById(orders[i].orders[j].id);
+        var store = await this.userDataModel.findById(data.storeId);
+        var product = await this.ProductsModel.findById(data.productId);
+        orders[i].orders[j]['details'] = data;
+        orders[i].orders[j]['store'] = store;
+        orders[i].orders[j]['product'] = product;
       }
+    }
     return orders[0];
   }
 
