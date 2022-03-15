@@ -88,9 +88,9 @@ export class EditDeliveryFleetDto {
   @ApiProperty()
   pickupTime: string;
 
-  @IsString()
+  @IsNumber()
   @ApiProperty()
-  cor: string;
+  cor: number;
 
   @IsBoolean()
   @IsNotEmpty()

@@ -113,7 +113,7 @@ export class UserDataService {
       data.gst_image = profileDto.gst_image;
       data.food_license = profileDto.food_license;
       if(files?.food_license_image) data.food_license_image = files.food_license_image; 
-      if (files?.profile_photo) data.profile_photo = files.profile_photo;
+      if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
       if (files?.store_license_image)
         data.store_license_image = files.store_license_image;
       if (files?.aadhar_card_image)
@@ -142,7 +142,7 @@ export class UserDataService {
       data.driving_card = profileDto.driving_card;
       data.vehicle_type = profileDto.vehicle_type;
       data.job_type = profileDto.job_type;
-      if (files?.profile_photo) data.profile_photo = files.profile_photo;
+      if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
       if (files?.vehicle_image) data.vehicle_image = files.vehicle_image;
       if (files?.aadhar_card_image)
         data.aadhar_card_image = files.aadhar_card_image;
@@ -170,7 +170,7 @@ export class UserDataService {
       data.adharcard_no = profileDto.adharcard_no;
       data.pancard_no = profileDto.pancard_no;
       data.gst_no = profileDto.gst_no;
-      if (files?.profile_photo) data.profile_photo = files.profile_photo;
+      if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
       if (files?.store_license_image)
         data.store_license_image = files.store_license_image;
       if (files?.aadhar_card_image)
