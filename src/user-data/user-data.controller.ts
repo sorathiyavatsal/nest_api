@@ -54,7 +54,7 @@ export class UserDataController {
         { name: 'profile_photo', maxCount: 1 },
         { name: 'store_license_image', maxCount: 5 },
         { name: 'vehicle_image', maxCount: 5 },
-        { name: 'store_no_image', maxCount: 5 },
+        { name: 'store_image', maxCount: 5 },
         { name: 'aadhar_card_image', maxCount: 2 },
         { name: 'gst_image', maxCount: 2 },
         { name: 'driving_card_image', maxCount: 2 },
@@ -235,11 +235,11 @@ export class UserDataController {
       files.vehicle_image = responsedata;
     }
     responsedata = []
-    if (files.store_no_image) {
-      for (let i = 0; i < files.store_no_image.length; i++) {
-        responsedata.push(files.store_no_image[i].path);
+    if (files.store_image) {
+      for (let i = 0; i < files.store_image.length; i++) {
+        responsedata.push(files.store_image[i].path);
       }
-      files.store_no_image = responsedata;
+      files.store_image = responsedata;
     }
     responsedata = []
     if (files.aadhar_card_image) {
