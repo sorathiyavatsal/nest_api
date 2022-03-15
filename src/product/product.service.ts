@@ -139,8 +139,7 @@ export class ProductService {
 
   async getProducts(productId: string) {
     return await this.ProductsModel.findOne({
-      _id: ObjectId(productId),
-      status: true,
+      _id: ObjectId(productId)
     });
   }
 
