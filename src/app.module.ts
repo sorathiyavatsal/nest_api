@@ -47,6 +47,9 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { EarningsModule } from './earnings/earnings.module';
 import { DeliveryAssociatesModule } from './delivery-associates/delivery-associates.module';
+import { RevenueModule } from './revenue/revenue.module';
+import { SalesModule } from './sales/sales.module';
+import { StoreCommissionModule } from './store-commission/store-commission.module';
 @Module({
   imports: [
     MulterModule.register({
@@ -115,6 +118,9 @@ import { DeliveryAssociatesModule } from './delivery-associates/delivery-associa
     InvoiceModule,
     EarningsModule,
     DeliveryAssociatesModule,
+    RevenueModule,
+    SalesModule,
+    StoreCommissionModule,
   ],
   controllers: [],
   providers: [
