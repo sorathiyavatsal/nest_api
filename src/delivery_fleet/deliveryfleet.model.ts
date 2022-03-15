@@ -100,7 +100,7 @@ export const DeliveryFleetSchema = new mongoose.Schema(
       required: true,
     },
     cor: {
-      type: String,
+      type: Number,
     },
     deliverChargeType: {
       type: String,
@@ -200,7 +200,7 @@ export interface DeliveryFleet extends mongoose.Document {
   pickupTime: Date;
   distance: number;
   userId: string;
-  cor: string;
+  cor: number;
   deliverChargeType: string;
   invoiceStatus: string;
   activeStatus: Boolean;

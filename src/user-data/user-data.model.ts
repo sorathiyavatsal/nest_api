@@ -6,7 +6,7 @@ let Schema = mongoose.Types,
 export const UserDataSchema = new mongoose.Schema(
   {
     profile_photo: {
-      type: Object,
+      type: String,
     },
     userId: {
       type: ObjectId,
@@ -78,7 +78,7 @@ export const UserDataSchema = new mongoose.Schema(
       type: String,
     },
     license_image: {
-      type: String,
+      type: Array,
     },
     store_license: {
       type: String,
@@ -87,21 +87,20 @@ export const UserDataSchema = new mongoose.Schema(
       type: String,
     },
     vehicle_image: {
-      type: String,
+      type: Array,
     },
     store_no_image: {
-      type: String,
+      type: Array,
     },
     aadhar_card_image: {
-      type: String,
+      type: Array,
     },
     driving_card_image: {
-      type: String,
+      type: Array,
     },
     pan_card_image: {
-      type: String,
+      type: Array,
     },
-
     services_area: {
       type: Array,
     },
@@ -149,7 +148,7 @@ export const UserDataSchema = new mongoose.Schema(
 
 export interface UserData extends mongoose.Document {
   _id: string;
-  profile_photo: object;
+  profile_photo: string;
   profile_type: string;
   gender: string;
   dob: Date;
@@ -168,14 +167,14 @@ export interface UserData extends mongoose.Document {
   createdAt: Date;
   createdBy: string;
   modifiedBy: string;
-  store_license_image: object;
-  aadhar_card_image: object;
-  pan_card_image: object;
+  store_license_image: [];
+  aadhar_card_image: [];
+  pan_card_image: [];
   vehicle_no: string;
-  driving_card: string;
+  driving_card: [];
   vehicle_type: string;
-  vehicle_image: object;
-  driving_card_image: object;
+  vehicle_image: [];
+  driving_card_image: [];
   shop_located_at: [];
   categoryId: String;
   delegate_access: [];
