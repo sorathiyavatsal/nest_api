@@ -151,7 +151,7 @@ export class UserDataService {
       if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
       data.modifiedBy = user.user._id;
       data.createdBy = user.user._id;
-      data.partnerId = profileDto.partnerId;
+      data.partnerId = profileDto.partnerId ? profileDto.partnerId : '';
       data.bank_details = {
         bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
         bank_account_no: profileDto.bank_details.bank_account_no,
