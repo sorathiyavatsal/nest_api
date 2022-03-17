@@ -245,8 +245,12 @@ export class SettingsController {
   //   );
   // }
 
-  @Get()
-  async getDA(@Request() request) {
-    return await this.securityService.getDelieveryAssociates();
+  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN)
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @Get('/')
+  @ApiQuery({ name: 'metaKey', required: false })
+  async getDA(@Request() request, @Query() query) {
+    return await this.securityService.getDelieveryAssociates(query);
   }
 }

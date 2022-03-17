@@ -22,6 +22,7 @@ import {
   ApiParam,
   ApiOperation,
   ApiConsumes,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -48,8 +49,13 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @Get('/all')
-  async getAllUsers(@Request() request) {
-    return await this.userService.getAllUsers();
+  @ApiQuery({ name: 'role', type: 'string', enum: Role, required: false })
+  @ApiQuery({ name: 'activeStatus', type: 'boolean', required: false })
+  @ApiQuery({ name: 'liveStatus', type: 'boolean', required: false })
+  @ApiQuery({ name: 'email', type: 'string', required: false })
+  @ApiQuery({ name: 'phoneNumber', type: 'string', required: false })
+  async getAllUsers(@Request() request, @Query() filter) {
+    return await this.userService.getAllUsers(filter);
   }
 
   @ApiOperation({ summary: 'Current user profile' })

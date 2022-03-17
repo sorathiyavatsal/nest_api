@@ -39,6 +39,7 @@ export class SalesService {
   }
 
   async updateSale(id: any, salesDto: any) {
+    delete salesDto?.storeId;
     return await this.salesModel.findOneAndUpdate(
       { _id: ObjectId(id) },
       { $set: salesDto },

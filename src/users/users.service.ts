@@ -45,8 +45,16 @@ export class UsersService {
   async findOneByEmail(email: string) {
     return await this.usersgetModel.findOne({ email: email });
   }
-  async getAllUsers() {
-    return await this.usersgetModel.find();
+  async getAllUsers(filter) {
+    const query: any = {};
+    filter && Object.keys(filter).length && Object.keys(filter).map(x=>{
+      if(x === 'email'){
+        query.email = { $regex: filter.email || '', $options: 'i' };
+      }else{
+        query[x] = filter[x];
+      }
+    });
+    return await this.usersgetModel.find(query);
   }
   async addEditSavedAddress(id: string, dto: any, user: any) {
     const existingAddress = await this.usersgetModel.findOneAndUpdate(
