@@ -222,8 +222,11 @@ export class SettingsService {
   //   );
   // }
 
-  async getDelieveryAssociates() {
-    return this.SettingsModel.find({});
+  async getDelieveryAssociates(query) {
+    const condition = {
+      ...(query?.metaKey ? { metaKey: query.metaKey } : {}),
+    };
+    return this.SettingsModel.find(condition);
   }
 
   async addServiceAreaSettingsDetail(settingDto: any) {
