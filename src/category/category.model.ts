@@ -17,6 +17,7 @@ export const CategoriesSchema = new mongoose.Schema(
         parent: {
             type: ObjectId,
             ref: 'Category',
+            required: false
         },
         status: {
             type: Boolean,
