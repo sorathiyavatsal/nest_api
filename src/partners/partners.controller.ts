@@ -56,40 +56,4 @@ export class PartnersController {
     const data = await this.PartnersService.getAllPartners();
     response.json(data)
   }
-
-  // @Post('/add')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiConsumes('multipart/form-data', 'application/json')
-  // async postPartners(
-  //   @Body() createPartnerDto: CreatePartnerDto,
-  //   @Response() response,
-  // ) {
-  //   const data = await this.PartnersService.postPartners(createPartnerDto);
-  //   response.json(data)
-  // }
-
-  // @Put('/update')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiConsumes('multipart/form-data', 'application/json')
-  // @ApiParam({ name: 'id', required: true })
-  // async putPartners(
-  //   @Body() editPartnerDto: EditPartnerDto,
-  //   @Param() params,
-  //   @Response() response,
-  // ) {
-  //   const data = await this.PartnersService.putPartners(editPartnerDto, params.id);
-  //   response.json(data)
-  // }
-
-  // @Delete('/delete')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiConsumes('multipart/form-data', 'application/json')
-  // @ApiParam({ name: 'id', required: true })
-  // async deletePartners(
-  //   @Param() params,
-  //   @Response() response,
-  // ) {
-  //   const data = await this.PartnersService.deletePartners(params.id);
-  //   response.json("partner delete successfully")
-  // }
 }
