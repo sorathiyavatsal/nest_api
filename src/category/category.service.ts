@@ -168,11 +168,11 @@ export class CategoryService {
       status: true,
     };
 
-    if (categoryDto.parent) {
+    if (categoryDto.parent && categoryDto.parent !== '') {
       categoryData['parent'] = ObjectId(categoryDto.parent);
     }
 
-    const newCategory = await new this.CategoryModel(categoryDto);
+    const newCategory = await new this.CategoryModel(categoryData);
 
     return await newCategory.save();
   }
