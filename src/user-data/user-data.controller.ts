@@ -110,8 +110,12 @@ export class UserDataController {
           description: 'required only merchant and partner profile',
         },
         gst_image: {
-          type: 'string',
           description: 'required only merchant and partner profile',
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
         },
         bank_details: {
           type: 'object',
@@ -341,8 +345,12 @@ export class UserDataController {
           description: 'required only merchant and partner profile',
         },
         gst_image: {
-          type: 'string',
           description: 'required only merchant and partner profile',
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
         },
         bank_details: {
           type: 'object',
