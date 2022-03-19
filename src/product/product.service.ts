@@ -33,6 +33,20 @@ export class ProductService {
       {
         $lookup: {
           from: 'categories',
+          localField: 'storeCategory',
+          foreignField: '_id',
+          as: 'storeCategories',
+        },
+      },
+      {
+        $unwind: {
+          path: '$storeCategories',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
           localField: 'category',
           foreignField: '_id',
           as: 'categories',
@@ -137,9 +151,171 @@ export class ProductService {
     ]);
   }
 
+  async getFilterProducts(filter: any) {
+    var products = JSON.parse(JSON.stringify(await this.ProductsModel.aggregate([
+      {
+        $lookup: {
+          from: 'userdatas',
+          localField: 'store',
+          foreignField: '_id',
+          as: 'stores',
+        },
+      },
+      {
+        $unwind: {
+          path: '$stores',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'storeCategory',
+          foreignField: '_id',
+          as: 'storeCategories',
+        },
+      },
+      {
+        $unwind: {
+          path: '$storeCategories',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categories',
+        },
+      },
+      {
+        $unwind: {
+          path: '$categories',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'collections',
+          foreignField: '_id',
+          as: 'collection',
+        },
+      },
+      {
+        $unwind: {
+          path: '$collection',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'menus',
+          localField: 'menu',
+          foreignField: '_id',
+          as: 'menu',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menu',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'brands',
+          localField: 'brand',
+          foreignField: '_id',
+          as: 'brand',
+        },
+      },
+      {
+        $unwind: {
+          path: '$brand',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: 'review',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+      {
+        $match: {
+          'stores.shop_name': {
+            $regex: filter.store ? filter.store : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'categories.categoryName': {
+            $regex: filter.category ? filter.category : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'collection.categoryName': {
+            $regex: filter.collection ? filter.collection : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'brand.brandName': {
+            $regex: filter.brand ? filter.brand : '',
+            $options: 'i',
+          },
+        },
+      },
+    ])));
+
+    let storeCategory = [], store = [], collection = [], category = [], brand = []
+
+    for(let i = 0; i < products.length; i++) {
+        if(products[i] && products[i]["stores"] && products[i]["stores"]["shop_name"]) {
+            store.push(products[i]["stores"]["shop_name"])
+        }
+        if(products[i] && products[i]["collection"] && products[i]["collection"]["categoryName"]) {
+            collection.push(products[i]["collection"]["categoryName"])
+        }
+
+        if(products[i] && products[i]["storeCategories"] && products[i]["storeCategories"]["categoryName"]) {
+            storeCategory.push(products[i]["storeCategories"]["categoryName"])
+        }
+        
+        if(products[i] && products[i]["categories"] && products[i]["categories"]["categoryName"]) {
+            category.push(products[i]["categories"]["categoryName"])
+        }
+        if(products[i] && products[i]["brand"] && products[i]["brand"]["brandName"]) {
+            brand.push(products[i]["brand"]["brandName"])
+        }
+    }
+
+    return {
+      products: products,
+      filters: {
+        store: [...new Set(store)],
+        collection: [...new Set(collection)],
+        storeCategory: [...new Set(storeCategory)],
+        category: [...new Set(category)],
+        brand: [...new Set(brand)]
+      },
+    };
+  }
+
   async getProducts(productId: string) {
     return await this.ProductsModel.findOne({
-      _id: ObjectId(productId)
+      _id: ObjectId(productId),
     });
   }
 
@@ -153,9 +329,10 @@ export class ProductService {
       metaDescription: productDto.metaDescription,
       urlHandle: productDto.urlHandle,
       productImage: productDto.productImage,
-      store: productDto.store,
+      storeCategory: productDto.store.storeCategory,
       category: productDto.category,
       collections: productDto.collection,
+      store: productDto.store.store,
       brand: productDto.brand,
       keywords: productDto.keywords,
       type: productDto.type,

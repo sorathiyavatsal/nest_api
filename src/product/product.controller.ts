@@ -49,6 +49,21 @@ export class ProductController {
     response.json(await this.ProductService.getAllProducts(query));
   }
 
+  @Get('/filter')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiQuery({ name: 'storeCategory', type: 'string', required: false })
+  @ApiQuery({ name: 'collection', type: 'string', required: false })
+  @ApiQuery({ name: 'category', type: 'string', required: false })
+  @ApiQuery({ name: 'store', type: 'string', required: false })
+  @ApiQuery({ name: 'brand', type: 'string', required: false })
+  async getFilterProducts(
+    @Request() request,
+    @Response() response,
+    @Query() query,
+  ) {
+    response.json(await this.ProductService.getFilterProducts(query));
+  }
+
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'id', type: 'string', required: true })
@@ -199,6 +214,9 @@ export class ProductController {
             format: 'binary',
           },
         },
+        storeCategory: {
+            type: 'string',
+        },
         store: {
           type: 'string',
         },
@@ -293,6 +311,9 @@ export class ProductController {
         },
         store: {
           type: 'string',
+        },
+        storeCategory: {
+            type: 'string',
         },
         category: {
           type: 'string',

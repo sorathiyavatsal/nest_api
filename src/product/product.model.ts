@@ -31,6 +31,10 @@ export const ProductSchema = new mongoose.Schema(
     },
     store: {
       type: ObjectId,
+      $ref: 'userdatas',
+    },
+    storeCategory: {
+      type: ObjectId,
       $ref: 'categories',
     },
     category: {
