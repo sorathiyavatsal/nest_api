@@ -6,6 +6,7 @@ import { ConfigModule } from '../core/config/config.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VariantSchema } from 'src/product/variant.model';
 import { VariantOptionsSchema } from 'src/product/variantOptions.model';
+import { ProductSchema } from 'src/product/product.model';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Variant', schema: VariantSchema }]),
@@ -13,6 +14,7 @@ import { VariantOptionsSchema } from 'src/product/variantOptions.model';
       { name: 'VariantOptions', schema: VariantOptionsSchema },
     ]),
     MongooseModule.forFeature([{ name: 'catalogue', schema: catalogueSchema }]),
+    MongooseModule.forFeature([{ name: 'Products', schema: ProductSchema }]),
     ConfigModule,
   ],
   controllers: [CatalogueController],
