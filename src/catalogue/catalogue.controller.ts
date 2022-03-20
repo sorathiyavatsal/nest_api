@@ -151,6 +151,19 @@ export class CatalogueController {
     return await this.catalogueService.getAllcatalogue();
   }
 
+  @ApiOperation({ summary: 'Get All Catalgoue' })
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/filter')
+  @ApiQuery({ name: 'storeCategory', type: 'string', required: false })
+  @ApiQuery({ name: 'collection', type: 'string', required: false })
+  @ApiQuery({ name: 'category', type: 'string', required: false })
+  @ApiQuery({ name: 'store', type: 'string', required: false })
+  @ApiQuery({ name: 'brand', type: 'string', required: false })
+  @ApiQuery({ name: 'catalogue', type: 'string', required: false })
+  async getFiltercatalogue(@Request() req, @Query() query) {
+    return await this.catalogueService.getFiltercatalogue(query);
+  }
+
 //   @ApiOperation({ summary: 'Get Catalogue By Id' })
 //   @UseGuards(AuthGuard('jwt'))
 //
