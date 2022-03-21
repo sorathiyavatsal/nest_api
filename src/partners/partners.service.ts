@@ -24,7 +24,7 @@ export class PartnersService {
         });
 
         const userData = await this.UserDataModel.find({
-            userIdId: ObjectId(partners[i]._id)
+            userId: ObjectId(partners[i]._id)
         });
 
         partners[i]["userData"] = userData[0]
