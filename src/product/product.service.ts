@@ -363,7 +363,7 @@ export class ProductService {
   }
 
   async getProducts(productId: string) {
-    return await this.ProductsModel.aggregate([
+    const products = await this.ProductsModel.aggregate([
       {
         $lookup: {
           from: 'variants',
@@ -378,6 +378,14 @@ export class ProductService {
         },
       },
     ]);
+
+    // for (let i = 0; i <= products.length; i++) {
+    //     for(let j = 0; j <= products[i]['variants']) {
+
+    //     }
+    // }
+
+    return products;
   }
 
   async postProduct(productDto: any) {

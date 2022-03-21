@@ -503,10 +503,7 @@ export class CatalogueService {
       _id: optionsDto.variantId,
     });
 
-    if (
-      (optionsDto.optionsImage && variant.type == true) ||
-      (optionsDto.optionsText && variant.type == false)
-    ) {
+    if (optionsDto.optionsImage) {
       let optionPayload = {
         variant_id: ObjectId(optionsDto.variantId),
         value: optionsDto.optionsValue,
