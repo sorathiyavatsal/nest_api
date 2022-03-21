@@ -8,9 +8,6 @@ export const VariantSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    type: {
-      type: Boolean,
-    },
     options: {
       type: Array,
     },
@@ -27,7 +24,6 @@ export const VariantSchema = new mongoose.Schema(
 export interface Variant extends mongoose.Document {
   _id: string;
   name: string;
-  type: boolean;
   options: [];
   Image: string;
   status: boolean;
