@@ -97,9 +97,6 @@ export class ProductController {
         name: {
           type: 'string',
         },
-        type: {
-          type: 'boolean',
-        },
         image: {
           type: 'string',
           format: 'binary',
@@ -151,9 +148,6 @@ export class ProductController {
             type: 'string',
             format: 'binary',
           },
-        },
-        optionsText: {
-          type: 'string',
         },
       },
     },

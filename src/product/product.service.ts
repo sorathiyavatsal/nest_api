@@ -501,8 +501,7 @@ export class ProductService {
   async postVariant(metaDto: any) {
     const variant = await new this.VariantModel({
       name: metaDto.name,
-      type: metaDto.type,
-      image: metaDto.image,
+      Image: metaDto.image,
       status: true,
     });
 
@@ -510,10 +509,6 @@ export class ProductService {
   }
 
   async postVariantOptions(optionsDto: any) {
-    const variant = await this.VariantModel.findOne({
-      _id: optionsDto.variantId,
-    });
-
     if (optionsDto.optionsImage) {
       let optionPayload = {
         variant_id: optionsDto.variantId,
@@ -525,9 +520,6 @@ export class ProductService {
         optionPayload['image'] = optionsDto.optionsImage;
       }
 
-      if (optionsDto.optionsImage) {
-        optionPayload['text'] = optionsDto.optionsText;
-      }
       const variantOptions = await new this.VariantOptionsModel(optionPayload);
 
       const options = await variantOptions.save();

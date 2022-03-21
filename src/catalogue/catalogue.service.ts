@@ -490,8 +490,7 @@ export class CatalogueService {
   async postVariant(metaDto: any) {
     const variant = await new this.VariantModel({
       name: metaDto.name,
-      type: metaDto.type,
-      image: metaDto.image,
+      Image: metaDto.metaImage,
       status: true,
     });
 
@@ -499,14 +498,7 @@ export class CatalogueService {
   }
 
   async postVariantOptions(optionsDto: any) {
-    const variant = await this.VariantModel.findOne({
-      _id: optionsDto.variantId,
-    });
-
-    if (
-      (optionsDto.optionsImage && variant.type == true) ||
-      (optionsDto.optionsText && variant.type == false)
-    ) {
+    if (optionsDto.optionsImage) {
       let optionPayload = {
         variant_id: ObjectId(optionsDto.variantId),
         value: optionsDto.optionsValue,
@@ -519,10 +511,7 @@ export class CatalogueService {
       if (optionsDto.optionsImage) {
         optionPayload['image'] = optionsDto.optionsImage;
       }
-
-      if (optionsDto.optionsImage) {
-        optionPayload['text'] = optionsDto.optionsText;
-      }
+      
       const variantOptions = await new this.VariantOptionsModel(optionPayload);
 
       const options = await variantOptions.save();
