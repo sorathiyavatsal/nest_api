@@ -28,7 +28,7 @@ export class NotificationController {
 
   @ApiOperation({ summary: 'Get User All Notification' })
   @UseGuards(AuthGuard('jwt'))
-  @Get('/user')
+  @Get('/')
   @ApiQuery({ name: 'id', type: 'string', required: true })
   async getFiltercatalogue(@Request() req, @Query() query) {
     return await this.notificationService.getFilternotification(query);
