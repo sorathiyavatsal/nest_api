@@ -56,6 +56,8 @@ export class ProductController {
   @ApiQuery({ name: 'category', type: 'string', required: false })
   @ApiQuery({ name: 'store', type: 'string', required: false })
   @ApiQuery({ name: 'brand', type: 'string', required: false })
+  @ApiQuery({ name: 'name', type: 'string', required: false })
+  @ApiQuery({ name: 'keywords', type: 'string', required: false })
   @ApiQuery({ name: 'page', type: 'number', required: true })
   @ApiQuery({ name: 'limit', type: 'number', required: true })
   async getFilterProducts(
