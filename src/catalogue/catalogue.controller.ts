@@ -60,9 +60,6 @@ export class CatalogueController {
         name: {
           type: 'string',
         },
-        type: {
-          type: 'boolean',
-        },
         image: {
           type: 'string',
           format: 'binary',
@@ -80,7 +77,7 @@ export class CatalogueController {
       });
     }
     request.body.metaImage = response[0];
-    console.log(request.body);
+    
     return await this.catalogueService.postVariant(request.body);
   }
 
@@ -115,9 +112,6 @@ export class CatalogueController {
             type: 'string',
             format: 'binary',
           },
-        },
-        optionsText: {
-          type: 'string',
         },
         mrpprice: {
           type: 'number',
