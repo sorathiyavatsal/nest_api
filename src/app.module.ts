@@ -50,6 +50,8 @@ import { DeliveryAssociatesModule } from './delivery-associates/delivery-associa
 import { RevenueModule } from './revenue/revenue.module';
 import { SalesModule } from './sales/sales.module';
 import { StoreCommissionModule } from './store-commission/store-commission.module';
+import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
+import { NotificationModule } from './notification/notification.module';
 @Module({
   imports: [
     MulterModule.register({
@@ -121,6 +123,8 @@ import { StoreCommissionModule } from './store-commission/store-commission.modul
     RevenueModule,
     SalesModule,
     StoreCommissionModule,
+    PaymentMethodsModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [

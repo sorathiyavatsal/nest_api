@@ -249,6 +249,22 @@ export class ProductService {
           },
           {
             $match: {
+              'name': {
+                $regex: filter.name ? filter.name : '',
+                $options: 'i',
+              },
+            },
+          },
+          {
+            $match: {
+              'keywords': {
+                $regex: filter.keyword ? filter.keyword : '',
+                $options: 'i',
+              },
+            },
+          },
+          {
+            $match: {
               'stores.shop_name': {
                 $regex: filter.store ? filter.store : '',
                 $options: 'i',

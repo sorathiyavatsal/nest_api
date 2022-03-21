@@ -67,6 +67,7 @@ export class CatalogueService {
       { $skip: parseInt(filter.page) * parseInt(filter.limit) },
       { $limit: parseInt(filter.limit) },
     );
+
     var catalogue = await this.catalogueModel.aggregate(condition);
 
     let storeCategory = [],
@@ -179,6 +180,30 @@ export class CatalogueService {
               },
               {
                 $match: {
+                  name: {
+                    $regex: filter.name ? filter.name : '',
+                    $options: 'i',
+                  },
+                },
+              },
+              {
+                $match: {
+                  keywords: {
+                    $regex: filter.keyword ? filter.keyword : '',
+                    $options: 'i',
+                  },
+                },
+              },
+              {
+                $match: {
+                  'variantoptionDetails.salepprice': {
+                    $gte: filter.minprice,
+                    $lte: filter.maxprice,
+                  },
+                },
+              },
+              {
+                $match: {
                   'stores.shop_name': {
                     $regex: filter.store ? filter.store : '',
                     $options: 'i',
@@ -264,7 +289,9 @@ export class CatalogueService {
         category: [...new Set(category)],
         brand: [...new Set(brand)],
       },
-      pages: Math.ceil(await this.catalogueModel.find({}).count() / filter.limit)
+      pages: Math.ceil(
+        (await this.catalogueModel.find({}).count()) / filter.limit,
+      ),
     };
   }
 

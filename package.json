@@ -51,6 +51,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.2.0",
     "nest-winston": "^1.6.2",
+    "nestjs-razorpay": "^1.0.3",
     "node-cron": "^3.0.0",
     "node-device-detector": "^1.4.3",
     "node-fetch": "^3.2.0",
