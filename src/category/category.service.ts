@@ -14,24 +14,26 @@ export class CategoryService {
   ) {}
 
   async getAllCategory(categoryDto: any) {
+    let condition = [];
+    if (categoryDto.status) {
+      condition.push({
+        $match: {
+          status: categoryDto.status == 'true' ? true : false,
+        },
+      });
+    }
+
+    condition.push({
+      $lookup: {
+        from: 'categories',
+        localField: 'parent',
+        foreignField: '_id',
+        as: 'parent',
+      },
+    });
+
     const category = JSON.parse(
-      JSON.stringify(
-        await this.CategoryModel.aggregate([
-          {
-            $match: {
-              status: categoryDto.status == 'true' ? true : false,
-            },
-          },
-          {
-            $lookup: {
-              from: 'categories',
-              localField: 'parent',
-              foreignField: '_id',
-              as: 'parent',
-            },
-          },
-        ]),
-      ),
+      JSON.stringify(await this.CategoryModel.aggregate(condition)),
     );
 
     for (let i = 0; i < category.length; i++) {
