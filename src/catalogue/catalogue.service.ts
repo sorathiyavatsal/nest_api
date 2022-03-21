@@ -18,17 +18,18 @@ export class CatalogueService {
   ) {}
 
   async getFiltercatalogue(filter: any) {
-      let condition = []
+    let condition = [];
 
-      if(filter.catalogue) {
-        condition.push({
-            $match: {
-              _id: ObjectId(filter.catalogue),
-            },
-          })
-      }
-
+    if (filter.catalogue) {
       condition.push({
+        $match: {
+          _id: ObjectId(filter.catalogue),
+        },
+      });
+    }
+
+    condition.push(
+      {
         $lookup: {
           from: 'products',
           localField: 'productId',
@@ -62,10 +63,17 @@ export class CatalogueService {
           foreignField: '_id',
           as: 'variantoptionDetails',
         },
-      })
+      },
+      { $skip: parseInt(filter.page) * parseInt(filter.limit) },
+      { $limit: parseInt(filter.limit) },
+    );
     var catalogue = await this.catalogueModel.aggregate(condition);
 
-    let storeCategory = [], store = [], collection = [], category = [], brand = []
+    let storeCategory = [],
+      store = [],
+      collection = [],
+      category = [],
+      brand = [];
 
     for (let i = 0; i < catalogue.length; i++) {
       for (let j = 0; j < catalogue[i]['products'].length; j++) {
@@ -74,7 +82,7 @@ export class CatalogueService {
             await this.ProductsModel.aggregate([
               {
                 $match: {
-                  _id: catalogue[i]['products'][j]["_id"],
+                  _id: catalogue[i]['products'][j]['_id'],
                 },
               },
               {
@@ -205,38 +213,59 @@ export class CatalogueService {
           ),
         );
 
-        for(let k = 0; k < products.length; k++) {
-            if(products[k] && products[k]["stores"] && products[k]["stores"]["shop_name"]) {
-                store.push(products[k]["stores"]["shop_name"])
-            }
-            if(products[k] && products[k]["collection"] && products[k]["collection"]["categoryName"]) {
-                collection.push(products[k]["collection"]["categoryName"])
-            }
+        for (let k = 0; k < products.length; k++) {
+          if (
+            products[k] &&
+            products[k]['stores'] &&
+            products[k]['stores']['shop_name']
+          ) {
+            store.push(products[k]['stores']['shop_name']);
+          }
+          if (
+            products[k] &&
+            products[k]['collection'] &&
+            products[k]['collection']['categoryName']
+          ) {
+            collection.push(products[k]['collection']['categoryName']);
+          }
 
-            if(products[k] && products[k]["storeCategories"] && products[k]["storeCategories"]["categoryName"]) {
-                storeCategory.push(products[k]["storeCategories"]["categoryName"])
-            }
-            
-            if(products[k] && products[k]["categories"] && products[k]["categories"]["categoryName"]) {
-                category.push(products[k]["categories"]["categoryName"])
-            }
-            if(products[k] && products[k]["brand"] && products[k]["brand"]["brandName"]) {
-                brand.push(products[k]["brand"]["brandName"])
-            }
+          if (
+            products[k] &&
+            products[k]['storeCategories'] &&
+            products[k]['storeCategories']['categoryName']
+          ) {
+            storeCategory.push(products[k]['storeCategories']['categoryName']);
+          }
+
+          if (
+            products[k] &&
+            products[k]['categories'] &&
+            products[k]['categories']['categoryName']
+          ) {
+            category.push(products[k]['categories']['categoryName']);
+          }
+          if (
+            products[k] &&
+            products[k]['brand'] &&
+            products[k]['brand']['brandName']
+          ) {
+            brand.push(products[k]['brand']['brandName']);
+          }
         }
       }
     }
 
     return {
-        catalogues: catalogue,
-        filters: {
-          store: [...new Set(store)],
-          collection: [...new Set(collection)],
-          storeCategory: [...new Set(storeCategory)],
-          category: [...new Set(category)],
-          brand: [...new Set(brand)]
-        },
-      };
+      catalogues: catalogue,
+      filters: {
+        store: [...new Set(store)],
+        collection: [...new Set(collection)],
+        storeCategory: [...new Set(storeCategory)],
+        category: [...new Set(category)],
+        brand: [...new Set(brand)],
+      },
+      pages: Math.ceil(await this.catalogueModel.find({}).count() / filter.limit)
+    };
   }
 
   async getAllcatalogue() {
