@@ -249,7 +249,7 @@ export class ProductService {
           },
           {
             $match: {
-              'name': {
+              name: {
                 $regex: filter.name ? filter.name : '',
                 $options: 'i',
               },
@@ -257,7 +257,7 @@ export class ProductService {
           },
           {
             $match: {
-              'keywords': {
+              keywords: {
                 $regex: filter.keyword ? filter.keyword : '',
                 $options: 'i',
               },
@@ -356,14 +356,28 @@ export class ProductService {
         category: [...new Set(category)],
         brand: [...new Set(brand)],
       },
-      pages: Math.ceil(await this.ProductsModel.find({}).count() / filter.limit)
+      pages: Math.ceil(
+        (await this.ProductsModel.find({}).count()) / filter.limit,
+      ),
     };
   }
 
   async getProducts(productId: string) {
-    return await this.ProductsModel.findOne({
-      _id: ObjectId(productId),
-    });
+    return await this.ProductsModel.aggregate([
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'Variant',
+          foreignField: '_id',
+          as: 'variants',
+        },
+      },
+      {
+        $match: {
+          _id: ObjectId(productId),
+        },
+      },
+    ]);
   }
 
   async postProduct(productDto: any) {

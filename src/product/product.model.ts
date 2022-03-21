@@ -19,6 +19,7 @@ export const ProductSchema = new mongoose.Schema(
     },
     Variant: {
       type: Array,
+      $ref: 'variants',
     },
     metaDescription: {
       type: String,
