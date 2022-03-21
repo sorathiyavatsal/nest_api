@@ -373,12 +373,6 @@ export class ProductService {
         },
       },
       {
-        $unwind: {
-          path: '$variants',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
         $match: {
           _id: ObjectId(productId),
         },
