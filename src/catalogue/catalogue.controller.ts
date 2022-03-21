@@ -160,6 +160,8 @@ export class CatalogueController {
   @ApiQuery({ name: 'store', type: 'string', required: false })
   @ApiQuery({ name: 'brand', type: 'string', required: false })
   @ApiQuery({ name: 'catalogue', type: 'string', required: false })
+  @ApiQuery({ name: 'page', type: 'number', required: true })
+  @ApiQuery({ name: 'limit', type: 'number', required: true })
   async getFiltercatalogue(@Request() req, @Query() query) {
     return await this.catalogueService.getFiltercatalogue(query);
   }
