@@ -63,7 +63,14 @@ export class CatalogueService {
       { $limit: parseInt(filter.limit) },
     );
 
-    var catalogue = await this.catalogueModel.aggregate(condition);
+    var catalogue = JSON.parse(
+      JSON.stringify(await this.catalogueModel.aggregate(condition)),
+    );
+
+    for (let i = 0; i < catalogue.length; i++) {
+      catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
+      delete catalogue[i]['options'];
+    }
 
     let storeCategory = [],
       store = [],
@@ -333,56 +340,54 @@ export class CatalogueService {
       condition['productId'] = ObjectId(product.productid);
     }
     condition['storeId'] = ObjectId(product.storeid);
-    console.log(condition);
 
-    var catalogue = await this.catalogueModel.aggregate([
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'productId',
-          foreignField: '_id',
-          as: 'products',
-        },
-      },
-      {
-        $lookup: {
-          from: 'userdatas',
-          localField: 'storeId',
-          foreignField: '_id',
-          as: 'stores',
-        },
-      },
-      {
-        $lookup: {
-          from: 'variants',
-          localField: 'variants',
-          foreignField: '_id',
-          as: 'variantsDetails',
-        },
-      },
-      {
-        $unwind: {
-          path: '$variantsDetails',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'variantoptions',
-          localField: 'variantsDetails.options',
-          foreignField: '_id',
-          as: 'variantoptionDetails',
-        },
-      },
-      {
-        $match: condition,
-      },
-    ]);
+    var catalogue = JSON.parse(
+      JSON.stringify(
+        await this.catalogueModel.aggregate([
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'products',
+            },
+          },
+          {
+            $lookup: {
+              from: 'userdatas',
+              localField: 'storeId',
+              foreignField: '_id',
+              as: 'stores',
+            },
+          },
+          {
+            $lookup: {
+              from: 'metadatas',
+              localField: 'variants',
+              foreignField: '_id',
+              as: 'options',
+            },
+          },
+          {
+            $unwind: {
+              path: '$options',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $match: condition,
+          },
+        ]),
+      ),
+    );
 
     for (let i = 0; i < catalogue.length; i++) {
-      catalogue[i].variantsDetails['variantoptionDetails'] =
-        catalogue[i].variantoptionDetails;
-      delete catalogue[i].variantoptionDetails;
+      const variants = await this.metaDataModel.find({
+        _id: ObjectId(catalogue[i]['options']['parentMetaId']),
+      });
+
+      catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
+      catalogue[i]['options'] = variants[0]['metaValue'];
     }
 
     return catalogue; //await this.catalogueModel.find(condition);
@@ -390,11 +395,13 @@ export class CatalogueService {
 
   async addNewcatalogue(dto: any) {
     const newcatalogue = {
+      _id: ObjectId(dto.catalogueId),
       productId: ObjectId(dto.productId),
       storeId: ObjectId(dto.storeId),
-      catalogueStatus: dto.catalogueStatus,
-      options: ObjectId(dto.options),
+      catalogueStatus: dto.catalogueStatus ? dto.catalogueStatus : true,
+      variants: ObjectId(dto.variants),
     };
+
     return await new this.catalogueModel(newcatalogue).save();
   }
 
@@ -473,7 +480,7 @@ export class CatalogueService {
           $push: {
             metaValue: [
               {
-                options: JSON.parse(JSON.stringify(optionsDto.options)),
+                variants: JSON.parse(JSON.stringify(optionsDto.variants)),
                 optionsImage: optionsDto.optionsImage,
                 mrpprice: optionsDto.mrpprice,
                 salepprice: optionsDto.salepprice,

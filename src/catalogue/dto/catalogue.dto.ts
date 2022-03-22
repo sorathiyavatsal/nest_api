@@ -1,11 +1,12 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsBoolean,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class catalogueDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ required: true })
+  catalogueId: String;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ required: true })
@@ -23,5 +24,5 @@ export class catalogueDto {
   @IsString()
   @ApiProperty()
   @IsNotEmpty()
-  options: String;
+  variants: String;
 }

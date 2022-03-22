@@ -44,7 +44,7 @@ export class CatalogueController {
     response.json(await this.catalogueService.getcatalogueId());
   }
 
-  @Post('/variants')
+  @Post('/options')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FilesInterceptor('image', 20, {
@@ -93,7 +93,7 @@ export class CatalogueController {
     return await this.catalogueService.postVariant(request.body);
   }
 
-  @Post('/variants/option')
+  @Post('/variants')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FilesInterceptor('optionsImage', 20, {
