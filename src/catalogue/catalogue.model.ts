@@ -15,7 +15,7 @@ export const catalogueSchema = new mongoose.Schema(
     catalogueStatus: {
       type: Boolean,
     },
-    options: {
+    variants: {
       type: ObjectId,
       $ref: 'metadatas',
     },
@@ -28,7 +28,7 @@ export interface catalogue extends mongoose.Document {
   productId: mongoose.ObjectId;
   storeId: mongoose.ObjectId;
   catalogueStatus: Boolean;
-  options: mongoose.ObjectId;
+  variants: mongoose.ObjectId;
   updatedAt: Date;
   createdAt: Date;
 }

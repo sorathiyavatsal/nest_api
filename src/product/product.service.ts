@@ -504,6 +504,16 @@ export class ProductService {
       ),
     );
 
+    products[0]['options'] = products[0]['metaOptions']['metaValue'];
+
+    const variants = await this.metaDataModel.find({
+      _id: ObjectId(products[0]['metaOptions']['parentMetaId']),
+    });
+
+    products[0]['variants'] = variants[0]['metaValue'];
+
+    delete products[0]['metaOptions'];
+
     return products[0];
   }
 

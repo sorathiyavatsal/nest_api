@@ -128,7 +128,7 @@ export class ProductController {
     return await this.ProductService.postVariant(request.body);
   }
 
-  @Post('/meta/option')
+  @Post('/variants')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FilesInterceptor('optionsImage', 20, {
