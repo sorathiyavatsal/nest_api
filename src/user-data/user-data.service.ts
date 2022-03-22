@@ -20,8 +20,12 @@ export class UserDataService {
     return this.UserDataModel.findById(id).populate('userId');
   }
 
-  async updateProfile(id: string, files: any, profileDto: any, user: any) {
-    if (user.user.role == 'MERCHANT') {
+  async updateProfile(id: string, files: any, profileDto: any, userData: any) {
+    let user: any = await this.UserModel.findOne({
+      _id: profileDto.userId,
+    });
+
+    if (user.role == 'MERCHANT') {
       return this.UserDataModel.findById({ _id: id }).then(
         (data) => {
           data.gender = profileDto.gender;
@@ -34,14 +38,15 @@ export class UserDataService {
           data.adharcard_no = profileDto.adharcard_no;
           data.pancard_no = profileDto.pancard_no;
           data.gst_no = profileDto.gst_no;
-          if (files?.profile_photo) data.profile_photo = files.profile_photo;
+          if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
           if (files?.store_license_image)
             data.store_license_image = files.store_license_image;
           if (files?.aadhar_card_image)
             data.aadhar_card_image = files.aadhar_card_image;
           if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
           data.bank_details = {
-            bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+            bank_account_holer_name:
+            profileDto.bank_details.bank_account_holer_name,
             bank_account_no: profileDto.bank_details.bank_account_no,
             bank_name: profileDto.bank_details.bank_name,
             ifsc_code: profileDto.bank_details.ifsc_code,
@@ -59,7 +64,7 @@ export class UserDataService {
         },
       );
     } else {
-      return this.UserDataModel.findById({ _id: id }).then(
+      return this.UserDataModel.findById({ _id: ObjectId(id) }).then(
         (data) => {
           data.gender = profileDto.gender;
           data.dob = profileDto.dob;
@@ -97,7 +102,9 @@ export class UserDataService {
     if (userProfile && userProfile._id) {
       return new BadRequestException('Profile is already created');
     }
-    const userData = await this.UserModel.findOne({_id: new ObjectId(data.userId)});
+    const userData = await this.UserModel.findOne({
+      _id: new ObjectId(data.userId),
+    });
     if (userData.role == 'MERCHANT') {
       data.profile_type = 'User';
       data.gender = profileDto.gender;
@@ -112,7 +119,8 @@ export class UserDataService {
       data.gst_no = profileDto.gst_no;
       data.gst_image = profileDto.gst_image;
       data.food_license = profileDto.food_license;
-      if(files?.food_license_image) data.food_license_image = files.food_license_image; 
+      if (files?.food_license_image)
+        data.food_license_image = files.food_license_image;
       if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
       if (files?.store_license_image)
         data.store_license_image = files.store_license_image;
@@ -120,12 +128,13 @@ export class UserDataService {
         data.aadhar_card_image = files.aadhar_card_image;
       if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
       data.bank_details = {
-        bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+        bank_account_holer_name:
+          profileDto.bank_details.bank_account_holer_name,
         bank_account_no: profileDto.bank_details.bank_account_no,
         bank_name: profileDto.bank_details.bank_name,
         ifsc_code: profileDto.bank_details.ifsc_code,
       };
-      if(files?.store_image) data.store_image = files.store_image
+      if (files?.store_image) data.store_image = files.store_image;
       data.store_license_image = files?.store_license;
       data.modifiedBy = user.user._id;
       data.createdBy = user.user._id;
@@ -153,14 +162,15 @@ export class UserDataService {
       data.createdBy = user.user._id;
       data.partnerId = profileDto.partnerId ? profileDto.partnerId : '';
       data.bank_details = {
-        bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+        bank_account_holer_name:
+          profileDto.bank_details.bank_account_holer_name,
         bank_account_no: profileDto.bank_details.bank_account_no,
         bank_name: profileDto.bank_details.bank_name,
         ifsc_code: profileDto.bank_details.ifsc_code,
       };
       data.services_area = profileDto.services_area || [];
     }
-    if(userData.role == 'PARTNER'){
+    if (userData.role == 'PARTNER') {
       data.profile_type = 'User';
       data.gender = profileDto.gender;
       data.fullName = profileDto.fullName;
@@ -177,7 +187,8 @@ export class UserDataService {
         data.aadhar_card_image = files.aadhar_card_image;
       if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
       data.bank_details = {
-        bank_account_holer_name: profileDto.bank_details.bank_account_holer_name,
+        bank_account_holer_name:
+          profileDto.bank_details.bank_account_holer_name,
         bank_account_no: profileDto.bank_details.bank_account_no,
         bank_name: profileDto.bank_details.bank_name,
         ifsc_code: profileDto.bank_details.ifsc_code,
@@ -186,7 +197,7 @@ export class UserDataService {
       data.createdBy = user.user._id;
       data.services_area = profileDto.services_area || [];
     }
-    
+
     let newProfile = new this.UserDataModel(data);
     return await newProfile.save().then(
       (user: any) => {

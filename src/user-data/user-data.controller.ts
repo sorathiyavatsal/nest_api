@@ -282,7 +282,7 @@ export class UserDataController {
   }
   @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'id', required: true })
-  @Put('/update')
+  @Put('/update/:id')
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -449,12 +449,69 @@ export class UserDataController {
   @ApiOperation({ summary: 'Merchant/Delivery boy add onboarding data' })
   async updateProfile(
     @Param() params,
-    @UploadedFiles() file,
+    @UploadedFiles() files,
     @Request() request,
   ) {
+    let responsedata = [];
+    if (files.profile_photo && files.profile_photo.length > 0) {
+      for (let i = 0; i < files.profile_photo.length; i++) {
+        responsedata.push(files.profile_photo[i].path);
+      }
+      files.profile_photo = responsedata;
+    }
+    responsedata = []
+    if (files.store_license_image) {
+      for (let i = 0; i < files.store_license_image.length; i++) {
+        responsedata.push(files.store_license_image[i].path);
+      }
+      files.store_license_image = responsedata;
+    }
+    responsedata = []
+    if (files.vehicle_image) {
+      for (let i = 0; i < files.vehicle_image.length; i++) {
+        responsedata.push(files.vehicle_image[i].path);
+      }
+      files.vehicle_image = responsedata;
+    }
+    responsedata = []
+    if (files.store_image) {
+      for (let i = 0; i < files.store_image.length; i++) {
+        responsedata.push(files.store_image[i].path);
+      }
+      files.store_image = responsedata;
+    }
+    responsedata = []
+    if (files.aadhar_card_image) {
+      for (let i = 0; i < files.aadhar_card_image.length; i++) {
+        responsedata.push(files.aadhar_card_image[i].path);
+      }
+      files.aadhar_card_image = responsedata;
+    }
+    responsedata = []
+    if (files.gst_image) {
+      for (let i = 0; i < files.gst_image.length; i++) {
+        responsedata.push(files.gst_image[i].path);
+      }
+      files.gst_image = responsedata;
+    }
+    responsedata = []
+    if (files.driving_card_image) {
+      for (let i = 0; i < files.driving_card_image.length; i++) {
+        responsedata.push(files.driving_card_image[i].path);
+      }
+      files.driving_card_image = responsedata;
+    }
+    responsedata = []
+    if (files.pan_card_image) {
+      for (let i = 0; i < files.pan_card_image.length; i++) {
+        responsedata.push(files.pan_card_image[i].path);
+      }
+      files.pan_card_image = responsedata;
+    }
+
     return await this.UserDataService.updateProfile(
       params.id,
-      file,
+      files,
       request.body,
       request.user,
     );

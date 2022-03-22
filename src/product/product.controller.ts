@@ -75,7 +75,7 @@ export class ProductController {
     response.json(await this.ProductService.getProducts(params.id));
   }
 
-  @Post('/meta')
+  @Post('/options')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FilesInterceptor('image', 20, {

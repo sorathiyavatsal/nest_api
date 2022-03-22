@@ -363,27 +363,39 @@ export class ProductService {
   }
 
   async getProducts(productId: string) {
-    const products = await this.ProductsModel.aggregate([
-      {
-        $lookup: {
-          from: 'variants',
-          localField: 'Variant',
-          foreignField: '_id',
-          as: 'variants',
-        },
-      },
-      {
-        $match: {
-          _id: ObjectId(productId),
-        },
-      },
-    ]);
+    var products = JSON.parse(
+      JSON.stringify(
+        await this.ProductsModel.aggregate([
+          {
+            $lookup: {
+              from: 'variants',
+              localField: 'Variant',
+              foreignField: '_id',
+              as: 'variants',
+            },
+          },
+          {
+            $match: {
+              _id: ObjectId(productId),
+            },
+          },
+        ]),
+      ),
+    );
 
-    // for (let i = 0; i <= products.length; i++) {
-    //     for(let j = 0; j <= products[i]['variants']) {
-
-    //     }
-    // }
+    for (let i = 0; i < products.length; i++) {
+      for (let j = 0; j < products[i]['variants'].length; j++) {
+        let options = [];
+        for (let k = 0; k < products[i]['variants'][j]['options'].length; k++) {
+          options.push(
+            await this.VariantOptionsModel.find({
+              _id: ObjectId(products[i]['variants'][j]['options'][k]),
+            }),
+          );
+        }
+        products[i]['variants'][j]['variantsOptions'] = options;
+      }
+    }
 
     return products;
   }
