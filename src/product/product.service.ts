@@ -1,32 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Mongoose } from 'mongoose';
-import { Variant } from './variant.model';
-import { VariantOptions } from './variantOptions.model';
+import { metaData } from './metaData.model';
 import { Product } from './product.model';
 let ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectModel('Variant') private VariantModel: Model<Variant>,
-    @InjectModel('VariantOptions')
-    private VariantOptionsModel: Model<VariantOptions>,
+    @InjectModel('metaData') private metaDataModel: Model<metaData>,
     @InjectModel('Products') private ProductsModel: Model<Product>,
   ) {}
+
+  async getProductId() {
+    return {
+      productId: ObjectId(),
+    };
+  }
 
   async getAllProducts(filter: any) {
     return await this.ProductsModel.aggregate([
       {
         $lookup: {
-          from: 'userdatas',
-          localField: 'store',
+          from: 'metadatas',
+          localField: 'metaOptions',
           foreignField: '_id',
-          as: 'stores',
+          as: 'metaOptions',
         },
       },
       {
         $unwind: {
-          path: '$stores',
+          path: '$metaOptions',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'userdatas',
+          localField: 'store',
+          foreignField: '_id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -49,12 +66,12 @@ export class ProductService {
           from: 'categories',
           localField: 'category',
           foreignField: '_id',
-          as: 'categories',
+          as: 'category',
         },
       },
       {
         $unwind: {
-          path: '$categories',
+          path: '$category',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -63,12 +80,12 @@ export class ProductService {
           from: 'categories',
           localField: 'collections',
           foreignField: '_id',
-          as: 'collection',
+          as: 'collections',
         },
       },
       {
         $unwind: {
-          path: '$collection',
+          path: '$collections',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -126,7 +143,7 @@ export class ProductService {
       },
       {
         $match: {
-          'stores.shop_name': {
+          'store.shop_name': {
             $regex: filter.store ? filter.store : '',
             $options: 'i',
           },
@@ -134,7 +151,7 @@ export class ProductService {
       },
       {
         $match: {
-          'categories.categoryName': {
+          'category.categoryName': {
             $regex: filter.category ? filter.category : '',
             $options: 'i',
           },
@@ -142,7 +159,7 @@ export class ProductService {
       },
       {
         $match: {
-          'collection.categoryName': {
+          'collections.categoryName': {
             $regex: filter.collection ? filter.collection : '',
             $options: 'i',
           },
@@ -157,15 +174,29 @@ export class ProductService {
         await this.ProductsModel.aggregate([
           {
             $lookup: {
-              from: 'userdatas',
-              localField: 'store',
+              from: 'metadatas',
+              localField: 'metaOptions',
               foreignField: '_id',
-              as: 'stores',
+              as: 'metaOptions',
             },
           },
           {
             $unwind: {
-              path: '$stores',
+              path: '$metaOptions',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'userdatas',
+              localField: 'store',
+              foreignField: '_id',
+              as: 'store',
+            },
+          },
+          {
+            $unwind: {
+              path: '$store',
               preserveNullAndEmptyArrays: true,
             },
           },
@@ -188,12 +219,12 @@ export class ProductService {
               from: 'categories',
               localField: 'category',
               foreignField: '_id',
-              as: 'categories',
+              as: 'category',
             },
           },
           {
             $unwind: {
-              path: '$categories',
+              path: '$category',
               preserveNullAndEmptyArrays: true,
             },
           },
@@ -202,12 +233,12 @@ export class ProductService {
               from: 'categories',
               localField: 'collections',
               foreignField: '_id',
-              as: 'collection',
+              as: 'collections',
             },
           },
           {
             $unwind: {
-              path: '$collection',
+              path: '$collections',
               preserveNullAndEmptyArrays: true,
             },
           },
@@ -265,7 +296,7 @@ export class ProductService {
           },
           {
             $match: {
-              'stores.shop_name': {
+              'store.shop_name': {
                 $regex: filter.store ? filter.store : '',
                 $options: 'i',
               },
@@ -273,7 +304,7 @@ export class ProductService {
           },
           {
             $match: {
-              'categories.categoryName': {
+              'category.categoryName': {
                 $regex: filter.category ? filter.category : '',
                 $options: 'i',
               },
@@ -281,16 +312,8 @@ export class ProductService {
           },
           {
             $match: {
-              'collection.categoryName': {
+              'collections.categoryName': {
                 $regex: filter.collection ? filter.collection : '',
-                $options: 'i',
-              },
-            },
-          },
-          {
-            $match: {
-              'brand.brandName': {
-                $regex: filter.brand ? filter.brand : '',
                 $options: 'i',
               },
             },
@@ -310,17 +333,17 @@ export class ProductService {
     for (let i = 0; i < products.length; i++) {
       if (
         products[i] &&
-        products[i]['stores'] &&
-        products[i]['stores']['shop_name']
+        products[i]['store'] &&
+        products[i]['store']['shop_name']
       ) {
-        store.push(products[i]['stores']['shop_name']);
+        store.push(products[i]['store']['shop_name']);
       }
       if (
         products[i] &&
-        products[i]['collection'] &&
-        products[i]['collection']['categoryName']
+        products[i]['collections'] &&
+        products[i]['collections']['categoryName']
       ) {
-        collection.push(products[i]['collection']['categoryName']);
+        collection.push(products[i]['collections']['categoryName']);
       }
 
       if (
@@ -333,10 +356,10 @@ export class ProductService {
 
       if (
         products[i] &&
-        products[i]['categories'] &&
-        products[i]['categories']['categoryName']
+        products[i]['category'] &&
+        products[i]['category']['categoryName']
       ) {
-        category.push(products[i]['categories']['categoryName']);
+        category.push(products[i]['category']['categoryName']);
       }
       if (
         products[i] &&
@@ -356,9 +379,9 @@ export class ProductService {
         category: [...new Set(category)],
         brand: [...new Set(brand)],
       },
-      pages: Math.ceil(
-        (await this.ProductsModel.find({}).count()) / filter.limit,
-      ),
+      pages:
+        Math.ceil((await this.ProductsModel.find({}).count()) / filter.limit) -
+        1,
     };
   }
 
@@ -368,10 +391,108 @@ export class ProductService {
         await this.ProductsModel.aggregate([
           {
             $lookup: {
-              from: 'variants',
-              localField: 'Variant',
+              from: 'metadatas',
+              localField: 'metaOptions',
               foreignField: '_id',
-              as: 'variants',
+              as: 'metaOptions',
+            },
+          },
+          {
+            $unwind: {
+              path: '$metaOptions',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'userdatas',
+              localField: 'store',
+              foreignField: '_id',
+              as: 'store',
+            },
+          },
+          {
+            $unwind: {
+              path: '$store',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'categories',
+              localField: 'storeCategory',
+              foreignField: '_id',
+              as: 'storeCategories',
+            },
+          },
+          {
+            $unwind: {
+              path: '$storeCategories',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'categories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category',
+            },
+          },
+          {
+            $unwind: {
+              path: '$category',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'categories',
+              localField: 'collections',
+              foreignField: '_id',
+              as: 'collections',
+            },
+          },
+          {
+            $unwind: {
+              path: '$collections',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'menus',
+              localField: 'menu',
+              foreignField: '_id',
+              as: 'menu',
+            },
+          },
+          {
+            $unwind: {
+              path: '$menu',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'brands',
+              localField: 'brand',
+              foreignField: '_id',
+              as: 'brand',
+            },
+          },
+          {
+            $unwind: {
+              path: '$brand',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'reviews',
+              localField: 'review',
+              foreignField: '_id',
+              as: 'reviews',
             },
           },
           {
@@ -383,43 +504,33 @@ export class ProductService {
       ),
     );
 
-    for (let i = 0; i < products.length; i++) {
-      for (let j = 0; j < products[i]['variants'].length; j++) {
-        let options = [];
-        for (let k = 0; k < products[i]['variants'][j]['options'].length; k++) {
-          options.push(
-            await this.VariantOptionsModel.find({
-              _id: ObjectId(products[i]['variants'][j]['options'][k]),
-            }),
-          );
-        }
-        products[i]['variants'][j]['variantsOptions'] = options;
-      }
-    }
-
-    return products;
+    return products[0];
   }
 
   async postProduct(productDto: any) {
     let productCollection = {
+      _id: productDto.productId,
       name: productDto.productName,
       secondary_name: productDto.secodary_productName,
       description: productDto.description,
       pageTitle: productDto.pageTitle,
-      Variant: productDto.variant.split(','),
+      metaOptions: productDto.metaOptions,
       metaDescription: productDto.metaDescription,
       urlHandle: productDto.urlHandle,
       productImage: productDto.productImage,
       storeCategory: productDto.store.storeCategory,
       category: productDto.category,
       collections: productDto.collection,
-      store: productDto.store.store,
+      store: productDto.store,
       brand: productDto.brand,
       keywords: productDto.keywords,
       type: productDto.type,
-      parentId: productDto.parentId,
       status: productDto.status,
     };
+
+    if (productDto.parentId) {
+      productCollection['parentId'] = productDto.parentId;
+    }
 
     if (productDto.menu) {
       productCollection['menu'] = productDto.menu;
@@ -427,13 +538,15 @@ export class ProductService {
 
     const product = await new this.ProductsModel(productCollection);
 
-    await this.ProductsModel.findOneAndUpdate(
-      { _id: productDto.parentId },
-      {
-        addon: product._id,
-      },
-      { upsert: true },
-    );
+    if (productDto.type == 'addon') {
+      await this.ProductsModel.findOneAndUpdate(
+        { _id: productDto.parentId },
+        {
+          addon: product._id,
+        },
+        { upsert: true },
+      );
+    }
 
     return await product.save();
   }
@@ -453,8 +566,8 @@ export class ProductService {
     if (productDto.pageTitle) {
       productCollection['pageTitle'] = productDto.pageTitle;
     }
-    if (productDto.variant) {
-      productCollection['Variant'] = productDto.variant.split(',');
+    if (productDto.metaOptions) {
+      productCollection['metaOptions'] = ObjectId(productDto.metaOptions);
     }
     if (productDto.metaDescription) {
       productCollection['metaDescription'] = productDto.metaDescription;
@@ -519,45 +632,90 @@ export class ProductService {
   }
 
   async postVariant(metaDto: any) {
-    const variant = await new this.VariantModel({
-      name: metaDto.name,
-      Image: metaDto.image,
-      status: true,
+    const metaDataResult = await this.metaDataModel.findOne({
+      productId: ObjectId(metaDto.productId),
+      metaKey: 'product_options',
     });
 
-    return await variant.save();
-  }
-
-  async postVariantOptions(optionsDto: any) {
-    if (optionsDto.optionsImage) {
-      let optionPayload = {
-        variant_id: optionsDto.variantId,
-        value: optionsDto.optionsValue,
-        status: true,
-      };
-
-      if (optionsDto.optionsImage) {
-        optionPayload['image'] = optionsDto.optionsImage;
-      }
-
-      const variantOptions = await new this.VariantOptionsModel(optionPayload);
-
-      const options = await variantOptions.save();
-
-      await this.VariantModel.findByIdAndUpdate(
+    if (metaDataResult) {
+      await this.metaDataModel.updateOne(
         {
-          _id: optionsDto.variantId,
+          _id: metaDataResult._id,
         },
         {
           $push: {
-            options: options._id,
+            metaValue: {
+              optionName: metaDto.optionName,
+              optionValue: metaDto.optionValue,
+              optionImage: metaDto.image,
+            },
           },
         },
       );
 
-      return options;
+      return await this.metaDataModel.findOne({
+        productId: ObjectId(metaDto.productId),
+        metaKey: 'product_options',
+      });
     } else {
-      return false;
+      const metaData = await new this.metaDataModel({
+        productId: ObjectId(metaDto.productId),
+        metaKey: 'product_options',
+        metaValue: [
+          {
+            optionName: metaDto.optionName,
+            optionValue: metaDto.optionValue,
+            optionImage: metaDto.image,
+          },
+        ],
+        status: true,
+      });
+
+      return await metaData.save();
+    }
+  }
+
+  async postVariantOptions(optionsDto: any) {
+    const metaDataResult = await this.metaDataModel.findOne({
+      productId: ObjectId(optionsDto.productId),
+      metaKey: 'product_variants',
+      parentMetaId: ObjectId(optionsDto.parentMetaId),
+    });
+
+    if (metaDataResult) {
+      await this.metaDataModel.updateOne(
+        {
+          _id: metaDataResult._id,
+        },
+        {
+          $push: {
+            metaValue: [
+              {
+                options: JSON.parse(JSON.stringify(optionsDto.options)),
+                optionsImage: optionsDto.optionsImage,
+              },
+            ],
+          },
+        },
+      );
+
+      return await this.metaDataModel.findOne({
+        productId: ObjectId(optionsDto.productId),
+        metaKey: 'product_variants',
+      });
+    } else {
+      return await new this.metaDataModel({
+        productId: ObjectId(optionsDto.productId),
+        metaKey: 'product_variants',
+        parentMetaId: ObjectId(optionsDto.parentMetaId),
+        metaValue: [
+          {
+            options: JSON.parse(JSON.stringify(optionsDto.options)),
+            optionsImage: optionsDto.optionsImage,
+          },
+        ],
+        status: true,
+      }).save();
     }
   }
 

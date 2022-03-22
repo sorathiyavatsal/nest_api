@@ -20,7 +20,8 @@ export class catalogueDto {
   @ApiProperty({ required: true })
   catalogueStatus: Boolean;
 
-  @ApiProperty({ type: Array })
+  @IsString()
+  @ApiProperty()
   @IsNotEmpty()
-  variants: [];
+  options: String;
 }

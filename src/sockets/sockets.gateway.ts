@@ -21,7 +21,7 @@ export class SocketGateway {
       client.join(payload.delivery_fleet_id);
       let deliveryBoys = await axios({
         method: 'POST',
-        url: `http://3.134.140.172:5000/api/delivery-fleet/find-near-delivery-boy`,
+        url: `http://localhost:5000/api/delivery-fleet/find-near-delivery-boy`,
         headers: JSON.parse(
           JSON.stringify({
             Authorization: 'Bearer ' + payload.token,
@@ -37,7 +37,7 @@ export class SocketGateway {
 
       const deliveryFleet = await axios({
         method: 'GET',
-        url: `http://3.134.140.172:5000/api/delivery-fleet/${payload.delivery_fleet_id}`,
+        url: `http://localhost:5000/api/delivery-fleet/${payload.delivery_fleet_id}`,
         headers: JSON.parse(
           JSON.stringify({
             Authorization: 'Bearer ' + payload.token,
@@ -49,6 +49,7 @@ export class SocketGateway {
         if (Array.isArray(deliveryBoys)) {
           let i = 0;
           while (i < deliveryBoys.length) {
+              console.log("data",deliveryBoys[i])
             this.sendPushNotification(deliveryBoys[i], deliveryFleet.data);
             i++;
             await delay(10000);
@@ -67,7 +68,7 @@ export class SocketGateway {
   async handleAcceptJob(client: Socket, payload: any) {
     const delivery_fleet = await axios({
       method: 'PUT',
-      url: `http://3.134.140.172:5000/api/delivery-fleet/update/${payload.delivery_fleet_id}`,
+      url: `http://localhost:5000/api/delivery-fleet/update/${payload.delivery_fleet_id}`,
       data: JSON.parse(
         JSON.stringify({
           invoiceStatus: 'complete',
@@ -82,7 +83,7 @@ export class SocketGateway {
 
     const delivery_boy = await axios({
       method: 'GET',
-      url: `http://3.134.140.172:5000/api/users/profile/${payload.delivery_boy_id}`,
+      url: `http://localhost:5000/api/users/profile/${payload.delivery_boy_id}`,
       headers: JSON.parse(
         JSON.stringify({
           Authorization: 'Bearer ' + payload.token,
@@ -118,6 +119,14 @@ export class SocketGateway {
         }),
       );
 
+      console.log({
+        deliveryFleet_id: deliveryFleet._id,
+        deliveryBoy_id: deliveryBoy._id,
+        expire_time: new Date(
+          new Date(new Date().toUTCString()).getTime() + 2 * 60000,
+        ),
+      });
+
       const body = JSON.parse(
         JSON.stringify({
           notification: {
@@ -152,7 +161,7 @@ export class SocketGateway {
   async handlePathLocation(client: Socket, payload: any) {
     const data = await axios({
       method: 'PUT',
-      url: `http://3.134.140.172:5000/api/users/location/${payload.delivery_boy_id}`,
+      url: `http://localhost:5000/api/users/location/${payload.delivery_boy_id}`,
       headers: JSON.parse(
         JSON.stringify({
           Authorization: 'Bearer ' + payload.token,
@@ -173,7 +182,7 @@ export class SocketGateway {
   async getDeliveyBoyNear(client: Socket, payload: any): Promise<Object> {
     try {
       return await axios.post(
-        `http://3.134.140.172:5000/api/delivery-fleet/find-near-delivery-boy`,
+        `http://localhost:5000/api/delivery-fleet/find-near-delivery-boy`,
         payload.params,
         {
           headers: {

@@ -2,20 +2,23 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { catalogue } from './catalogue.model';
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Variant } from 'src/product/variant.model';
-import { VariantOptions } from 'src/product/variantOptions.model';
+import { metaData } from 'src/product/metaData.model';
 import { Product } from 'src/product/product.model';
 let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
 export class CatalogueService {
   constructor(
-    @InjectModel('Variant') private VariantModel: Model<Variant>,
-    @InjectModel('VariantOptions')
-    private VariantOptionsModel: Model<VariantOptions>,
+    @InjectModel('metaData') private metaDataModel: Model<metaData>,
     @InjectModel('catalogue') private catalogueModel: Model<catalogue>,
     @InjectModel('Products') private ProductsModel: Model<Product>,
   ) {}
+
+  async getcatalogueId() {
+    return {
+      catalogueId: ObjectId(),
+    };
+  }
 
   async getFiltercatalogue(filter: any) {
     let condition = [];
@@ -47,22 +50,14 @@ export class CatalogueService {
       },
       {
         $lookup: {
-          from: 'variants',
-          localField: 'variants',
+          from: 'metadatas',
+          localField: 'options',
           foreignField: '_id',
-          as: 'variantsDetails',
+          as: 'options',
         },
       },
       {
-        $unwind: '$variantsDetails',
-      },
-      {
-        $lookup: {
-          from: 'variantoptions',
-          localField: 'variantsDetails.options',
-          foreignField: '_id',
-          as: 'variantoptionDetails',
-        },
+        $unwind: '$options',
       },
       { $skip: parseInt(filter.page) * parseInt(filter.limit) },
       { $limit: parseInt(filter.limit) },
@@ -315,88 +310,19 @@ export class CatalogueService {
       },
       {
         $lookup: {
-          from: 'variants',
-          localField: 'variants',
+          from: 'metadatas',
+          localField: 'options',
           foreignField: '_id',
-          as: 'variantsDetails',
-        },
-      },
-      {
-        $unwind: '$variantsDetails',
-      },
-      {
-        $lookup: {
-          from: 'variantoptions',
-          localField: 'variantsDetails.options',
-          foreignField: '_id',
-          as: 'variantoptionDetails',
-        },
-      },
-    ]);
-
-    for (let i = 0; i < catalogue.length; i++) {
-      catalogue[i].variantsDetails['variantoptionDetails'] =
-        catalogue[i].variantoptionDetails;
-      delete catalogue[i].variantoptionDetails;
-    }
-
-    return catalogue;
-  }
-
-  async getcatalogueId(catlog: any) {
-    var catalogue = await this.catalogueModel.aggregate([
-      {
-        $match: {
-          _id: ObjectId(catlog.id),
-        },
-      },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'productId',
-          foreignField: '_id',
-          as: 'products',
-        },
-      },
-      {
-        $lookup: {
-          from: 'userdatas',
-          localField: 'storeId',
-          foreignField: '_id',
-          as: 'stores',
-        },
-      },
-      {
-        $lookup: {
-          from: 'variants',
-          localField: 'variants',
-          foreignField: '_id',
-          as: 'variantsDetails',
+          as: 'options',
         },
       },
       {
         $unwind: {
-          path: '$variantsDetails',
+          path: '$options',
           preserveNullAndEmptyArrays: true,
         },
       },
-      {
-        $lookup: {
-          from: 'variantoptions',
-          localField: 'variantsDetails.options',
-          foreignField: '_id',
-          as: 'variantoptionDetails',
-        },
-      },
     ]);
-
-    for (let i = 0; i < catalogue.length; i++) {
-      if (catalogue[i] ?? catalogue[i].variantoptionDetails) {
-        catalogue[i].variantsDetails['variantoptionDetails'] =
-          catalogue[i].variantoptionDetails;
-        delete catalogue[i].variantoptionDetails;
-      }
-    }
 
     return catalogue;
   }
@@ -467,7 +393,7 @@ export class CatalogueService {
       productId: ObjectId(dto.productId),
       storeId: ObjectId(dto.storeId),
       catalogueStatus: dto.catalogueStatus,
-      variants: dto.variants.map((s) => ObjectId(s)),
+      options: ObjectId(dto.options),
     };
     return await new this.catalogueModel(newcatalogue).save();
   }
@@ -488,48 +414,102 @@ export class CatalogueService {
   }
 
   async postVariant(metaDto: any) {
-    const variant = await new this.VariantModel({
-      name: metaDto.name,
-      Image: metaDto.metaImage,
-      status: true,
+    const metaDataResult = await this.metaDataModel.findOne({
+      productId: ObjectId(metaDto.catalogueId),
+      metaKey: 'catalogue_options',
     });
 
-    return await variant.save();
-  }
-
-  async postVariantOptions(optionsDto: any) {
-    if (optionsDto.optionsImage) {
-      let optionPayload = {
-        variant_id: ObjectId(optionsDto.variantId),
-        value: optionsDto.optionsValue,
-        mrpprice: optionsDto.mrpprice,
-        salepprice: optionsDto.salepprice,
-        qty: optionsDto.qty,
-        status: true,
-      };
-
-      if (optionsDto.optionsImage) {
-        optionPayload['image'] = optionsDto.optionsImage;
-      }
-      
-      const variantOptions = await new this.VariantOptionsModel(optionPayload);
-
-      const options = await variantOptions.save();
-
-      await this.VariantModel.findByIdAndUpdate(
+    if (metaDataResult) {
+      await this.metaDataModel.updateOne(
         {
-          _id: optionsDto.variantId,
+          _id: metaDataResult._id,
         },
         {
           $push: {
-            options: options._id,
+            metaValue: {
+              optionName: metaDto.optionName,
+              optionValue: metaDto.optionValue,
+              optionImage: metaDto.image,
+            },
           },
         },
       );
 
-      return options;
+      return await this.metaDataModel.findOne({
+        productId: ObjectId(metaDto.catalogueId),
+        metaKey: 'catalogue_options',
+      });
     } else {
-      return false;
+      const metaData = await new this.metaDataModel({
+        productId: ObjectId(metaDto.catalogueId),
+        metaKey: 'catalogue_options',
+        metaValue: [
+          {
+            optionName: metaDto.optionName,
+            optionValue: metaDto.optionValue,
+            optionImage: metaDto.image,
+          },
+        ],
+        status: true,
+      });
+
+      return await metaData.save();
+    }
+  }
+
+  async postVariantOptions(optionsDto: any) {
+    const metaDataResult = await this.metaDataModel.findOne({
+      productId: ObjectId(optionsDto.catalogueId),
+      metaKey: 'catalogue_variants',
+      parentMetaId: ObjectId(optionsDto.parentMetaId),
+    });
+
+    if (metaDataResult) {
+      await this.metaDataModel.updateOne(
+        {
+          _id: metaDataResult._id,
+        },
+        {
+          $push: {
+            metaValue: [
+              {
+                options: JSON.parse(JSON.stringify(optionsDto.options)),
+                optionsImage: optionsDto.optionsImage,
+                mrpprice: optionsDto.mrpprice,
+                salepprice: optionsDto.salepprice,
+                qty: optionsDto.qty,
+                discount: JSON.parse(JSON.stringify(optionsDto.discount)),
+                unitWight: optionsDto.unitWight,
+                pics: optionsDto.pics,
+              },
+            ],
+          },
+        },
+      );
+
+      return await this.metaDataModel.findOne({
+        productId: ObjectId(optionsDto.catalogueId),
+        metaKey: 'catalogue_variants',
+      });
+    } else {
+      return await new this.metaDataModel({
+        productId: ObjectId(optionsDto.catalogueId),
+        metaKey: 'catalogue_variants',
+        parentMetaId: ObjectId(optionsDto.parentMetaId),
+        metaValue: [
+          {
+            options: JSON.parse(JSON.stringify(optionsDto.options)),
+            optionsImage: optionsDto.optionsImage,
+            mrpprice: optionsDto.mrpprice,
+            salepprice: optionsDto.salepprice,
+            qty: optionsDto.qty,
+            discount: JSON.parse(JSON.stringify(optionsDto.discount)),
+            unitWight: optionsDto.unitWight,
+            pics: optionsDto.pics,
+          },
+        ],
+        status: true,
+      }).save();
     }
   }
 }

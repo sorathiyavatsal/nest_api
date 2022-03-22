@@ -75,6 +75,11 @@ export class ProductController {
     response.json(await this.ProductService.getProducts(params.id));
   }
 
+  @Post('/Id')
+  async getProductId(@Response() response) {
+    response.json(await this.ProductService.getProductId());
+  }
+
   @Post('/options')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
@@ -94,8 +99,14 @@ export class ProductController {
     schema: {
       type: 'object',
       properties: {
-        name: {
+        productId: {
           type: 'string',
+        },
+        optionName: {
+          type: 'string',
+        },
+        optionValue: {
+          type: 'array',
         },
         image: {
           type: 'string',
@@ -136,11 +147,14 @@ export class ProductController {
     schema: {
       type: 'object',
       properties: {
-        variantId: {
+        productId: {
           type: 'string',
         },
-        optionsValue: {
+        parentMetaId: {
           type: 'string',
+        },
+        options: {
+          type: 'object',
         },
         optionsImage: {
           type: 'array',
@@ -161,7 +175,8 @@ export class ProductController {
         response.push(fileReponse);
       });
     }
-    request.body.optionsImage = response[0];
+    request.body.optionsImage = response;
+
     return await this.ProductService.postVariantOptions(request.body);
   }
 
@@ -184,6 +199,9 @@ export class ProductController {
     schema: {
       type: 'object',
       properties: {
+        productId: {
+          type: 'string',
+        },
         productName: {
           type: 'string',
         },
@@ -196,8 +214,8 @@ export class ProductController {
         pageTitle: {
           type: 'string',
         },
-        variant: {
-          type: 'array',
+        metaOptions: {
+          type: 'string',
         },
         metaDescription: {
           type: 'string',
@@ -213,7 +231,7 @@ export class ProductController {
           },
         },
         storeCategory: {
-            type: 'string',
+          type: 'string',
         },
         store: {
           type: 'string',
@@ -291,8 +309,8 @@ export class ProductController {
         pageTitle: {
           type: 'string',
         },
-        variant: {
-          type: 'array',
+        metaOptions: {
+          type: 'string',
         },
         metaDescription: {
           type: 'string',
@@ -311,7 +329,7 @@ export class ProductController {
           type: 'string',
         },
         storeCategory: {
-            type: 'string',
+          type: 'string',
         },
         category: {
           type: 'string',

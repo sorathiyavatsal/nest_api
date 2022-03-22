@@ -1,6 +1,5 @@
 import * as mongoose from 'mongoose';
-import * as bcrypt from 'bcrypt';
-import { type } from 'os';
+
 let Schema = mongoose.Types,
   ObjectId = Schema.ObjectId;
 export const ProductSchema = new mongoose.Schema(
@@ -17,9 +16,9 @@ export const ProductSchema = new mongoose.Schema(
     pageTitle: {
       type: String,
     },
-    Variant: {
-      type: Array,
-      $ref: 'variants',
+    metaOptions: {
+      type: ObjectId,
+      $ref: 'metadatas',
     },
     metaDescription: {
       type: String,
@@ -86,7 +85,7 @@ export interface Product extends mongoose.Document {
   secondary_name: string;
   description: string;
   pageTitle: string;
-  Variant: [];
+  metaOptions: string;
   metaDescription: string;
   urlHandle: string;
   productImage: [];

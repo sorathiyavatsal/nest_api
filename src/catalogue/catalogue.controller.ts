@@ -6,6 +6,7 @@ import {
   Body,
   Put,
   Request,
+  Response,
   Param,
   UseGuards,
   UseInterceptors,
@@ -38,6 +39,11 @@ import { diskStorage } from 'multer';
 export class CatalogueController {
   constructor(private catalogueService: CatalogueService) {}
 
+  @Post('/Id')
+  async getcatalogueId(@Response() response) {
+    response.json(await this.catalogueService.getcatalogueId());
+  }
+
   @Post('/variants')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
@@ -57,8 +63,14 @@ export class CatalogueController {
     schema: {
       type: 'object',
       properties: {
-        name: {
+        catalogueId: {
           type: 'string',
+        },
+        optionName: {
+          type: 'string',
+        },
+        optionValue: {
+          type: 'array',
         },
         image: {
           type: 'string',
@@ -77,7 +89,7 @@ export class CatalogueController {
       });
     }
     request.body.metaImage = response[0];
-    
+
     return await this.catalogueService.postVariant(request.body);
   }
 
@@ -100,11 +112,14 @@ export class CatalogueController {
     schema: {
       type: 'object',
       properties: {
-        variantId: {
+        catalogueId: {
           type: 'string',
         },
-        optionsValue: {
+        parentMetaId: {
           type: 'string',
+        },
+        options: {
+          type: 'object',
         },
         optionsImage: {
           type: 'array',
@@ -122,6 +137,15 @@ export class CatalogueController {
         qty: {
           type: 'number',
         },
+        discount: {
+          type: 'object',
+        },
+        unitWight: {
+          type: 'string',
+        },
+        pics: {
+          type: 'string',
+        },
       },
     },
   })
@@ -134,7 +158,7 @@ export class CatalogueController {
         response.push(fileReponse);
       });
     }
-    request.body.optionsImage = response[0];
+    request.body.optionsImage = response;
     return await this.catalogueService.postVariantOptions(request.body);
   }
 
@@ -163,17 +187,6 @@ export class CatalogueController {
   async getFiltercatalogue(@Request() req, @Query() query) {
     return await this.catalogueService.getFiltercatalogue(query);
   }
-
-//   @ApiOperation({ summary: 'Get Catalogue By Id' })
-//   @UseGuards(AuthGuard('jwt'))
-//
-//   @ApiQuery({ name: 'id', required: true })
-//   @ApiConsumes('multipart/form-data', 'application/json')
-//   @Get('/:id')
-//   async getcatalogueId(@Query() query) {
-//     return await this.catalogueService.getcatalogueId(query);
-//   }
-
 
   @ApiOperation({ summary: 'Get Catalogue By Id' })
   @UseGuards(AuthGuard('jwt'))
