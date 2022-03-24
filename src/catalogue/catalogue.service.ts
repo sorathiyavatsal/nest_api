@@ -51,14 +51,14 @@ export class CatalogueService {
       {
         $lookup: {
           from: 'metadatas',
-          localField: 'options',
+          localField: 'variants',
           foreignField: '_id',
-          as: 'options',
+          as: 'variants',
         },
       },
       {
         $unwind: {
-          path: '$options',
+          path: '$variants',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -84,6 +84,7 @@ export class CatalogueService {
       brand = [];
 
     for (let i = 0; i < catalogue.length; i++) {
+        catalogue[i]['variants'] = catalogue[i]['variants']['metaValue']
       for (let j = 0; j < catalogue[i]['products'].length; j++) {
         var products = JSON.parse(
           JSON.stringify(
