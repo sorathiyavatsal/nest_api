@@ -225,14 +225,14 @@ export class DeliveryFleetService {
     return deliveryBoy;
   }
   async updateDeliveryFleetBoy(id: any, req: any, user: any) {
-    console.log(user);
+
     let delivery: any = await this.deliveryfleetModel
       .findOne({ _id: id })
       .populate('userId');
     if (!delivery) {
       return new BadRequestException('Invalid Delivery Fleet');
     }
-    console.log(delivery);
+    
     let dto = req.body;
     let updateObj: any = {
       deliveryBoy: user.user._id,
@@ -249,7 +249,7 @@ export class DeliveryFleetService {
       name: 'DELIVERY_FLEET_ORDER_ACCEPTED',
       type: 'SMS',
       device: req.headers.OsName || 'ANDROID',
-      phone: delivery.userId.phoneNumber,
+      phone: delivery.toPhone,
     };
     this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 

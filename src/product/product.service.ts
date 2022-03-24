@@ -528,7 +528,7 @@ export class ProductService {
       metaDescription: productDto.metaDescription,
       urlHandle: productDto.urlHandle,
       productImage: productDto.productImage,
-      storeCategory: productDto.store.storeCategory,
+      storeCategory: productDto.storeCategory,
       category: productDto.category,
       collections: productDto.collection,
       store: productDto.store,

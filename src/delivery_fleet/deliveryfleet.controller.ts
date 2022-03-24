@@ -89,7 +89,7 @@ export class DeliveryFleetController {
       req.user,
     );
   }
-  @Get('/accept/:id')
+  @Get('/users/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'id', required: true })

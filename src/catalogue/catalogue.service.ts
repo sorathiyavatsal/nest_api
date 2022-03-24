@@ -57,7 +57,10 @@ export class CatalogueService {
         },
       },
       {
-        $unwind: '$options',
+        $unwind: {
+          path: '$options',
+          preserveNullAndEmptyArrays: true,
+        },
       },
       { $skip: parseInt(filter.page) * parseInt(filter.limit) },
       { $limit: parseInt(filter.limit) },
@@ -68,8 +71,10 @@ export class CatalogueService {
     );
 
     for (let i = 0; i < catalogue.length; i++) {
-      catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
-      delete catalogue[i]['options'];
+      if (catalogue[i] && catalogue[i]['options']) {
+        catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
+        delete catalogue[i]['options'];
+      }
     }
 
     let storeCategory = [],
@@ -85,7 +90,7 @@ export class CatalogueService {
             await this.ProductsModel.aggregate([
               {
                 $match: {
-                  _id: catalogue[i]['products'][j]['_id'],
+                  _id: ObjectId(catalogue[i]['products'][j]['_id']),
                 },
               },
               {
@@ -239,7 +244,7 @@ export class CatalogueService {
             ]),
           ),
         );
-
+        
         for (let k = 0; k < products.length; k++) {
           if (
             products[k] &&
