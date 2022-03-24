@@ -70,21 +70,16 @@ export class CatalogueService {
       JSON.stringify(await this.catalogueModel.aggregate(condition)),
     );
 
-    for (let i = 0; i < catalogue.length; i++) {
-      if (catalogue[i] && catalogue[i]['options']) {
-        catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
-        delete catalogue[i]['options'];
-      }
-    }
-
     let storeCategory = [],
       store = [],
       collection = [],
       category = [],
-      brand = [];
+      brand = [],
+      catalogueProducts = [];
 
     for (let i = 0; i < catalogue.length; i++) {
-        catalogue[i]['variants'] = catalogue[i]['variants']['metaValue']
+      catalogueProducts = [];
+      catalogue[i]['variants'] = catalogue[i]['variants']['metaValue'];
       for (let j = 0; j < catalogue[i]['products'].length; j++) {
         var products = JSON.parse(
           JSON.stringify(
@@ -245,7 +240,11 @@ export class CatalogueService {
             ]),
           ),
         );
-        
+
+        if(products[0]) {
+            catalogueProducts.push(products[0]);
+        }
+
         for (let k = 0; k < products.length; k++) {
           if (
             products[k] &&
@@ -285,6 +284,11 @@ export class CatalogueService {
             brand.push(products[k]['brand']['brandName']);
           }
         }
+      }
+      if(catalogueProducts.length == 0) {
+          delete catalogue[i]
+      } else {
+        catalogue[i]['products'] = catalogueProducts
       }
     }
 
