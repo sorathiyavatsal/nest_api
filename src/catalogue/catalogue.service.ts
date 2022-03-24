@@ -293,7 +293,9 @@ export class CatalogueService {
     }
 
     return {
-      catalogues: catalogue,
+      catalogues: catalogue.filter(function (catalogue) {
+        return catalogue != null;
+      }),
       filters: {
         store: [...new Set(store)],
         collection: [...new Set(collection)],
