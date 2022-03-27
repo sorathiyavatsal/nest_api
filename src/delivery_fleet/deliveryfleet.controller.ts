@@ -64,10 +64,14 @@ export class DeliveryFleetController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiQuery({ name: 'merchantid', required: true })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
+  @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE','PRICE','KEYWORD'] })
   async getDeliveryFleet(@Req() req, @Query() query) {
     return await this.deliveryService.getDeliveryFleet(
       req.user,
-      query.merchantid,
+      query,
     );
   }
 
@@ -78,6 +82,7 @@ export class DeliveryFleetController {
   async getDeliveryFleetData(@Param() params, @Req() req) {
     return await this.deliveryService.getDeliveryFleetData(params.id, req);
   }
+
   @Get('/location/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

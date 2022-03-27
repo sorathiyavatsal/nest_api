@@ -58,8 +58,10 @@ export class ProductController {
   @ApiQuery({ name: 'brand', type: 'string', required: false })
   @ApiQuery({ name: 'name', type: 'string', required: false })
   @ApiQuery({ name: 'keywords', type: 'string', required: false })
-  @ApiQuery({ name: 'page', type: 'number', required: true })
-  @ApiQuery({ name: 'limit', type: 'number', required: true })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
+  @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE','PRICE'] })
   async getFilterProducts(
     @Request() request,
     @Response() response,
