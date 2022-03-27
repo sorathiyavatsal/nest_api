@@ -225,14 +225,13 @@ export class DeliveryFleetService {
     return deliveryBoy;
   }
   async updateDeliveryFleetBoy(id: any, req: any, user: any) {
-
     let delivery: any = await this.deliveryfleetModel
       .findOne({ _id: id })
       .populate('userId');
     if (!delivery) {
       return new BadRequestException('Invalid Delivery Fleet');
     }
-    
+
     let dto = req.body;
     let updateObj: any = {
       deliveryBoy: user.user._id,
@@ -463,10 +462,30 @@ export class DeliveryFleetService {
     );
   }
 
-  async getDeliveryFleet(user: any, merchant_id: String) {
-    let where: any = {};
-    if (merchant_id) where.createdBy = ObjectId(merchant_id);
-    return this.deliveryfleetModel.find(where);
+  async getDeliveryFleet(user: any, filter: any) {
+    let where = [];
+    if (filter.merchant_id) {
+      where.push({
+        $match: {
+          createdBy: ObjectId(filter.merchant_id),
+        },
+      });
+    }
+
+    where.push(
+      {
+        $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
+      },
+      { $limit: filter.limit ? parseInt(filter.limit) : 20 },
+    );
+
+    var fleet = JSON.parse(JSON.stringify(await this.deliveryfleetModel.aggregate(where)));
+
+    return {
+        fleet: fleet,
+        pages: Math.ceil(fleet.length / filter.limit ? filter.limit: 20) -
+        1,
+    }
   }
 
   async getDeliveryFleetLocationData(id: any, req: any, user: any) {

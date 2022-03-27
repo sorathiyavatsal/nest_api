@@ -23,14 +23,40 @@ export class CategoryService {
       });
     }
 
-    condition.push({
-      $lookup: {
-        from: 'categories',
-        localField: 'parent',
-        foreignField: '_id',
-        as: 'parent',
+    if (categoryDto.sort) {
+      if (categoryDto.sort == 'DATE') {
+        condition.push({
+          $sort: {
+            createdAt: categoryDto.sort_order == 'AESC' ? 1 : -1,
+          },
+        });
+      }
+      if (categoryDto.sort == 'NAME') {
+        condition.push({
+          $sort: {
+            categoryName: categoryDto.sort_order == 'AESC' ? 1 : -1,
+          },
+        });
+      }
+    }
+
+    condition.push(
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'parent',
+          foreignField: '_id',
+          as: 'parent',
+        },
       },
-    });
+      {
+        $skip:
+          categoryDto.page && categoryDto.limit
+            ? parseInt(categoryDto.page) * parseInt(categoryDto.limit)
+            : 0,
+      },
+      { $limit: categoryDto.limit ? parseInt(categoryDto.limit) : 20 },
+    );
 
     const category = JSON.parse(
       JSON.stringify(await this.CategoryModel.aggregate(condition)),
@@ -58,7 +84,12 @@ export class CategoryService {
       }).count();
     }
 
-    return category;
+    return {
+      category: category,
+      pages: Math.ceil(
+        category.length / (categoryDto.limit ? categoryDto.limit : 20),
+      ) - 1,
+    };
   }
 
   async getCategory(categoryId: string) {

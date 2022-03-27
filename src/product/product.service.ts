@@ -169,158 +169,183 @@ export class ProductService {
   }
 
   async getFilterProducts(filter: any) {
+    let condition = []
+    condition.push({
+        $lookup: {
+          from: 'metadatas',
+          localField: 'metaOptions',
+          foreignField: '_id',
+          as: 'metaOptions',
+        },
+      },
+      {
+        $unwind: {
+          path: '$metaOptions',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'userdatas',
+          localField: 'store',
+          foreignField: '_id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'storeCategory',
+          foreignField: '_id',
+          as: 'storeCategories',
+        },
+      },
+      {
+        $unwind: {
+          path: '$storeCategories',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $unwind: {
+          path: '$category',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'collections',
+          foreignField: '_id',
+          as: 'collections',
+        },
+      },
+      {
+        $unwind: {
+          path: '$collections',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'menus',
+          localField: 'menu',
+          foreignField: '_id',
+          as: 'menu',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menu',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'brands',
+          localField: 'brand',
+          foreignField: '_id',
+          as: 'brand',
+        },
+      },
+      {
+        $unwind: {
+          path: '$brand',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: 'review',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+      {
+        $match: {
+          name: {
+            $regex: filter.name ? filter.name : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          keywords: {
+            $regex: filter.keyword ? filter.keyword : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'store.shop_name': {
+            $regex: filter.store ? filter.store : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'category.categoryName': {
+            $regex: filter.category ? filter.category : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'collections.categoryName': {
+            $regex: filter.collection ? filter.collection : '',
+            $options: 'i',
+          },
+        },
+      },
+      { $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0 },
+      { $limit: filter.limit ? parseInt(filter.limit) : 20 })
+
+      if (filter.sort) {
+        if (filter.sort == 'DATE') {
+          condition.push({
+            $sort: {
+              createdAt: filter.sort_order == 'AESC' ? 1 : -1,
+            },
+          });
+        }
+        if (filter.sort == 'NAME') {
+          condition.push({
+            $sort: {
+              name: filter.sort_order == 'AESC' ? 1 : -1,
+            },
+          });
+        }
+        // if (filter.sort == 'PRICE') {
+        //   condition.push({
+        //     $sort: {
+        //       name: filter.sort_order == 'AESC' ? 1 : -1,
+        //     },
+        //   });
+        // }
+      }
+
     var products = JSON.parse(
       JSON.stringify(
-        await this.ProductsModel.aggregate([
-          {
-            $lookup: {
-              from: 'metadatas',
-              localField: 'metaOptions',
-              foreignField: '_id',
-              as: 'metaOptions',
-            },
-          },
-          {
-            $unwind: {
-              path: '$metaOptions',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'userdatas',
-              localField: 'store',
-              foreignField: '_id',
-              as: 'store',
-            },
-          },
-          {
-            $unwind: {
-              path: '$store',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'categories',
-              localField: 'storeCategory',
-              foreignField: '_id',
-              as: 'storeCategories',
-            },
-          },
-          {
-            $unwind: {
-              path: '$storeCategories',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'categories',
-              localField: 'category',
-              foreignField: '_id',
-              as: 'category',
-            },
-          },
-          {
-            $unwind: {
-              path: '$category',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'categories',
-              localField: 'collections',
-              foreignField: '_id',
-              as: 'collections',
-            },
-          },
-          {
-            $unwind: {
-              path: '$collections',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'menus',
-              localField: 'menu',
-              foreignField: '_id',
-              as: 'menu',
-            },
-          },
-          {
-            $unwind: {
-              path: '$menu',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'brands',
-              localField: 'brand',
-              foreignField: '_id',
-              as: 'brand',
-            },
-          },
-          {
-            $unwind: {
-              path: '$brand',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'reviews',
-              localField: 'review',
-              foreignField: '_id',
-              as: 'reviews',
-            },
-          },
-          {
-            $match: {
-              name: {
-                $regex: filter.name ? filter.name : '',
-                $options: 'i',
-              },
-            },
-          },
-          {
-            $match: {
-              keywords: {
-                $regex: filter.keyword ? filter.keyword : '',
-                $options: 'i',
-              },
-            },
-          },
-          {
-            $match: {
-              'store.shop_name': {
-                $regex: filter.store ? filter.store : '',
-                $options: 'i',
-              },
-            },
-          },
-          {
-            $match: {
-              'category.categoryName': {
-                $regex: filter.category ? filter.category : '',
-                $options: 'i',
-              },
-            },
-          },
-          {
-            $match: {
-              'collections.categoryName': {
-                $regex: filter.collection ? filter.collection : '',
-                $options: 'i',
-              },
-            },
-          },
-          { $skip: parseInt(filter.page) * parseInt(filter.limit) },
-          { $limit: parseInt(filter.limit) },
-        ]),
+        await this.ProductsModel.aggregate(condition),
       ),
     );
 
@@ -380,7 +405,7 @@ export class ProductService {
         brand: [...new Set(brand)],
       },
       pages:
-        Math.ceil((await this.ProductsModel.find({}).count()) / filter.limit) -
+        Math.ceil(products.length / filter.limit ? filter.limit: 20) -
         1,
     };
   }

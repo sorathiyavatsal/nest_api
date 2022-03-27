@@ -36,9 +36,13 @@ import { response } from 'express';
 export class CategoryController {
   constructor(private CategoryService: CategoryService) {}
 
-  @Get('/all/:status')
+  @Get('/all')
   @UseGuards(AuthGuard('jwt'))
   @ApiQuery({ name: 'status', type: 'boolean', required: false })
+  @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
+  @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE'] })
+  @ApiQuery({ name: 'limit', type: 'string', required: false })
+  @ApiQuery({ name: 'page', type: 'string', required: false })
   async getAllCategory(@Request() request, @Response() response,@Query() query) {
     response.json(await this.CategoryService.getAllCategory(query));
   }
