@@ -75,7 +75,7 @@ export class AuthService {
         );
       }
       let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
-      return { user: userToAttempt, loginType: "registred", message: 'Verification sent to mobile' };
+      return { user: userToAttempt, loginStatus: true, message: 'Verification sent to mobile' };
     }
 
     let findroles = this.findRole(userCredentialsDto.role);
@@ -137,7 +137,7 @@ export class AuthService {
       //   user.role,
       //   false,
       // );
-      return { user: user.toObject({ versionKey: false }), loginStaus: "new user" };
+      return { user: user.toObject({ versionKey: false }), loginStaus: false };
     });
   }
 
