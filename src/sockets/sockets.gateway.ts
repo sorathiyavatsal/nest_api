@@ -15,7 +15,7 @@ export class SocketGateway {
   server: Server;
   private logger: Logger = new Logger('AppGateway');
   private ObjectId = require('mongodb').ObjectId;
-  private WEB_URL = process.env.SOCKET_WEB_URI
+  private WEB_URL = "http://3.142.255.179:5000"
 
   @SubscribeMessage('deliveryNotification')
   async handleDeliveryNotification(client: Socket, payload: any) {
@@ -23,7 +23,7 @@ export class SocketGateway {
       client.join(payload.delivery_fleet_id);
       let deliveryBoys = await axios({
         method: 'POST',
-        url: `${this.WEB_URL}api/delivery-fleet/find-near-delivery-boy`,
+        url: `${this.WEB_URL}/api/delivery-fleet/find-near-delivery-boy`,
         headers: JSON.parse(
           JSON.stringify({
             Authorization: 'Bearer ' + payload.token,
