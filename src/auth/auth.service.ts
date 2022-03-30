@@ -613,8 +613,10 @@ export class AuthService {
         });
 
         if (userDataDetails) {
+          data['userDataStatus'] = true;
           data['userData'] = userDataDetails;
         } else {
+          data['userDataStatus'] = false;
           data['userData'] = {};
         }
 

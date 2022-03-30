@@ -66,13 +66,20 @@ export class DeliveryFleetController {
   @ApiQuery({ name: 'merchantid', required: true })
   @ApiQuery({ name: 'page', type: 'number', required: false })
   @ApiQuery({ name: 'limit', type: 'number', required: false })
-  @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
-  @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE','PRICE','KEYWORD'] })
+  @ApiQuery({
+    name: 'sort_order',
+    type: 'string',
+    required: false,
+    enum: ['AESC', 'DESC'],
+  })
+  @ApiQuery({
+    name: 'sort',
+    type: 'string',
+    required: false,
+    enum: ['NAME', 'DATE', 'PRICE', 'KEYWORD'],
+  })
   async getDeliveryFleet(@Req() req, @Query() query) {
-    return await this.deliveryService.getDeliveryFleet(
-      req.user,
-      query,
-    );
+    return await this.deliveryService.getDeliveryFleet(req.user, query);
   }
 
   @Get('/:id')
@@ -94,17 +101,39 @@ export class DeliveryFleetController {
       req.user,
     );
   }
-  @Get('/users/:id')
+
+  @Get('/users/:userId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiParam({ name: 'id', required: true })
-  async updateDeliveryFleetBoy(@Param() params, @Req() req) {
-    return await this.deliveryService.updateDeliveryFleetBoy(
-      params.id,
-      req,
-      req.user,
-    );
+  @ApiQuery({
+    name: 'userType',
+    type: 'string',
+    enum: ['GENERAL', 'DA'],
+    required: true,
+  })
+  @ApiParam({ name: 'userId', type: 'string', required: true })
+  @ApiQuery({
+    name: 'status',
+    type: 'string',
+    enum: [
+      'progress',
+      'pending',
+      'complete',
+      'dispatched',
+      'delivered',
+      'cancelled',
+      'faliure',
+      'accepted',
+      'pickup',
+    ],
+    required: false,
+  })
+  @ApiQuery({ name: 'from_date', type: 'string', required: false })
+  @ApiQuery({ name: 'to_date', type: 'string', required: false })
+  async getDeliveryFleetBoy(@Query() query, @Param() params) {
+    return await this.deliveryService.getDeliveryFleetBoy(query,params.userId);
   }
+
   @Put('/update/payment/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
