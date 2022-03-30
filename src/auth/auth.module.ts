@@ -17,10 +17,12 @@ import { ApiKeyStrategy } from './auth-header-api-key.strategy';
 import { SecurityModule } from 'src/security/security.module';
 import { DeliveryFleetSchema } from 'src/delivery_fleet/deliveryfleet.model';
 import { UsersModule } from 'src/users/users.module';
+import { UserDataSchema } from 'src/user-data/user-data.model';
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
+      { name: 'UserData', schema: UserDataSchema },
       { name: 'UserVerification', schema: UserVerificationSchema },
       { name: 'UserLogin', schema: UserLoginSchema },
       { name: 'DeliveryFleet', schema: DeliveryFleetSchema },
