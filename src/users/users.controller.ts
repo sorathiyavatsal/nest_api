@@ -121,9 +121,9 @@ export class UsersController {
   ) {
     let user = await this.userService.activeAccount(
       params.id,
-      profileStatus,
-      req.user,
+      profileStatus
     );
+
     if (user && user.verifyStatus == true){
       const mailOptions = {
         name: 'ACCOUNT_APPROVED',

@@ -29,13 +29,16 @@ import { SecurityService } from '../security/security.service';
 import { TokenInstance } from 'twilio/lib/rest/api/v2010/account/token';
 import { OtpVerifyCredentialsDto } from './dto/otpVerify-credentials.dto';
 import { UsersService } from 'src/users/users.service';
+import { UserData } from 'src/user-data/user-data.model';
 const DeviceDetector = require('node-device-detector');
+let ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel('DeliveryFleet')
     private deliveryfleetModel: Model<DeliveryFleet>,
     @InjectModel('User') private userModel: Model<User>,
+    @InjectModel('UserData') private userDataModel: Model<UserData>,
     @InjectModel('UserLogin') private UserLoginModel: Model<UserLogin>,
     @InjectModel('UserVerification')
     private userVerificationModel: Model<UserVerification>,
@@ -45,7 +48,7 @@ export class AuthService {
     private configService: ConfigService,
     private securityService: SecurityService,
     private userService: UsersService,
-  ) { }
+  ) {}
   async validateApiKey(key: any) {
     return await this.securityService.validateApiKey(key);
   }
@@ -75,7 +78,11 @@ export class AuthService {
         );
       }
       let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
-      return { user: userToAttempt, loginStatus: true, message: 'Verification sent to mobile' };
+      return {
+        user: userToAttempt,
+        loginStatus: true,
+        message: 'Verification sent to mobile',
+      };
     }
 
     let findroles = this.findRole(userCredentialsDto.role);
@@ -127,7 +134,7 @@ export class AuthService {
         phone: user.phoneNumber,
         otp: newTokenVerifyEmail.otp,
         username: user.fullName,
-      }
+      };
       this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
       // this.sendEmailMiddleware.sensSMS(
@@ -161,7 +168,7 @@ export class AuthService {
       phone: user.phoneNumber,
       otp: newTokenVerifyEmail.otp,
       username: user.fullName,
-    }
+    };
     this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
     // this.sendEmailMiddleware.sensSMS(
@@ -214,7 +221,7 @@ export class AuthService {
             email: user.email,
             otp: newTokenVerifyEmail.otp,
             username: user.fullName,
-          }
+          };
           this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
           // let emailData: any = {
           //   to: user.email,
@@ -233,7 +240,7 @@ export class AuthService {
             phone: user.phoneNumber,
             otp: newTokenVerifyEmail.otp,
             username: user.fullName,
-          }
+          };
           this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
           // this.sendEmailMiddleware.sensSMS(
           //   req.headers.OsName,
@@ -404,7 +411,7 @@ export class AuthService {
             phone: userToAttempt.phoneNumber,
             otp: newTokenVerifyEmail.otp,
             username: userToAttempt.fullName,
-          }
+          };
           this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
           // this.sendEmailMiddleware.sensSMS(
@@ -421,7 +428,7 @@ export class AuthService {
             email: userToAttempt.email,
             otp: newTokenVerifyEmail.otp,
             username: userToAttempt.fullName,
-          }
+          };
           this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
           // let emailData: any = {
@@ -563,57 +570,72 @@ export class AuthService {
 
       if (!userToAttempt) throw new BadRequestException(errorMsgNotFound);
       let userToken: any = await this.userLoginToken(userToAttempt, res);
-      return this.userVerificationModel
-        .findOne({
-          createdUser: userToAttempt._id,
-          otp: emailVerifyCredentialsDto.code,
-          verifiedStatus: false,
-        })
-        .then(
-          (data) => {
-            if (data) {
-              const savedAddress = ("savedAddress" in emailVerifyCredentialsDto) ? emailVerifyCredentialsDto.savedAddress : null;
-              let userData = this.userModel
-                .findByIdAndUpdate(userToAttempt._id, {
-                  emailVerified: true,
-                  phoneVerified: true,
-                  deviceId: emailVerifyCredentialsDto.deviceId,
-                }, { upsert: true })
-                .exec();
-              if(userData && savedAddress){
-                savedAddress.forEach(address => {
-                  this.userService.addEditSavedAddress(userToAttempt._id, address, null);
-                })
-              }
-              data.verifiedStatus = true;
-              data.verifiedTime = new Date();
-              data.save();
-              if (userToAttempt.role == 'DELIVERY') {
-                return {
-                  user: data,
-                  token: userToken,
-                  message: 'Welcome Back!',
-                };
-              } else if (
-                userToAttempt.fullName &&
-                userToAttempt.fullName != ''
-              ) {
-                return {
-                  user: data,
-                  token: userToken,
-                  message: 'Welcome Back!',
-                };
-              } else {
-                return { user: data, message: 'Set up your byecom account!' };
-              }
-            } else {
-              return new BadRequestException('Verification code is invalid!');
-            }
-          },
-          (error) => {
-            return new BadRequestException('Verification code is invalid!');
-          },
-        );
+
+      let data = await this.userVerificationModel.findOne({
+        createdUser: userToAttempt._id,
+        otp: emailVerifyCredentialsDto.code,
+        verifiedStatus: false,
+      });
+
+      if (data) {
+        const savedAddress =
+          'savedAddress' in emailVerifyCredentialsDto
+            ? emailVerifyCredentialsDto.savedAddress
+            : null;
+        let userData = this.userModel
+          .findByIdAndUpdate(
+            userToAttempt._id,
+            {
+              emailVerified: true,
+              phoneVerified: true,
+              deviceId: emailVerifyCredentialsDto.deviceId,
+            },
+            { upsert: true },
+          )
+          .exec();
+        if (userData && savedAddress) {
+          savedAddress.forEach((address) => {
+            this.userService.addEditSavedAddress(
+              userToAttempt._id,
+              address,
+              null,
+            );
+          });
+        }
+        data.verifiedStatus = true;
+        data.verifiedTime = new Date();
+        data.save();
+
+        data = JSON.parse(JSON.stringify(data));
+
+        let userDataDetails = await this.userDataModel.findOne({
+          userId: ObjectId(userToAttempt._id),
+        });
+
+        if (userDataDetails) {
+          data['userData'] = userDataDetails;
+        } else {
+          data['userData'] = {};
+        }
+
+        if (userToAttempt.role == 'DELIVERY') {
+          return {
+            user: data,
+            token: userToken,
+            message: 'Welcome Back!',
+          };
+        } else if (userToAttempt.fullName && userToAttempt.fullName != '') {
+          return {
+            user: data,
+            token: userToken,
+            message: 'Welcome Back!',
+          };
+        } else {
+          return { user: data, message: 'Set up your byecom account!' };
+        }
+      } else {
+        return new BadRequestException('Verification code is invalid!');
+      }
     } catch (e) {
       return new BadRequestException('Internal server error');
     }
