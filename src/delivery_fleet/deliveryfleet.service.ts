@@ -15,6 +15,7 @@ import { DeliveryLocation } from './deliveryLocation.model';
 import { UserLogin } from 'src/core/models/userLogin.model';
 import { Notification } from 'src/notification/notification.model';
 let ObjectId = require('mongodb').ObjectId;
+var _ = require('underscore');
 @Injectable()
 export class DeliveryFleetService {
   settings: any = [];
@@ -83,23 +84,23 @@ export class DeliveryFleetService {
     const invoiceData = new this.deliveryfleetModel(dto);
 
     return await invoiceData.save().then((newInvoice: any) => {
-        new this.NotificationModel({
-            userId: ObjectId(userid),
-            type: 'GENERAL',
-            operation: "NEW FLEET REQUEST",
-            title: "Your Fleet Job",
-            content: "You have create new fleet",
-            status: "SEND",
-            extraData: {
-                notification_details: {
-                    id: ObjectId(newInvoice._id),
-                    type: 'FLEET',
-                    status: newInvoice.invoiceStatus
-                }
-            }
-        }).save()
-      
-        if (!newInvoice) {
+      new this.NotificationModel({
+        userId: ObjectId(userid),
+        type: 'GENERAL',
+        operation: 'NEW FLEET REQUEST',
+        title: 'Your Fleet Job',
+        content: 'You have create new fleet',
+        status: 'SEND',
+        extraData: {
+          notification_details: {
+            id: ObjectId(newInvoice._id),
+            type: 'FLEET',
+            status: newInvoice.invoiceStatus,
+          },
+        },
+      }).save();
+
+      if (!newInvoice) {
         return new BadRequestException('Invalid Invoice');
       } else if (
         newInvoice &&
@@ -235,6 +236,55 @@ export class DeliveryFleetService {
     });
     return deliveryBoy;
   }
+
+  async getDeliveryFleetBoy(dto: any, userId: String) {
+    let condition = {};
+
+    if (dto.userType == 'GENERAL') {
+      condition['createdBy'] = ObjectId(userId);
+    } else {
+      condition['deliveryBoy'] = ObjectId(userId);
+    }
+
+    if (dto.status) {
+      condition['invoiceStatus'] = dto.status;
+    }
+
+    var deliveryFleets = await this.deliveryfleetModel.find(condition);
+
+    if (dto.userType == 'GENERAL') {
+      if (dto.to_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.createdAt) <= new Date(dto.to_date),
+        );
+      }
+
+      if (dto.from_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.createdAt) >= new Date(dto.from_date),
+        );
+      }
+    } else {
+      if (dto.to_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.updatedAt) <= new Date(dto.to_date),
+        );
+      }
+
+      if (dto.from_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.updatedAt) >= new Date(dto.from_date),
+        );
+      }
+    }
+
+    return deliveryFleets;
+  }
+
   async updateDeliveryFleetBoy(id: any, req: any, user: any) {
     let delivery: any = await this.deliveryfleetModel
       .findOne({ _id: id })
@@ -490,13 +540,14 @@ export class DeliveryFleetService {
       { $limit: filter.limit ? parseInt(filter.limit) : 20 },
     );
 
-    var fleet = JSON.parse(JSON.stringify(await this.deliveryfleetModel.aggregate(where)));
+    var fleet = JSON.parse(
+      JSON.stringify(await this.deliveryfleetModel.aggregate(where)),
+    );
 
     return {
-        fleet: fleet,
-        pages: Math.ceil(fleet.length / filter.limit ? filter.limit: 20) -
-        1,
-    }
+      fleet: fleet,
+      pages: Math.ceil(fleet.length / filter.limit ? filter.limit : 20) - 1,
+    };
   }
 
   async getDeliveryFleetLocationData(id: any, req: any, user: any) {

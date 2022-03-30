@@ -16,7 +16,7 @@ export class EarningsController {
   @UseGuards(AuthGuard('jwt'))
   @ApiQuery({ name: 'to_date', required: false })
   @ApiQuery({ name: 'from_date', required: false })
-  @ApiQuery({ name: 'id', required: false })
+  @ApiQuery({ name: 'userId', required: false })
   async getAllOrders(@Query() query) {
     return await this.EarningsService.getAllEarning(query);
   }

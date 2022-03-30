@@ -32,12 +32,12 @@ export class UsersService {
     );
   }
 
-  async updateStatus(id: string, dto: any, user: any) {
-    return await this.usersgetModel.findById(id).then((data) => {
-      data.activeStatus = dto.activeStatus;
-      data.save();
-      return data.toObject({ versionKey: false });
-    });
+  async updateStatus(id: string, dto: any) {
+    return await this.usersgetModel.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { liveStatus: dto.liveStatus } },
+        { $upsert: true }
+      );
   }
   async findOneId(id: string) {
     return await this.usersgetModel.findById(id);

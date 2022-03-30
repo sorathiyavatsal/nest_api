@@ -58,21 +58,21 @@ export class EarningsService {
     if (EarningDto.to_date) {
       earningResult = _.filter(
         earningResult,
-        (e) => new Date(e.startDateTime) >= new Date(EarningDto.to_date),
+        (e) => new Date(e.startDateTime) <= new Date(EarningDto.to_date),
       );
     }
 
     if (EarningDto.from_date) {
       earningResult = _.filter(
         earningResult,
-        (e) => new Date(e.startDateTime) <= new Date(EarningDto.from_date),
+        (e) => new Date(e.startDateTime) >= new Date(EarningDto.from_date),
       );
     }
 
     if(EarningDto.id) {
         earningResult = _.filter(
             earningResult,
-            (e) => e.deliveryBoyId == EarningDto.id,
+            (e) => e.deliveryBoyId == EarningDto.userId,
           );
     }
 
