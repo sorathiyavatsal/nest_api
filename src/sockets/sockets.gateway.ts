@@ -14,6 +14,7 @@ export class SocketGateway {
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('AppGateway');
+  private ObjectId = require('mongodb').ObjectId;
 
   @SubscribeMessage('deliveryNotification')
   async handleDeliveryNotification(client: Socket, payload: any) {
@@ -49,13 +50,12 @@ export class SocketGateway {
         if (Array.isArray(deliveryBoys)) {
           let i = 0;
           while (i < deliveryBoys.length) {
-              console.log("data",deliveryBoys[i])
-            this.sendPushNotification(deliveryBoys[i], deliveryFleet.data);
+            this.sendPushNotification(deliveryBoys[i], deliveryFleet.data, 'Bearer ' + payload.token);
             i++;
             await delay(10000);
           }
         } else {
-          this.sendPushNotification(deliveryBoys, deliveryFleet.data);
+          this.sendPushNotification(deliveryBoys, deliveryFleet.data, 'Bearer ' + payload.token);
         }
       } else {
       }
@@ -109,7 +109,7 @@ export class SocketGateway {
     const data = await client.rooms.delete(payload.delivery_boy_id);
   }
 
-  async sendPushNotification(deliveryBoy, deliveryFleet) {
+  async sendPushNotification(deliveryBoy, deliveryFleet, token) {
     try {
       const headers = JSON.parse(
         JSON.stringify({
@@ -119,12 +119,30 @@ export class SocketGateway {
         }),
       );
 
-      console.log({
-        deliveryFleet_id: deliveryFleet._id,
-        deliveryBoy_id: deliveryBoy._id,
-        expire_time: new Date(
-          new Date(new Date().toUTCString()).getTime() + 2 * 60000,
+      await axios({
+        method: 'POST',
+        url: `http://localhost:5000/api/notification/send`,
+        headers: JSON.parse(
+          JSON.stringify({
+            Authorization: token,
+          }),
         ),
+        data: {
+            type: 'GENERAL',
+            operation: 'FLEET ASSIGNED',
+            deviceId: deliveryBoy.deviceId,
+            userId: deliveryBoy._id,
+            title: 'Your Fleet Job',
+            content: deliveryBoy.fullName + ' delivery boy accepted your delivery and some demons. text goes here and here and here',
+            status: 'SEND',
+            extraData: {
+                notification_details: {
+                    id: this.ObjectId(deliveryFleet._id),
+                    type: 'FLEET',
+                    status: 'Not Accepted'
+                }
+            }
+        },
       });
 
       const body = JSON.parse(

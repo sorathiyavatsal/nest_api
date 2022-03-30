@@ -15,6 +15,7 @@ import { DeliveryLocationSchema } from './deliveryLocation.model';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
 import { UserLoginSchema } from 'src/core/models/userLogin.model';
 import { UserVerificationSchema } from 'src/core/models/userVerification.model';
+import { NotificationSchema } from 'src/notification/notification.model';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -28,6 +29,7 @@ import { UserVerificationSchema } from 'src/core/models/userVerification.model';
       { name: 'UserVerification', schema: UserVerificationSchema },
       { name: 'DeliveryLocation', schema: DeliveryLocationSchema },
       { name: 'UserLogin', schema: UserLoginSchema },
+      { name: 'Notification', schema: NotificationSchema },
     ]),
     ConfigModule,
     HolidaysModule,

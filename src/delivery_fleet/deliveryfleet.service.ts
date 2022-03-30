@@ -7,19 +7,13 @@ import { Packagings } from '../packaging/packaging.model';
 import { Settings } from '../settings/settings.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateDeliveryFleetDto } from './dto/create-deliveryfleet';
-import { EditDeliveryFleetDto } from './dto/edit-deliveryfleet';
-import { v5 as uuidv5 } from 'uuid';
 import { DeliveryChargesDto } from './dto/deliverycharges';
-import { Buffer } from 'buffer';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
-import { throws } from 'assert';
 import { User } from '../auth/user.model';
 import { UserVerification } from 'src/core/models/userVerification.model';
 import { DeliveryLocation } from './deliveryLocation.model';
 import { UserLogin } from 'src/core/models/userLogin.model';
-import { identity } from 'rxjs';
-const GeoPoint = require('geopoint');
+import { Notification } from 'src/notification/notification.model';
 let ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class DeliveryFleetService {
@@ -39,6 +33,7 @@ export class DeliveryFleetService {
     @InjectModel('DeliveryLocation')
     private LocationModel: Model<DeliveryLocation>,
     @InjectModel('UserLogin') private UserLogin: Model<UserLogin>,
+    @InjectModel('Notification') private NotificationModel: Model<Notification>,
   ) {}
   async createnewDeliveryFleet(files: any, req: any) {
     let today = new Date();
@@ -88,7 +83,23 @@ export class DeliveryFleetService {
     const invoiceData = new this.deliveryfleetModel(dto);
 
     return await invoiceData.save().then((newInvoice: any) => {
-      if (!newInvoice) {
+        new this.NotificationModel({
+            userId: ObjectId(userid),
+            type: 'GENERAL',
+            operation: "NEW FLEET REQUEST",
+            title: "Your Fleet Job",
+            content: "You have create new fleet",
+            status: "SEND",
+            extraData: {
+                notification_details: {
+                    id: ObjectId(newInvoice._id),
+                    type: 'FLEET',
+                    status: newInvoice.invoiceStatus
+                }
+            }
+        }).save()
+      
+        if (!newInvoice) {
         return new BadRequestException('Invalid Invoice');
       } else if (
         newInvoice &&
