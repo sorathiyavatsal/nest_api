@@ -22,7 +22,7 @@ export class CatalogueService {
 
   async getFiltercatalogue(filter: any) {
     let condition = [];
-
+    let words = [];
     if (filter.catalogue) {
       condition.push({
         $match: {
@@ -31,13 +31,88 @@ export class CatalogueService {
       });
     }
 
+    if (filter.keywords) {
+      filter.keywords.split(' ').forEach((element) => {
+        words.push({
+          $match: {
+            'brand.brandName': {
+              $regex: filter.brand ? filter.brand : '',
+              $options: 'i',
+            },
+          },
+        });
+      });
+    }
+
     condition.push(
       {
         $lookup: {
           from: 'products',
-          localField: 'productId',
-          foreignField: '_id',
-          as: 'products',
+          let: { pId: '$productId' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$pId'] } } },
+            {
+              $lookup: {
+                from: 'categories',
+                let: { cId: '$category' },
+                pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$cId'] } } }],
+                as: 'category',
+              },
+            },
+            {
+              $lookup: {
+                from: 'categories',
+                let: { scId: '$storeCategory' },
+                pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$scId'] } } }],
+                as: 'storeCategory',
+              },
+            },
+            {
+              $lookup: {
+                from: 'categories',
+                let: { colId: '$collections' },
+                pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$colId'] } } }],
+                as: 'collection',
+              },
+            },
+            {
+              $lookup: {
+                from: 'brands',
+                let: { bId: '$brand' },
+                pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$bId'] } } }],
+                as: 'brand',
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+                secondary_name: 1,
+                description: 1,
+                pageTitle: 1,
+                metaOptions: 1,
+                metaDescription: 1,
+                urlHandle: 1,
+                productImage: 1,
+                keywords: 1,
+                category: { $first: '$category' },
+                storeCategory: { $first: '$storeCategory' },
+                collection: { $first: '$collection' },
+                brand: { $first: '$brand' },
+                type: 1,
+                review: 1,
+                addon: 1,
+                status: 1,
+              },
+            },
+          ],
+          as: 'product',
+        },
+      },
+      {
+        $unwind: {
+          path: '$products',
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -62,251 +137,280 @@ export class CatalogueService {
           preserveNullAndEmptyArrays: true,
         },
       },
-      { $skip: parseInt(filter.page) * parseInt(filter.limit) },
-      { $limit: parseInt(filter.limit) },
+      {
+        $project: {
+          _id: 1,
+          catalogueStatus: 1,
+          variants: '$variants.metaValue',
+          product: 1,
+          stores: { $first: '$stores' },
+          shopName: '$stores.shop_name',
+        },
+      },
+      {
+        $match: {
+          shopName: {
+            $regex: filter.store ? filter.store : '',
+            $options: 'i',
+          },
+        },
+      },
+      {
+        $match: {
+          'variants[0].salepprice': {
+            $gte: filter.minprice,
+            $lte: filter.maxprice,
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          catalogueStatus: 1,
+          variants: 1,
+          product: 1,
+          stores: 1,
+          price: '$variants[0].salepprice'
+        },
+      },
     );
 
-    var catalogue = JSON.parse(
-      JSON.stringify(await this.catalogueModel.aggregate(condition)),
-    );
+    let catalogue = await this.catalogueModel
+      .aggregate(condition)
+      .skip(filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0)
+      .limit(filter.limit ? parseInt(filter.limit) : 20);
 
-    let storeCategory = [],
-      store = [],
-      collection = [],
-      category = [],
-      brand = [],
-      catalogueProducts = [];
+    let count = await this.catalogueModel.aggregate(condition);
 
-    for (let i = 0; i < catalogue.length; i++) {
-      catalogueProducts = [];
-      catalogue[i]['variants'] = catalogue[i]['variants']['metaValue'];
-      for (let j = 0; j < catalogue[i]['products'].length; j++) {
-        var products = JSON.parse(
-          JSON.stringify(
-            await this.ProductsModel.aggregate([
-              {
-                $match: {
-                  _id: ObjectId(catalogue[i]['products'][j]['_id']),
-                },
-              },
-              {
-                $lookup: {
-                  from: 'userdatas',
-                  localField: 'store',
-                  foreignField: '_id',
-                  as: 'stores',
-                },
-              },
-              {
-                $unwind: {
-                  path: '$stores',
-                  preserveNullAndEmptyArrays: true,
-                },
-              },
-              {
-                $lookup: {
-                  from: 'categories',
-                  localField: 'storeCategory',
-                  foreignField: '_id',
-                  as: 'storeCategories',
-                },
-              },
-              {
-                $unwind: {
-                  path: '$storeCategories',
-                  preserveNullAndEmptyArrays: true,
-                },
-              },
-              {
-                $lookup: {
-                  from: 'categories',
-                  localField: 'category',
-                  foreignField: '_id',
-                  as: 'categories',
-                },
-              },
-              {
-                $unwind: {
-                  path: '$categories',
-                  preserveNullAndEmptyArrays: true,
-                },
-              },
-              {
-                $lookup: {
-                  from: 'categories',
-                  localField: 'collections',
-                  foreignField: '_id',
-                  as: 'collection',
-                },
-              },
-              {
-                $unwind: {
-                  path: '$collection',
-                  preserveNullAndEmptyArrays: true,
-                },
-              },
-              {
-                $lookup: {
-                  from: 'menus',
-                  localField: 'menu',
-                  foreignField: '_id',
-                  as: 'menu',
-                },
-              },
-              {
-                $unwind: {
-                  path: '$menu',
-                  preserveNullAndEmptyArrays: true,
-                },
-              },
-              {
-                $lookup: {
-                  from: 'brands',
-                  localField: 'brand',
-                  foreignField: '_id',
-                  as: 'brand',
-                },
-              },
-              {
-                $unwind: {
-                  path: '$brand',
-                  preserveNullAndEmptyArrays: true,
-                },
-              },
-              {
-                $lookup: {
-                  from: 'reviews',
-                  localField: 'review',
-                  foreignField: '_id',
-                  as: 'reviews',
-                },
-              },
-              {
-                $match: {
-                  name: {
-                    $regex: filter.name ? filter.name : '',
-                    $options: 'i',
-                  },
-                },
-              },
-              {
-                $match: {
-                  keywords: {
-                    $regex: filter.keyword ? filter.keyword : '',
-                    $options: 'i',
-                  },
-                },
-              },
-              {
-                $match: {
-                  'variantoptionDetails.salepprice': {
-                    $gte: filter.minprice,
-                    $lte: filter.maxprice,
-                  },
-                },
-              },
-              {
-                $match: {
-                  'stores.shop_name': {
-                    $regex: filter.store ? filter.store : '',
-                    $options: 'i',
-                  },
-                },
-              },
-              {
-                $match: {
-                  'categories.categoryName': {
-                    $regex: filter.category ? filter.category : '',
-                    $options: 'i',
-                  },
-                },
-              },
-              {
-                $match: {
-                  'collection.categoryName': {
-                    $regex: filter.collection ? filter.collection : '',
-                    $options: 'i',
-                  },
-                },
-              },
-              {
-                $match: {
-                  'brand.brandName': {
-                    $regex: filter.brand ? filter.brand : '',
-                    $options: 'i',
-                  },
-                },
-              },
-            ]),
-          ),
-        );
-
-        if(products[0]) {
-            catalogueProducts.push(products[0]);
-        }
-
-        for (let k = 0; k < products.length; k++) {
-          if (
-            products[k] &&
-            products[k]['stores'] &&
-            products[k]['stores']['shop_name']
-          ) {
-            store.push(products[k]['stores']['shop_name']);
-          }
-          if (
-            products[k] &&
-            products[k]['collection'] &&
-            products[k]['collection']['categoryName']
-          ) {
-            collection.push(products[k]['collection']['categoryName']);
-          }
-
-          if (
-            products[k] &&
-            products[k]['storeCategories'] &&
-            products[k]['storeCategories']['categoryName']
-          ) {
-            storeCategory.push(products[k]['storeCategories']['categoryName']);
-          }
-
-          if (
-            products[k] &&
-            products[k]['categories'] &&
-            products[k]['categories']['categoryName']
-          ) {
-            category.push(products[k]['categories']['categoryName']);
-          }
-          if (
-            products[k] &&
-            products[k]['brand'] &&
-            products[k]['brand']['brandName']
-          ) {
-            brand.push(products[k]['brand']['brandName']);
-          }
-        }
-      }
-      if(catalogueProducts.length == 0) {
-          delete catalogue[i]
-      } else {
-        catalogue[i]['products'] = catalogueProducts
-      }
-    }
+    let pages = count.length / (filter.limit ? parseInt(filter.limit) : 20);
 
     return {
-      catalogues: catalogue.filter(function (catalogue) {
-        return catalogue != null;
-      }),
-      filters: {
-        store: [...new Set(store)],
-        collection: [...new Set(collection)],
-        storeCategory: [...new Set(storeCategory)],
-        category: [...new Set(category)],
-        brand: [...new Set(brand)],
-      },
-      pages: Math.ceil(
-        (await this.catalogueModel.find({}).count()) / filter.limit,
-      ),
+      catalogue: catalogue,
+      pages: pages == 0 ? 0 : pages <= 1 ? 1 : Math.ceil(pages),
     };
+
+    // let storeCategory = [],
+    //   store = [],
+    //   collection = [],
+    //   category = [],
+    //   brand = [],
+    //   catalogueProducts = [];
+
+    // for (let i = 0; i < catalogue.length; i++) {
+    //   catalogueProducts = [];
+    //   catalogue[i]['variants'] = catalogue[i]['variants']['metaValue'];
+    //   for (let j = 0; j < catalogue[i]['products'].length; j++) {
+    //     var products = JSON.parse(
+    //       JSON.stringify(
+    //         await this.ProductsModel.aggregate([
+    //           {
+    //             $match: {
+    //               _id: ObjectId(catalogue[i]['products'][j]['_id']),
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'userdatas',
+    //               localField: 'store',
+    //               foreignField: '_id',
+    //               as: 'stores',
+    //             },
+    //           },
+    //           {
+    //             $unwind: {
+    //               path: '$stores',
+    //               preserveNullAndEmptyArrays: true,
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'categories',
+    //               localField: 'storeCategory',
+    //               foreignField: '_id',
+    //               as: 'storeCategories',
+    //             },
+    //           },
+    //           {
+    //             $unwind: {
+    //               path: '$storeCategories',
+    //               preserveNullAndEmptyArrays: true,
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'categories',
+    //               localField: 'category',
+    //               foreignField: '_id',
+    //               as: 'categories',
+    //             },
+    //           },
+    //           {
+    //             $unwind: {
+    //               path: '$categories',
+    //               preserveNullAndEmptyArrays: true,
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'categories',
+    //               localField: 'collections',
+    //               foreignField: '_id',
+    //               as: 'collection',
+    //             },
+    //           },
+    //           {
+    //             $unwind: {
+    //               path: '$collection',
+    //               preserveNullAndEmptyArrays: true,
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'menus',
+    //               localField: 'menu',
+    //               foreignField: '_id',
+    //               as: 'menu',
+    //             },
+    //           },
+    //           {
+    //             $unwind: {
+    //               path: '$menu',
+    //               preserveNullAndEmptyArrays: true,
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'brands',
+    //               localField: 'brand',
+    //               foreignField: '_id',
+    //               as: 'brand',
+    //             },
+    //           },
+    //           {
+    //             $unwind: {
+    //               path: '$brand',
+    //               preserveNullAndEmptyArrays: true,
+    //             },
+    //           },
+    //           {
+    //             $lookup: {
+    //               from: 'reviews',
+    //               localField: 'review',
+    //               foreignField: '_id',
+    //               as: 'reviews',
+    //             },
+    //           },
+    //           {
+    //             $match: {
+    //               name: {
+    //                 $regex: filter.name ? filter.name : '',
+    //                 $options: 'i',
+    //               },
+    //             },
+    //           },
+    //
+    //           {
+    //             $match: {
+    //               'variantoptionDetails.salepprice': {
+    //                 $gte: filter.minprice,
+    //                 $lte: filter.maxprice,
+    //               },
+    //             },
+    //           },
+    //           {
+    //             $match: {
+    //               'categories.categoryName': {
+    //                 $regex: filter.category ? filter.category : '',
+    //                 $options: 'i',
+    //               },
+    //             },
+    //           },
+    //           {
+    //             $match: {
+    //               'collection.categoryName': {
+    //                 $regex: filter.collection ? filter.collection : '',
+    //                 $options: 'i',
+    //               },
+    //             },
+    //           },
+    //           {
+    //             $match: {
+    //               'brand.brandName': {
+    //                 $regex: filter.brand ? filter.brand : '',
+    //                 $options: 'i',
+    //               },
+    //             },
+    //           },
+    //         ]),
+    //       ),
+    //     );
+
+    //     if(products[0]) {
+    //         catalogueProducts.push(products[0]);
+    //     }
+
+    //     for (let k = 0; k < products.length; k++) {
+    //       if (
+    //         products[k] &&
+    //         products[k]['stores'] &&
+    //         products[k]['stores']['shop_name']
+    //       ) {
+    //         store.push(products[k]['stores']['shop_name']);
+    //       }
+    //       if (
+    //         products[k] &&
+    //         products[k]['collection'] &&
+    //         products[k]['collection']['categoryName']
+    //       ) {
+    //         collection.push(products[k]['collection']['categoryName']);
+    //       }
+
+    //       if (
+    //         products[k] &&
+    //         products[k]['storeCategories'] &&
+    //         products[k]['storeCategories']['categoryName']
+    //       ) {
+    //         storeCategory.push(products[k]['storeCategories']['categoryName']);
+    //       }
+
+    //       if (
+    //         products[k] &&
+    //         products[k]['categories'] &&
+    //         products[k]['categories']['categoryName']
+    //       ) {
+    //         category.push(products[k]['categories']['categoryName']);
+    //       }
+    //       if (
+    //         products[k] &&
+    //         products[k]['brand'] &&
+    //         products[k]['brand']['brandName']
+    //       ) {
+    //         brand.push(products[k]['brand']['brandName']);
+    //       }
+    //     }
+    //   }
+    //   if(catalogueProducts.length == 0) {
+    //       delete catalogue[i]
+    //   } else {
+    //     catalogue[i]['products'] = catalogueProducts
+    //   }
+    // }
+
+    // return {
+    //   catalogues: catalogue.filter(function (catalogue) {
+    //     return catalogue != null;
+    //   }),
+    //   filters: {
+    //     store: [...new Set(store)],
+    //     collection: [...new Set(collection)],
+    //     storeCategory: [...new Set(storeCategory)],
+    //     category: [...new Set(category)],
+    //     brand: [...new Set(brand)],
+    //   },
+    //   pages: Math.ceil(
+    //     (await this.catalogueModel.find({}).count()) / filter.limit,
+    //   ),
+    // };
   }
 
   async getAllcatalogue() {

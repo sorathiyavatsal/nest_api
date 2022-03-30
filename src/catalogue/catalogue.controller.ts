@@ -182,8 +182,9 @@ export class CatalogueController {
   @ApiQuery({ name: 'maxprice', type: 'string', required: false })
   @ApiQuery({ name: 'keywords', type: 'string', required: false })
   @ApiQuery({ name: 'catalogue', type: 'string', required: false })
-  @ApiQuery({ name: 'page', type: 'number', required: true })
-  @ApiQuery({ name: 'limit', type: 'number', required: true })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({ name: 'loc', type: 'string', required: false })
   async getFiltercatalogue(@Request() req, @Query() query) {
     return await this.catalogueService.getFiltercatalogue(query);
   }
