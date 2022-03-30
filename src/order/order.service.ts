@@ -8,6 +8,7 @@ import { UserData } from 'src/user-data/user-data.model';
 import { PruchaseOrder } from './order.model';
 let ObjectId = require('mongodb').ObjectId;
 var _ = require('underscore');
+import axios from 'axios';
 
 @Injectable()
 export class OrderService {
@@ -165,6 +166,32 @@ export class OrderService {
       shippingId: ObjectId(orderDto.shippingId),
       paymentTransactionId: ObjectId(orderDto.paymentTransactionId),
     };
+
+    // await axios({
+    //     method: 'POST',
+    //     url: `http://localhost:5000/api/notification/send`,
+    //     headers: JSON.parse(
+    //       JSON.stringify({
+    //         Authorization: token,
+    //       }),
+    //     ),
+    //     data: {
+    //         type: 'GENERAL',
+    //         operation: 'FLEET ASSIGNED',
+    //         deviceId: deliveryBoy.deviceId,
+    //         userId: deliveryBoy._id,
+    //         title: 'Your Fleet Job',
+    //         content: deliveryBoy.fullName + ' delivery boy accepted your delivery and some demons. text goes here and here and here',
+    //         status: 'SEND',
+    //         extraData: {
+    //             notification_details: {
+    //                 id: this.ObjectId(deliveryFleet._id),
+    //                 type: 'FLEET',
+    //                 status: 'Not Accepted'
+    //             }
+    //         }
+    //     },
+    //   });
 
     return await new this.OrderModel(order).save();
   }
