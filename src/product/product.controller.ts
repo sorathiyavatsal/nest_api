@@ -54,7 +54,6 @@ export class ProductController {
   @ApiQuery({ name: 'storeCategory', type: 'string', required: false })
   @ApiQuery({ name: 'collection', type: 'string', required: false })
   @ApiQuery({ name: 'category', type: 'string', required: false })
-  @ApiQuery({ name: 'store', type: 'string', required: false })
   @ApiQuery({ name: 'brand', type: 'string', required: false })
   @ApiQuery({ name: 'name', type: 'string', required: false })
   @ApiQuery({ name: 'keywords', type: 'string', required: false })
@@ -235,9 +234,6 @@ export class ProductController {
         storeCategory: {
           type: 'string',
         },
-        store: {
-          type: 'string',
-        },
         category: {
           type: 'string',
         },
@@ -326,9 +322,6 @@ export class ProductController {
             type: 'string',
             format: 'binary',
           },
-        },
-        store: {
-          type: 'string',
         },
         storeCategory: {
           type: 'string',
