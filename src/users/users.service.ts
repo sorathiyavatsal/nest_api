@@ -23,21 +23,21 @@ export class UsersService {
       return data.toObject({ versionKey: false });
     });
   }
-  async activeAccount(id: string, dto: any, user: any) {
-    return await this.usersgetModel
-      .findOne({ _id: new ObjectId(id) })
-      .then((data) => {
-        data.verifyStatus = dto.activeStatus;
-        data.save();
-        return data.toObject({ versionKey: false });
-      });
+
+  async activeAccount(id: string, dto: any) {
+    return await this.usersgetModel.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { activeStatus: dto.activeStatus } },
+      { $upsert: true }
+    );
   }
-  async updateStatus(id: string, dto: any, user: any) {
-    return await this.usersgetModel.findById(id).then((data) => {
-      data.activeStatus = dto.activeStatus;
-      data.save();
-      return data.toObject({ versionKey: false });
-    });
+
+  async updateStatus(id: string, dto: any) {
+    return await this.usersgetModel.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { liveStatus: dto.liveStatus } },
+        { $upsert: true }
+      );
   }
   async findOneId(id: string) {
     return await this.usersgetModel.findById(id);
@@ -47,13 +47,15 @@ export class UsersService {
   }
   async getAllUsers(filter) {
     const query: any = {};
-    filter && Object.keys(filter).length && Object.keys(filter).map(x=>{
-      if(x === 'email'){
-        query.email = { $regex: filter.email || '', $options: 'i' };
-      }else{
-        query[x] = filter[x];
-      }
-    });
+    filter &&
+      Object.keys(filter).length &&
+      Object.keys(filter).map((x) => {
+        if (x === 'email') {
+          query.email = { $regex: filter.email || '', $options: 'i' };
+        } else {
+          query[x] = filter[x];
+        }
+      });
     return await this.usersgetModel.find(query);
   }
   async addEditSavedAddress(id: string, dto: any, user: any) {

@@ -35,20 +35,6 @@ export class ProductService {
       },
       {
         $lookup: {
-          from: 'userdatas',
-          localField: 'store',
-          foreignField: '_id',
-          as: 'store',
-        },
-      },
-      {
-        $unwind: {
-          path: '$store',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
           from: 'categories',
           localField: 'storeCategory',
           foreignField: '_id',
@@ -126,6 +112,12 @@ export class ProductService {
         },
       },
       {
+        $unwind: {
+          path: '$reviews',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $match: {
           name: {
             $regex: filter.name ? filter.name : '',
@@ -143,7 +135,7 @@ export class ProductService {
       },
       {
         $match: {
-          'store.shop_name': {
+          'storeCategories.categoryName': {
             $regex: filter.store ? filter.store : '',
             $options: 'i',
           },
@@ -157,14 +149,14 @@ export class ProductService {
           },
         },
       },
-      {
-        $match: {
-          'collections.categoryName': {
-            $regex: filter.collection ? filter.collection : '',
-            $options: 'i',
-          },
-        },
-      },
+    //   {
+    //     $match: {
+    //       'collections.categoryName': {
+    //         $regex: filter.collection ? filter.collection : '',
+    //         $options: 'i',
+    //       },
+    //     },
+    //   },
     ]);
   }
 
@@ -181,20 +173,6 @@ export class ProductService {
       {
         $unwind: {
           path: '$metaOptions',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'userdatas',
-          localField: 'store',
-          foreignField: '_id',
-          as: 'store',
-        },
-      },
-      {
-        $unwind: {
-          path: '$store',
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -294,7 +272,7 @@ export class ProductService {
       },
       {
         $match: {
-          'store.shop_name': {
+          'storeCategories.categoryName': {
             $regex: filter.store ? filter.store : '',
             $options: 'i',
           },
@@ -430,20 +408,6 @@ export class ProductService {
           },
           {
             $lookup: {
-              from: 'userdatas',
-              localField: 'store',
-              foreignField: '_id',
-              as: 'store',
-            },
-          },
-          {
-            $unwind: {
-              path: '$store',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
               from: 'categories',
               localField: 'storeCategory',
               foreignField: '_id',
@@ -556,7 +520,6 @@ export class ProductService {
       storeCategory: productDto.storeCategory,
       category: productDto.category,
       collections: productDto.collection,
-      store: productDto.store,
       brand: productDto.brand,
       keywords: productDto.keywords,
       type: productDto.type,
@@ -612,9 +575,6 @@ export class ProductService {
     }
     if (productDto.productImage[0]) {
       productCollection['productImage'] = productDto.productImage;
-    }
-    if (productDto.store) {
-      productCollection['store'] = productDto.store;
     }
     if (productDto.category) {
       productCollection['category'] = productDto.category;

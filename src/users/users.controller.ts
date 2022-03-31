@@ -35,6 +35,7 @@ import { profileStatusDto } from './dto/useravailable';
 import { locationUpdateDto } from './dto/locationupdate';
 import { savedAddressesDto } from './dto/savedaddresses';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
+import { userDutyStatusDto } from './dto/userduty';
 @Controller('users')
 @ApiTags('Users')
 @ApiSecurity('api_key')
@@ -47,7 +48,7 @@ export class UsersController {
   @ApiOperation({ summary: 'All users' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
+//   @Roles(Role.ADMIN)
   @Get('/all')
   @ApiQuery({ name: 'role', type: 'string', enum: Role, required: false })
   @ApiQuery({ name: 'activeStatus', type: 'boolean', required: false })
@@ -92,25 +93,24 @@ export class UsersController {
   @ApiOperation({ summary: 'delivery boy status update' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.DELIVERY)
+//   @Roles(Role.DELIVERY)
   @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Put('/delivery-boy/duty/:id')
   async deliveryBoyUpdateStatus(
     @Param() params,
-    @Body() profileStatus: profileStatusDto,
+    @Body() profileStatus: userDutyStatusDto,
     @Req() req,
   ) {
     return await this.userService.updateStatus(
       params.id,
-      profileStatus,
-      req.user,
+      profileStatus
     );
   }
   @ApiOperation({ summary: 'Admin Approved/Rejected Accounts' })
   @ApiParam({ name: 'id', required: true })
   @ApiBearerAuth()
-  @Roles(Role.ADMIN)
+//   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data', 'application/json')
   @Put('/delivery-boy/status/:id')
@@ -121,9 +121,9 @@ export class UsersController {
   ) {
     let user = await this.userService.activeAccount(
       params.id,
-      profileStatus,
-      req.user,
+      profileStatus
     );
+
     if (user && user.verifyStatus == true){
       const mailOptions = {
         name: 'ACCOUNT_APPROVED',

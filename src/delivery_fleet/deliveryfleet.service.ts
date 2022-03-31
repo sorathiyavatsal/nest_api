@@ -7,20 +7,15 @@ import { Packagings } from '../packaging/packaging.model';
 import { Settings } from '../settings/settings.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateDeliveryFleetDto } from './dto/create-deliveryfleet';
-import { EditDeliveryFleetDto } from './dto/edit-deliveryfleet';
-import { v5 as uuidv5 } from 'uuid';
 import { DeliveryChargesDto } from './dto/deliverycharges';
-import { Buffer } from 'buffer';
 import { SendEmailMiddleware } from '../core/middleware/send-email.middleware';
-import { throws } from 'assert';
 import { User } from '../auth/user.model';
 import { UserVerification } from 'src/core/models/userVerification.model';
 import { DeliveryLocation } from './deliveryLocation.model';
 import { UserLogin } from 'src/core/models/userLogin.model';
-import { identity } from 'rxjs';
-const GeoPoint = require('geopoint');
+import { Notification } from 'src/notification/notification.model';
 let ObjectId = require('mongodb').ObjectId;
+var _ = require('underscore');
 @Injectable()
 export class DeliveryFleetService {
   settings: any = [];
@@ -39,6 +34,7 @@ export class DeliveryFleetService {
     @InjectModel('DeliveryLocation')
     private LocationModel: Model<DeliveryLocation>,
     @InjectModel('UserLogin') private UserLogin: Model<UserLogin>,
+    @InjectModel('Notification') private NotificationModel: Model<Notification>,
   ) {}
   async createnewDeliveryFleet(files: any, req: any) {
     let today = new Date();
@@ -88,6 +84,22 @@ export class DeliveryFleetService {
     const invoiceData = new this.deliveryfleetModel(dto);
 
     return await invoiceData.save().then((newInvoice: any) => {
+      new this.NotificationModel({
+        userId: ObjectId(userid),
+        type: 'GENERAL',
+        operation: 'NEW FLEET REQUEST',
+        title: 'Your Fleet Job',
+        content: 'You have create new fleet',
+        status: 'SEND',
+        extraData: {
+          notification_details: {
+            id: ObjectId(newInvoice._id),
+            type: 'FLEET',
+            status: newInvoice.invoiceStatus,
+          },
+        },
+      }).save();
+
       if (!newInvoice) {
         return new BadRequestException('Invalid Invoice');
       } else if (
@@ -224,6 +236,55 @@ export class DeliveryFleetService {
     });
     return deliveryBoy;
   }
+
+  async getDeliveryFleetBoy(dto: any, userId: String) {
+    let condition = {};
+
+    if (dto.userType == 'GENERAL') {
+      condition['createdBy'] = ObjectId(userId);
+    } else {
+      condition['deliveryBoy'] = ObjectId(userId);
+    }
+
+    if (dto.status) {
+      condition['invoiceStatus'] = dto.status;
+    }
+
+    var deliveryFleets = await this.deliveryfleetModel.find(condition);
+
+    if (dto.userType == 'GENERAL') {
+      if (dto.to_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.createdAt) <= new Date(dto.to_date),
+        );
+      }
+
+      if (dto.from_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.createdAt) >= new Date(dto.from_date),
+        );
+      }
+    } else {
+      if (dto.to_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.updatedAt) <= new Date(dto.to_date),
+        );
+      }
+
+      if (dto.from_date) {
+        deliveryFleets = _.filter(
+          deliveryFleets,
+          (e) => new Date(e.updatedAt) >= new Date(dto.from_date),
+        );
+      }
+    }
+
+    return deliveryFleets;
+  }
+
   async updateDeliveryFleetBoy(id: any, req: any, user: any) {
     let delivery: any = await this.deliveryfleetModel
       .findOne({ _id: id })
@@ -302,7 +363,8 @@ export class DeliveryFleetService {
     let message: string = 'Byecom delivery';
     let data: any = await this.deliveryfleetModel
       .findOne({ _id: id })
-      .populate('userId');
+      .populate('deliveryBoy');
+
     if (!data) return new BadRequestException('Invalid Delivery Request');
 
     if (dto.invoiceStatus == 'progress') {
@@ -334,7 +396,7 @@ export class DeliveryFleetService {
       } else {
         return new BadRequestException('Invalid Otp');
       }
-    } else if (dto.invoiceStatus == 'delivered') {
+    } else if (dto.invoiceStatus == 'dispatched') {
       let verification: any = await this.userVerificationModel.findOne({
         otp: dto.otp,
         deliveryId: id,
@@ -342,7 +404,7 @@ export class DeliveryFleetService {
       });
       if (verification && !verification.verifiedStatus) {
         const mailOptions = {
-          name: 'DELIVERY_DELIVERED',
+          name: 'DELIVERY_DISPATCHED',
           type: 'SMS',
           device: req.headers.OsName || 'ANDROID',
           phone: data.userId.phoneNumber,
@@ -363,12 +425,12 @@ export class DeliveryFleetService {
       } else {
         return new BadRequestException('Invalid Otp');
       }
-    } else if (data.invoiceStatus == 'declined') {
-    } else if (data.invoiceStatus == 'cancelled') {
-    } else if (data.invoiceStatus == 'pickup') {
+    } else if (dto.invoiceStatus == 'declined') {
+    } else if (dto.invoiceStatus == 'cancelled') {
+    } else if (dto.invoiceStatus == 'pickup') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
-        data.userId._id,
+        data.deliveryBoy._id,
         'deliveryProgress',
       );
       code = code.otp;
@@ -376,7 +438,7 @@ export class DeliveryFleetService {
       const mailOptions = {
         name: 'DELIVERY_PICKUP_OTP',
         type: 'SMS',
-        device: req.headers.OsName || 'ANDROID',
+        device: 'MOBILE',
         phone: data.fromPhone,
         otp: code,
       };
@@ -384,7 +446,7 @@ export class DeliveryFleetService {
 
       // message = message + ' boy delivery pickup otp ' + code;
       // this.sendEmailMiddleware.sensSMSdelivery(req, data.fromPhone, message);
-    } else if (data.invoiceStatus == 'delivered') {
+    } else if (dto.invoiceStatus == 'delivered') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
         data.userId._id,
@@ -413,8 +475,9 @@ export class DeliveryFleetService {
       data.loc = dto.loc;
     }
     if (dto.totalHrs) data.totalHrs = dto.totalHrs;
-    this.deliveryfleetModel.findOneAndUpdate(
-      { _id: id },
+
+    await this.deliveryfleetModel.updateOne(
+      { _id: ObjectId(id) },
       { $set: dto },
       { upsert: true },
     );
@@ -479,13 +542,14 @@ export class DeliveryFleetService {
       { $limit: filter.limit ? parseInt(filter.limit) : 20 },
     );
 
-    var fleet = JSON.parse(JSON.stringify(await this.deliveryfleetModel.aggregate(where)));
+    var fleet = JSON.parse(
+      JSON.stringify(await this.deliveryfleetModel.aggregate(where)),
+    );
 
     return {
-        fleet: fleet,
-        pages: Math.ceil(fleet.length / filter.limit ? filter.limit: 20) -
-        1,
-    }
+      fleet: fleet,
+      pages: Math.ceil(fleet.length / filter.limit ? filter.limit : 20) - 1,
+    };
   }
 
   async getDeliveryFleetLocationData(id: any, req: any, user: any) {
