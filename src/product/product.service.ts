@@ -112,6 +112,12 @@ export class ProductService {
         },
       },
       {
+        $unwind: {
+          path: '$reviews',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $match: {
           name: {
             $regex: filter.name ? filter.name : '',
@@ -143,14 +149,14 @@ export class ProductService {
           },
         },
       },
-      {
-        $match: {
-          'collections.categoryName': {
-            $regex: filter.collection ? filter.collection : '',
-            $options: 'i',
-          },
-        },
-      },
+    //   {
+    //     $match: {
+    //       'collections.categoryName': {
+    //         $regex: filter.collection ? filter.collection : '',
+    //         $options: 'i',
+    //       },
+    //     },
+    //   },
     ]);
   }
 
