@@ -363,7 +363,8 @@ export class DeliveryFleetService {
     let message: string = 'Byecom delivery';
     let data: any = await this.deliveryfleetModel
       .findOne({ _id: id })
-      .populate('userId');
+      .populate('deliveryBoy');
+
     if (!data) return new BadRequestException('Invalid Delivery Request');
 
     if (dto.invoiceStatus == 'progress') {
@@ -395,7 +396,7 @@ export class DeliveryFleetService {
       } else {
         return new BadRequestException('Invalid Otp');
       }
-    } else if (dto.invoiceStatus == 'delivered') {
+    } else if (dto.invoiceStatus == 'dispatched') {
       let verification: any = await this.userVerificationModel.findOne({
         otp: dto.otp,
         deliveryId: id,
@@ -403,7 +404,7 @@ export class DeliveryFleetService {
       });
       if (verification && !verification.verifiedStatus) {
         const mailOptions = {
-          name: 'DELIVERY_DELIVERED',
+          name: 'DELIVERY_DISPATCHED',
           type: 'SMS',
           device: req.headers.OsName || 'ANDROID',
           phone: data.userId.phoneNumber,
@@ -424,12 +425,12 @@ export class DeliveryFleetService {
       } else {
         return new BadRequestException('Invalid Otp');
       }
-    } else if (data.invoiceStatus == 'declined') {
-    } else if (data.invoiceStatus == 'cancelled') {
-    } else if (data.invoiceStatus == 'pickup') {
+    } else if (dto.invoiceStatus == 'declined') {
+    } else if (dto.invoiceStatus == 'cancelled') {
+    } else if (dto.invoiceStatus == 'pickup') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
-        data.userId._id,
+        data.deliveryBoy._id,
         'deliveryProgress',
       );
       code = code.otp;
@@ -437,7 +438,7 @@ export class DeliveryFleetService {
       const mailOptions = {
         name: 'DELIVERY_PICKUP_OTP',
         type: 'SMS',
-        device: req.headers.OsName || 'ANDROID',
+        device: 'MOBILE',
         phone: data.fromPhone,
         otp: code,
       };
@@ -445,7 +446,7 @@ export class DeliveryFleetService {
 
       // message = message + ' boy delivery pickup otp ' + code;
       // this.sendEmailMiddleware.sensSMSdelivery(req, data.fromPhone, message);
-    } else if (data.invoiceStatus == 'delivered') {
+    } else if (dto.invoiceStatus == 'delivered') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
         data.userId._id,
@@ -474,8 +475,9 @@ export class DeliveryFleetService {
       data.loc = dto.loc;
     }
     if (dto.totalHrs) data.totalHrs = dto.totalHrs;
-    this.deliveryfleetModel.findOneAndUpdate(
-      { _id: id },
+
+    await this.deliveryfleetModel.updateOne(
+      { _id: ObjectId(id) },
       { $set: dto },
       { upsert: true },
     );
