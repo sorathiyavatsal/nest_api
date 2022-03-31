@@ -52,9 +52,9 @@ export class UserDataController {
     FileFieldsInterceptor(
       [
         { name: 'profile_photo', maxCount: 1 },
-        { name: 'store_license_image', maxCount: 5 },
+        { name: 'license_image', maxCount: 5 },
+        { name: 'store_no_image', maxCount: 5},
         { name: 'vehicle_image', maxCount: 5 },
-        { name: 'store_image', maxCount: 5 },
         { name: 'aadhar_card_image', maxCount: 2 },
         { name: 'gst_image', maxCount: 2 },
         { name: 'driving_card_image', maxCount: 2 },
