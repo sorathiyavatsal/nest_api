@@ -126,7 +126,7 @@ export class DeliveryFleetService {
           $geoWithin: {
             $centerSphere: [
               [parseFloat(order.fromLat), parseFloat(order.fromLng)],
-              radiusmeter / 3963.2,
+              (radiusmeter / 1000) / 6378.1,
             ],
           },
         },
