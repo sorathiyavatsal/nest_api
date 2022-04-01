@@ -316,7 +316,14 @@ export class CatalogueService {
         _id: 1,
         catalogueStatus: 1,
         variants: 1,
-        product: 1,
+        product: {
+            name: "$product.name",
+            secondary_name: "$product.secondary_name",
+            productImage: "$product.productImage",
+            type: "$product.type",
+            review: "$product.review",
+            status: "$product.status",
+        },
         stores: 1,
       },
     });
