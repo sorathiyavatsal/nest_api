@@ -128,7 +128,7 @@ export class CatalogueService {
           price: { $first: '$variants.metaValue.salepprice' },
           productName: { $first: '$product.name' },
           productSecondaryName: { $first: '$product.secondary_name' },
-          storeName: { $first: '$stores.shop_name' },
+          storeId: { $first: '$stores._id' },
           brandName: { $first: '$product.brand.brandName' },
           storeCategoryName: { $first: '$product.storeCategory.categoryName' },
           collectionName: { $first: '$product.collection.categoryName' },
@@ -163,11 +163,11 @@ export class CatalogueService {
       });
     }
 
-    if (filter.storeName) {
-      let storeName = [];
-      filter.storeName.split(',').forEach((element) => {
-        storeName.push({
-          storeName: {
+    if (filter.storeId) {
+      let storeId = [];
+      filter.storeId.split(',').forEach((element) => {
+        storeId.push({
+          storeId: {
             $regex: element,
             $options: 'i',
           },
@@ -176,7 +176,7 @@ export class CatalogueService {
 
       condition.push({
         $match: {
-          $or: storeName,
+          $or: storeId,
         },
       });
     }
@@ -317,12 +317,12 @@ export class CatalogueService {
         catalogueStatus: 1,
         variants: 1,
         product: {
-            name: "$product.name",
-            secondary_name: "$product.secondary_name",
-            productImage: "$product.productImage",
-            type: "$product.type",
-            review: "$product.review",
-            status: "$product.status",
+          name: '$product.name',
+          secondary_name: '$product.secondary_name',
+          productImage: '$product.productImage',
+          type: '$product.type',
+          review: '$product.review',
+          status: '$product.status',
         },
         stores: 1,
       },
