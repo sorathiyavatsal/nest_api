@@ -164,14 +164,6 @@ export class CatalogueController {
 
   @ApiOperation({ summary: 'Get All Catalgoue' })
   @UseGuards(AuthGuard('jwt'))
-  @Get('/all')
-  async getAllcatalogue(@Request() req) {
-    return await this.catalogueService.getAllcatalogue();
-  }
-
-  @ApiOperation({ summary: 'Get All Catalgoue' })
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/filter/data')
   @ApiQuery({ name: 'storeCategoryName', type: 'string', required: false })
   @ApiQuery({ name: 'collectionName', type: 'string', required: false })
   @ApiQuery({ name: 'categoryName', type: 'string', required: false })
@@ -188,6 +180,7 @@ export class CatalogueController {
   @ApiQuery({ name: 'lng', type: 'string', required: false })
   @ApiQuery({ name: 'radius', type: 'number', required: false })
   @ApiQuery({ name: 'review', type: 'number', required: false })
+  @Get('/all')
   async getFiltercatalogue(@Request() req, @Query() query) {
     return await this.catalogueService.getFiltercatalogue(query);
   }
