@@ -427,6 +427,9 @@ export class DeliveryFleetService {
       }
     } else if (dto.invoiceStatus == 'declined') {
     } else if (dto.invoiceStatus == 'cancelled') {
+    
+        
+
     } else if (dto.invoiceStatus == 'pickup') {
       let code: any = await this.loginVerificationSmsOtp(
         id,

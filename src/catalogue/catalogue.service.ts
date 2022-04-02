@@ -323,6 +323,10 @@ export class CatalogueService {
           type: '$product.type',
           review: '$product.review',
           status: '$product.status',
+          collection: '$product.collection.categoryName',
+          storeCategory: '$product.storeCategory.categoryName',
+          category: '$product.category.categoryName',
+          brand: '$product.brand.brandName',
         },
         stores: 1,
       },
@@ -352,35 +356,31 @@ export class CatalogueService {
       }
       if (
         catalogue[i].product &&
-        catalogue[i].product['collection'] &&
-        catalogue[i].product['collection']['categoryName']
+        catalogue[i].product['collection']
       ) {
-        collection.push(catalogue[i].product['collection']['categoryName']);
+        collection.push(catalogue[i].product['collection']);
       }
 
       if (
         catalogue[i].product &&
-        catalogue[i].product['storeCategory'] &&
-        catalogue[i].product['storeCategory']['categoryName']
+        catalogue[i].product['storeCategory']
       ) {
         storeCategory.push(
-          catalogue[i].product['storeCategory']['categoryName'],
+          catalogue[i].product['storeCategory'],
         );
       }
 
       if (
         catalogue[i].product &&
-        catalogue[i].product['category'] &&
-        catalogue[i].product['category']['categoryName']
+        catalogue[i].product['category']
       ) {
-        category.push(catalogue[i].product['category']['categoryName']);
+        category.push(catalogue[i].product['category']);
       }
       if (
         catalogue[i].product &&
-        catalogue[i].product['brand'] &&
-        catalogue[i].product['brand']['brandName']
+        catalogue[i].product['brand']
       ) {
-        brand.push(catalogue[i].product['brand']['brandName']);
+        brand.push(catalogue[i].product['brand']);
       }
     }
 

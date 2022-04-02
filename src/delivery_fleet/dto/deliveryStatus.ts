@@ -10,22 +10,30 @@ import {
 import { ApiProperty, ApiParam } from '@nestjs/swagger';
 
 export class DeliveryStatusDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty()
   invoiceStatus: string;
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
     required: false,
     description: 'OTP is need when status is progress and complete',
   })
   otp: string;
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
     description: ' you can pass when trip is complete',
     required: false,
   })
   totalHrs: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: ' you can pass when trip is complete',
+    required: false,
+  })
+  reason: string;
 }
