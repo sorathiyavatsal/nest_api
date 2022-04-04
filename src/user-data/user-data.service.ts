@@ -46,7 +46,7 @@ export class UserDataService {
           if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
           data.bank_details = {
             bank_account_holer_name:
-            profileDto.bank_details.bank_account_holer_name,
+              profileDto.bank_details.bank_account_holer_name,
             bank_account_no: profileDto.bank_details.bank_account_no,
             bank_name: profileDto.bank_details.bank_name,
             ifsc_code: profileDto.bank_details.ifsc_code,
