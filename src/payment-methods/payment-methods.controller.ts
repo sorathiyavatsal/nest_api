@@ -33,6 +33,9 @@ export class PaymentMethodsController {
             schema: {
                 type: 'object',
                 properties: {
+                    orderId: {
+                        type: 'string'
+                    },
                     amount: {
                         type: 'number'
                     }

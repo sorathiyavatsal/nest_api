@@ -39,14 +39,12 @@ export class PaymentMethodsService {
     }
 
     async verifyPaymentAndSave(req) {
-        console.log(req);
+
         let body = req.razorpay_order_id + "|" + req.razorpay_payment_id;
         var crypto = require("crypto");
         var expectedSignature = crypto.createHmac('sha256', 'AFpsju7mn5moZPQKljRqVDAp')
             .update(body.toString())
             .digest('hex');
-        console.log("sig" + req.razorpay_signature);
-        console.log("sig" + expectedSignature);
 
         if (expectedSignature === req.razorpay_signature) {
             console.log("Payment Success");
