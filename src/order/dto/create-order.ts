@@ -59,6 +59,11 @@ export class OrderDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
+  orderId: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
   consumerId: String;
 
   @IsString()
@@ -112,4 +117,9 @@ export class OrderDto {
   @IsNotEmpty()
   @ApiProperty({ required: false })
   cor: Number;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  paymentTransactionId: String;
 }

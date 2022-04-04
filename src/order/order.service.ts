@@ -50,22 +50,22 @@ export class OrderService {
       const orderCount = orders[i].orders.length;
       for (let j = 0; j < orderCount; j++) {
         var data = await this.catalogueModel.findById(orders[i].orders[j].id);
-        var store = await this.userDataModel.findById(data.storeId);
-        var product = await this.ProductsModel.findById(data.productId);
+        // var store = await this.userDataModel.findById(data.storeId);
+        // var product = await this.ProductsModel.findById(data.productId);
         orders[i].orders[j]['details'] = data;
-        orders[i].orders[j]['store'] = store;
-        orders[i].orders[j]['product'] = product;
-        if (!product.name.includes(OrderDto.name)) {
-          delete orders[i].orders[j];
+        // orders[i].orders[j]['store'] = store;
+        // orders[i].orders[j]['product'] = product;
+        // if (!product.name.includes(OrderDto.name)) {
+        //   delete orders[i].orders[j];
 
-          orders[i].orders = orders[i].orders.filter((element) => {
-            return element !== null;
-          });
+        //   orders[i].orders = orders[i].orders.filter((element) => {
+        //     return element !== null;
+        //   });
 
-          if (orders[i].orders.length <= 0) {
-            delete orders[i];
-          }
-        }
+        //   if (orders[i].orders.length <= 0) {
+        //     delete orders[i];
+        //   }
+        // }
       }
     }
 
@@ -91,6 +91,10 @@ export class OrderService {
     }
 
     return orders;
+  }
+
+  async getOrderId() {
+    return {};
   }
 
   async getOrder(orderId: String) {
@@ -123,11 +127,18 @@ export class OrderService {
     for (let i = 0; i < orders.length; i++) {
       for (let j = 0; j < orders[i].orders.length; j++) {
         var data = await this.catalogueModel.findById(orders[i].orders[j].id);
-        var store = await this.userDataModel.findById(data.storeId);
-        var product = await this.ProductsModel.findById(data.productId);
+        if (data) {
+          if (data.storeId) {
+            var store = await this.userDataModel.findById(data.storeId);
+            orders[i].orders[j]['store'] = store;
+          }
+          if (data.productId) {
+            var product = await this.ProductsModel.findById(data.productId);
+            orders[i].orders[j]['product'] = product;
+          }
+        }
+
         orders[i].orders[j]['details'] = data;
-        orders[i].orders[j]['store'] = store;
-        orders[i].orders[j]['product'] = product;
       }
     }
     return orders[0];
@@ -154,7 +165,8 @@ export class OrderService {
     }
 
     let order = {
-      consumerId: orderDto.consumerId,
+      _id: ObjectId(orderDto.orderId),
+      consumerId: ObjectId(orderDto.consumerId),
       orderType: orderDto.orderType,
       orderDate: orderDto.orderDate,
       orders: orders_details,

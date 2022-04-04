@@ -21,6 +21,8 @@ import {
 import { Roles } from 'src/auth/roles.decorator';
 import { OrderService } from './order.service';
 import { OrderDto } from './dto/create-order';
+let ObjectId = require('mongodb').ObjectId;
+
 @Controller('order')
 @ApiTags('Order')
 @ApiBearerAuth()
@@ -38,11 +40,19 @@ export class OrderController {
     return await this.OrderService.getAllOrder(query);
   }
 
-  @ApiParam({ name: 'id', required: true })
-  @Get('/:id')
+  @ApiQuery({ name: 'id', required: true })
+  @Get('/')
   @UseGuards(AuthGuard('jwt'))
-  async getOrder(@Param() params, @Request() request: any) {
-    return await this.OrderService.getOrder(params.id);
+  async getOrder(@Query() query, @Request() request: any) {
+    return await this.OrderService.getOrder(query.id);
+  }
+
+  @Get('/orderId')
+  async getOrderId(@Request() request: any) {
+      console.log("test")
+    return {
+        orderId: ObjectId(),
+    };
   }
 
   @Post('/add')

@@ -2,14 +2,17 @@ import { Module } from '@nestjs/common';
 import { PaymentMethodsController } from './payment-methods.controller';
 import { PaymentMethodsService } from './payment-methods.service';
 import { RazorpayModule } from 'nestjs-razorpay';
+import { PaymentMethodsSchema } from './payment-methods.model';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-//   imports: [
-//     RazorpayModule.forRoot({
-//       key_id: process.env.RAZORPAY_ID,
-//       key_secret: process.env.RAZORPAY_SECRET_KEY,
-//     }),
-//   ],
+  imports: [
+    RazorpayModule.forRoot({
+      key_id: 'rzp_test_VF8nzkfCPp8Rr7',
+      key_secret: 'AFpsju7mn5moZPQKljRqVDAp',
+    }),
+    MongooseModule.forFeature([{ name: 'PaymentMethods', schema: PaymentMethodsSchema }])
+  ],
   controllers: [PaymentMethodsController],
   providers: [PaymentMethodsService],
 })
