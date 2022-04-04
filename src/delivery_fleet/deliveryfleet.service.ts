@@ -126,7 +126,7 @@ export class DeliveryFleetService {
           $geoWithin: {
             $centerSphere: [
               [parseFloat(order.fromLat), parseFloat(order.fromLng)],
-              radiusmeter / 3963.2,
+              (radiusmeter / 1000) / 6378.1,
             ],
           },
         },
@@ -427,6 +427,9 @@ export class DeliveryFleetService {
       }
     } else if (dto.invoiceStatus == 'declined') {
     } else if (dto.invoiceStatus == 'cancelled') {
+    
+        
+
     } else if (dto.invoiceStatus == 'pickup') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
