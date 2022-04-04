@@ -41,7 +41,7 @@ export class OrderController {
   }
 
   @ApiQuery({ name: 'id', required: true })
-  @Get('/:id')
+  @Get('/')
   @UseGuards(AuthGuard('jwt'))
   async getOrder(@Query() query, @Request() request: any) {
     return await this.OrderService.getOrder(query.id);

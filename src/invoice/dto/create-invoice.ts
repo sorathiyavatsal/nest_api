@@ -64,9 +64,4 @@ export class InvoiceDistanceDto {
   @IsNotEmpty()
   @ApiProperty()
   charges: Number;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  orderId: ObjectId;
 }
