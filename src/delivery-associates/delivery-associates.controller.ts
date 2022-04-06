@@ -13,17 +13,17 @@ export class DeliveryAssociatesController {
 
   @Get('/')
   @ApiQuery({ name: 'partnerId', type: 'string', required: false })
-  @ApiQuery({ name: 'work_load', type: 'string', required: false })
-  @ApiQuery({ name: 'vehical_type', type: 'string', required: false })
-  @ApiQuery({ name: 'vehical_number', type: 'string', required: false })
-  @ApiQuery({ name: 'job_status', type: 'string', required: false })
-  @ApiQuery({ name: 'duty_status', type: 'string', required: false })
+  @ApiQuery({ name: 'work_load', type: 'string', enum: ['FULLTIME','PARTTIME'], required: false })
+  @ApiQuery({ name: 'vehicle_type', type: 'string', required: false })
+  @ApiQuery({ name: 'vehicle_number', type: 'string', required: false })
+  @ApiQuery({ name: 'job_status', type: 'boolean', required: false })
+  @ApiQuery({ name: 'duty_status', type: 'boolean', required: false })
   @ApiQuery({ name: 'limit', type: 'string', required: false })
   @ApiQuery({ name: 'page', type: 'string', required: false })
   @UseGuards(AuthGuard('jwt'))
   async getAllDeliveryAssociates(@Query() query, @Response() response) {
     const data =
-      await this.deliveryAssociatesService.getAllDeliveryAssociates();
+      await this.deliveryAssociatesService.getAllDeliveryAssociates(query);
     response.json(data);
   }
 }

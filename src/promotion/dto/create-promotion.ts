@@ -67,17 +67,6 @@ import {
     @IsNumber()
     @ApiPropertyOptional()
     da_hours_worked_month: number;
-    // @IsObject()
-    // @ApiProperty()
-    // merchant: object;
-
-    // @IsObject()
-    // @ApiProperty()
-    // consumer: object;
-
-    // @IsObject()
-    // @ApiProperty()
-    // da: object;
 
     @IsString()
     @ApiProperty()
@@ -92,7 +81,6 @@ import {
     @ApiProperty()
     section: string;
 
-
     @IsString()
     @ApiProperty()
     start_date: string;
@@ -100,21 +88,5 @@ import {
     @IsString()
     @ApiProperty()
     end_date: string;
-
-    
-
-    // @IsObject()
-    // @ApiProperty()
-    // placement: object;
-
-
-
-    // @IsArray()
-    // @ApiProperty()
-    // DAs: Array<string>;
-
-    // @IsArray()
-    // @ApiProperty()
-    // AllocatedZipCodes: Array<number>;
   }
   
