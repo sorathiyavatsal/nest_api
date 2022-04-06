@@ -28,16 +28,16 @@ export class UsersService {
     return await this.usersgetModel.findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: { activeStatus: dto.activeStatus } },
-      { $upsert: true }
+      { $upsert: true },
     );
   }
 
   async updateStatus(id: string, dto: any) {
     return await this.usersgetModel.findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { liveStatus: dto.liveStatus } },
-        { $upsert: true }
-      );
+      { _id: new ObjectId(id) },
+      { $set: { liveStatus: dto.liveStatus } },
+      { $upsert: true },
+    );
   }
   async findOneId(id: string) {
     return await this.usersgetModel.findById(id);
@@ -88,50 +88,59 @@ export class UsersService {
   }
 
   async addprofile(dto: any, user: any) {
-      let data = {}
-      if(!dto["savedAddress"]){
-        data["savedAddress"] = []
-      }
+    let data = {};
+    if (!dto['savedAddress']) {
+      data['savedAddress'] = [];
+    }
+    if (dto.email) {
+      data['email'] = dto.email;
+    }
+    if (dto.emailVerified) {
+      data['emailVerified'] = dto.emailVerified;
+    }
+    if (dto.gender) {
+      data['gender'] = dto.gender;
+    }
+    if (dto.dateofbirth) {
+      data['dateofbirth'] = dto.dateofbirth;
+    }
+    if (dto.profilePhoto) {
+      data['profilePhoto'] = dto.profilePhoto;
+    }
+    if (dto.address) {
+      data['address'] = dto.address;
+    }
+    if (dto.phoneNumber) {
+      data['phoneNumber'] = dto.phoneNumber;
+    }
+    if (dto.fullName) {
+      data['fullName'] = dto.fullName;
+    }
+    if (dto.role) {
+      data['role'] = dto.role;
+    }
+    if (dto.liveStatus) {
+      data['liveStatus'] = dto.liveStatus;
+    }
+    if (dto.phoneVerified) {
+      data['phoneVerified'] = dto.phoneVerified;
+    }
+    if (dto.permissions) {
+      data['permissions'] = dto.permissions;
+    }
+    if (dto.loc) {
+      data['loc'] = dto.loc;
+    }
+    if (dto.activeStatus) {
+      data['activeStatus'] = dto.activeStatus;
+    }
+    if (dto.verifyStatus) {
+      data['verifyStatus'] = dto.verifyStatus;
+    }
 
-        if(dto.email) {
-            data['email'] = dto.email
-        }
-        if(dto.emailVerified) {
-            data["emailVerified"] = dto.emailVerified
-        }
-        if(dto.gender){
-            
-        }
-        
-        if(dto.dateofbirth) {
+    data['password'] = Math.floor(Math.random() * 1000000000).toString();
 
-        }
-        
-        if(dto.profilePhoto) {
-
-        }
-        if(dto.address) {
-
-        }
-        if(dto.phoneNumber) {
-
-        }
-        // fullName
-        // role
-        // userId
-        // deviceId
-        // verifyType
-        // liveStatus
-        // phoneVerified
-        // permissions
-        // loc
-        // activeStatus
-        // password
-        // verifyStatus
-        // savedAddress
-    
-    dto["password"] = Math.floor(Math.random() * 1000000000).toString()
-    const userdata = await new this.usersgetModel(dto).save()
+    const userdata = await new this.usersgetModel(data).save();
 
     return userdata;
   }

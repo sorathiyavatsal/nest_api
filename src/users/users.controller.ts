@@ -208,8 +208,6 @@ export class UsersController {
         phoneNumber: { type: 'string' },
         fullName: { type: 'string' },
         role: { type: 'string' },
-        userId: {type: 'string',description: '_id from the  add user response api',},
-        deviceId: { type: 'string' },
         verifyType: { type: 'string' },
         liveStatus: { type: 'boolean' },
         phoneVerified: { type: 'boolean' },
@@ -217,7 +215,6 @@ export class UsersController {
         loc: { type: 'array' },
         activeStatus: { type: 'boolean' },
         verifyStatus: { type: 'boolean' },
-        savedAddress: { type: 'object' },
       },
     },
   })
