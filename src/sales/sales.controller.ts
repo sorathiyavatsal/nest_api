@@ -36,6 +36,12 @@ export class SalesController {
     summary: "get All Sales"
   })
   @ApiQuery({ name: 'storeId', required: false })
+  @ApiQuery({ name: 'invoiceId', type: 'string', required: false })
+  @ApiQuery({ name: 'saleminAmount', type: 'number', required: false })
+  @ApiQuery({ name: 'salemaxAmount', type: 'number', required: false })
+  @ApiQuery({ name: 'settlmentStatus', type: 'string', required: false })
+  @ApiQuery({ name: 'limit', type: 'string', required: false })
+  @ApiQuery({ name: 'page', type: 'string', required: false })
   async getAllSales(@Request() request, @Query() query) {
     return await this.salesService.getAllSales(query?.storeId || null);
   }

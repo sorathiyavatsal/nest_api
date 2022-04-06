@@ -22,6 +22,13 @@ export class NotificationController {
   @UseGuards(AuthGuard('jwt'))
   @Get('/all')
   @ApiQuery({ name: 'userId', type: 'string', required: false })
+  @ApiQuery({ name: 'operation', type: 'string', required: false })
+  @ApiQuery({ name: 'type', type: 'number', required: false })
+  @ApiQuery({ name: 'status', type: 'number', required: false })
+  @ApiQuery({ name: 'fromDate', type: 'string', required: false })
+  @ApiQuery({ name: 'toDate', type: 'string', required: false })
+  @ApiQuery({ name: 'limit', type: 'string', required: false })
+  @ApiQuery({ name: 'page', type: 'string', required: false })
   async getAllcatalogue(@Request() req, @Query() query) {
     return await this.notificationService.getAllnotification(query);
   }

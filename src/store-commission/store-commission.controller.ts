@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   Request,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -14,6 +15,7 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -30,12 +32,19 @@ export class StoreCommissionController {
   constructor(private storeCommissionService: StoreCommissionService) { }
 
   @Get('/')
+  
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: "get All Store Commissions"
   })
-  async getAllStoreCommissions(@Request() request) {
+  @ApiQuery({ name: 'categoryName', type: 'string', required: false })
+  @ApiQuery({ name: 'planCode', type: 'number', required: false })
+  @ApiQuery({ name: 'applicationType', type: 'number', required: false })
+  @ApiQuery({ name: 'comissionType', type: 'string', required: false })
+  @ApiQuery({ name: 'limit', type: 'string', required: false })
+  @ApiQuery({ name: 'page', type: 'string', required: false })
+  async getAllStoreCommissions(@Request() request, @Query() query) {
     return await this.storeCommissionService.getAllStoreCommissions();
   }
 

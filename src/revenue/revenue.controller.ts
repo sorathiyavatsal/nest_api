@@ -4,6 +4,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import {
   ApiParam,
   ApiSecurity,
   ApiTags,
+  ApiQuery
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'src/auth/role.enum';
@@ -33,7 +35,7 @@ export class RevenueController {
   @ApiOperation({
     summary: "get All revenues"
   })
-  async getAllRevenues(@Request() request) {
+  async getAllRevenues(@Request() request, @Query() query) {
     return await this.revenueService.getAllRevenues();
   }
 
