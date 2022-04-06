@@ -13,7 +13,7 @@ export class DeliveryAssociatesController {
 
   @Get('/')
   @ApiQuery({ name: 'partnerId', type: 'string', required: false })
-  @ApiQuery({ name: 'work_load', type: 'string', enum: ['FULLTIME','PARTTIME'], required: false })
+  @ApiQuery({ name: 'work_load', type: 'string', description: '', required: false })
   @ApiQuery({ name: 'vehicle_type', type: 'string', required: false })
   @ApiQuery({ name: 'vehicle_number', type: 'string', required: false })
   @ApiQuery({ name: 'job_status', type: 'boolean', required: false })

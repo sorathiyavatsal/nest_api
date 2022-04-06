@@ -86,4 +86,53 @@ export class UsersService {
         return data.toObject({ versionKey: false });
       });
   }
+
+  async addprofile(dto: any, user: any) {
+      let data = {}
+      if(!dto["savedAddress"]){
+        data["savedAddress"] = []
+      }
+
+        if(dto.email) {
+            data['email'] = dto.email
+        }
+        if(dto.emailVerified) {
+            data["emailVerified"] = dto.emailVerified
+        }
+        if(dto.gender){
+            
+        }
+        
+        if(dto.dateofbirth) {
+
+        }
+        
+        if(dto.profilePhoto) {
+
+        }
+        if(dto.address) {
+
+        }
+        if(dto.phoneNumber) {
+
+        }
+        // fullName
+        // role
+        // userId
+        // deviceId
+        // verifyType
+        // liveStatus
+        // phoneVerified
+        // permissions
+        // loc
+        // activeStatus
+        // password
+        // verifyStatus
+        // savedAddress
+    
+    dto["password"] = Math.floor(Math.random() * 1000000000).toString()
+    const userdata = await new this.usersgetModel(dto).save()
+
+    return userdata;
+  }
 }

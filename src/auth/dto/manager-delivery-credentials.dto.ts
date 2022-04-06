@@ -12,7 +12,7 @@ export class MangerDeliveryCredentialsDto {
 
   @IsString()
   @ApiProperty({
-    description: 'Merchant App = MERCHANT , Delivery App = DELIVERY',
+    description: 'Merchant App = MERCHANT , Delivery App = DELIVERY, Marketplace = CONSUMER',
   })
   role: string;
 

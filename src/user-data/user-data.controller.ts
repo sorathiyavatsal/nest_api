@@ -53,13 +53,13 @@ export class UserDataController {
       [
         { name: 'profile_photo', maxCount: 1 },
         { name: 'store_license_image', maxCount: 5 },
-        { name: 'store_image', maxCount: 5},
+        { name: 'store_image', maxCount: 5 },
         { name: 'vehicle_image', maxCount: 5 },
         { name: 'aadhar_card_image', maxCount: 2 },
         { name: 'gst_image', maxCount: 2 },
         { name: 'driving_card_image', maxCount: 2 },
         { name: 'pan_card_image', maxCount: 2 },
-        { name: 'food_license_image', maxCount: 2 }
+        { name: 'food_license_image', maxCount: 2 },
       ],
       {
         storage: diskStorage({
@@ -133,7 +133,11 @@ export class UserDataController {
         },
         job_type: {
           type: 'string',
-          description: "you can pass any one the value ['FULLTIME','PARTTIME']",
+          description: "you can pass any one the id",
+        },
+        store_comission: {
+          type: 'string',
+          description: "you can pass any one the id",
         },
         store_license: {
           type: 'string',
@@ -225,49 +229,49 @@ export class UserDataController {
       }
       files.profile_photo = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.store_license_image) {
       for (let i = 0; i < files.store_license_image.length; i++) {
         responsedata.push(files.store_license_image[i].path);
       }
       files.store_license_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.vehicle_image) {
       for (let i = 0; i < files.vehicle_image.length; i++) {
         responsedata.push(files.vehicle_image[i].path);
       }
       files.vehicle_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.store_image) {
       for (let i = 0; i < files.store_image.length; i++) {
         responsedata.push(files.store_image[i].path);
       }
       files.store_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.aadhar_card_image) {
       for (let i = 0; i < files.aadhar_card_image.length; i++) {
         responsedata.push(files.aadhar_card_image[i].path);
       }
       files.aadhar_card_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.gst_image) {
       for (let i = 0; i < files.gst_image.length; i++) {
         responsedata.push(files.gst_image[i].path);
       }
       files.gst_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.driving_card_image) {
       for (let i = 0; i < files.driving_card_image.length; i++) {
         responsedata.push(files.driving_card_image[i].path);
       }
       files.driving_card_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.pan_card_image) {
       for (let i = 0; i < files.pan_card_image.length; i++) {
         responsedata.push(files.pan_card_image[i].path);
@@ -281,6 +285,7 @@ export class UserDataController {
       request.user,
     );
   }
+  
   @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'id', required: true })
   @Put('/update/:id')
@@ -295,7 +300,7 @@ export class UserDataController {
         { name: 'gst_image', maxCount: 2 },
         { name: 'driving_card_image', maxCount: 2 },
         { name: 'pan_card_image', maxCount: 2 },
-        { name: 'food_license_image', maxCount: 5}
+        { name: 'food_license_image', maxCount: 5 },
       ],
       {
         storage: diskStorage({
@@ -461,49 +466,49 @@ export class UserDataController {
       }
       files.profile_photo = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.store_license_image) {
       for (let i = 0; i < files.store_license_image.length; i++) {
         responsedata.push(files.store_license_image[i].path);
       }
       files.store_license_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.vehicle_image) {
       for (let i = 0; i < files.vehicle_image.length; i++) {
         responsedata.push(files.vehicle_image[i].path);
       }
       files.vehicle_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.store_image) {
       for (let i = 0; i < files.store_image.length; i++) {
         responsedata.push(files.store_image[i].path);
       }
       files.store_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.aadhar_card_image) {
       for (let i = 0; i < files.aadhar_card_image.length; i++) {
         responsedata.push(files.aadhar_card_image[i].path);
       }
       files.aadhar_card_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.gst_image) {
       for (let i = 0; i < files.gst_image.length; i++) {
         responsedata.push(files.gst_image[i].path);
       }
       files.gst_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.driving_card_image) {
       for (let i = 0; i < files.driving_card_image.length; i++) {
         responsedata.push(files.driving_card_image[i].path);
       }
       files.driving_card_image = responsedata;
     }
-    responsedata = []
+    responsedata = [];
     if (files.pan_card_image) {
       for (let i = 0; i < files.pan_card_image.length; i++) {
         responsedata.push(files.pan_card_image[i].path);

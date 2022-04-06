@@ -232,6 +232,7 @@ export class DeliveryFleetController {
         activeStatus: { type: 'boolean' },
         distance: { type: 'string' },
         price: { type: 'number' },
+        createdBy: { type: 'string' },
         image: {
           type: 'array',
           items: {

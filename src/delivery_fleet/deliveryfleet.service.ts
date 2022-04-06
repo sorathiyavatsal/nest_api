@@ -126,7 +126,7 @@ export class DeliveryFleetService {
           $geoWithin: {
             $centerSphere: [
               [parseFloat(order.fromLat), parseFloat(order.fromLng)],
-              (radiusmeter / 1000) / 6378.1,
+              radiusmeter / 1000 / 6378.1,
             ],
           },
         },
@@ -427,9 +427,6 @@ export class DeliveryFleetService {
       }
     } else if (dto.invoiceStatus == 'declined') {
     } else if (dto.invoiceStatus == 'cancelled') {
-    
-        
-
     } else if (dto.invoiceStatus == 'pickup') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
@@ -487,13 +484,19 @@ export class DeliveryFleetService {
     data.invoiceStatus = dto.invoiceStatus;
     return data;
   }
+
   async updateDeliveryFleet(id: any, files: any, req: any) {
     let dto = req.body;
     let userid: string;
     if (req.user && req.user.user._id) {
       userid = req.user.user._id;
-      dto.createdBy = userid;
-      dto.modifiedBy = userid;
+      const checkCreatedById = await this.deliveryfleetModel.findOne({
+        _id: id,
+      });
+      if (checkCreatedById.createdBy) {
+        dto.createdBy = userid;
+      }
+      dto.modifiedBy = dto.createdBy;
     }
     if (files && files.length > 0) {
       dto.goodsPhotos = files;

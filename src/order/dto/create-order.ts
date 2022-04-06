@@ -71,6 +71,11 @@ export class OrderDto {
   @ApiProperty({ enum: ['PRODUCT', 'FLEET'] })
   orderType: String;
 
+//   @IsString()
+//   @IsNotEmpty()
+//   @ApiProperty({ enum: ['PRODUCT', 'FLEET'] })
+//   orderStatus: String;
+
   @IsDate()
   @IsNotEmpty()
   @ApiProperty()

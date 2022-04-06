@@ -4,10 +4,10 @@ let Schema = mongoose.Types,
   ObjectId = Schema.ObjectId;
 export const PromotionSchema = new mongoose.Schema(
   {
-    name: {
+    network: {
       type: String,
     },
-    description: {
+    type: {
       type: String,
     },
     image: {
@@ -16,13 +16,9 @@ export const PromotionSchema = new mongoose.Schema(
     target: {
       type: Object,
     },
-    promotion_for_coupon: {
+    ads: {
       type: String,
     },
-    type: {
-      type: String,
-    },
-    
     placement: { type: Object },
     date: { type: Object },
     createdBy: {
@@ -43,7 +39,7 @@ export interface Promotion extends mongoose.Document {
   description: string,
   image: string,
   target: Array<object>,
-  promotion_for_coupon: string,
+  ads: [],
   type: string,
   placement: object,
   date: object,

@@ -127,6 +127,8 @@ export class UserDataService {
       if (files?.aadhar_card_image)
         data.aadhar_card_image = files.aadhar_card_image;
       if (files?.pan_card_image) data.pan_card_image = files.pan_card_image;
+      if (profileDto.store_comission)
+        data.store_comission = profileDto.store_comission;
       data.bank_details = {
         bank_account_holer_name:
           profileDto.bank_details.bank_account_holer_name,
@@ -150,7 +152,7 @@ export class UserDataService {
       data.pancard_no = profileDto.pancard_no;
       data.driving_card = profileDto.driving_card;
       data.vehicle_type = profileDto.vehicle_type;
-      data.job_type = profileDto.job_type;
+      if (profileDto.job_type) data.job_type = profileDto.job_type;
       if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
       if (files?.vehicle_image) data.vehicle_image = files.vehicle_image;
       if (files?.aadhar_card_image)

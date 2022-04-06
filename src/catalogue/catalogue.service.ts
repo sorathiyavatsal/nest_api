@@ -317,6 +317,7 @@ export class CatalogueService {
         catalogueStatus: 1,
         variants: 1,
         product: {
+          _id: '$product._id',
           name: '$product.name',
           secondary_name: '$product.secondary_name',
           productImage: '$product.productImage',
@@ -354,32 +355,18 @@ export class CatalogueService {
       ) {
         store.push(catalogue[i]['stores']['shop_name']);
       }
-      if (
-        catalogue[i].product &&
-        catalogue[i].product['collection']
-      ) {
+      if (catalogue[i].product && catalogue[i].product['collection']) {
         collection.push(catalogue[i].product['collection']);
       }
 
-      if (
-        catalogue[i].product &&
-        catalogue[i].product['storeCategory']
-      ) {
-        storeCategory.push(
-          catalogue[i].product['storeCategory'],
-        );
+      if (catalogue[i].product && catalogue[i].product['storeCategory']) {
+        storeCategory.push(catalogue[i].product['storeCategory']);
       }
 
-      if (
-        catalogue[i].product &&
-        catalogue[i].product['category']
-      ) {
+      if (catalogue[i].product && catalogue[i].product['category']) {
         category.push(catalogue[i].product['category']);
       }
-      if (
-        catalogue[i].product &&
-        catalogue[i].product['brand']
-      ) {
+      if (catalogue[i].product && catalogue[i].product['brand']) {
         brand.push(catalogue[i].product['brand']);
       }
     }
@@ -455,7 +442,6 @@ export class CatalogueService {
     if (product.productid) {
       condition['productId'] = ObjectId(product.productid);
     }
-    condition['storeId'] = ObjectId(product.storeid);
 
     var catalogue = JSON.parse(
       JSON.stringify(
@@ -488,6 +474,11 @@ export class CatalogueService {
             $unwind: {
               path: '$options',
               preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $match: {
+              storeId: ObjectId(product.storeid),
             },
           },
           {
