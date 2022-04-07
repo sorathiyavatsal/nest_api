@@ -38,7 +38,7 @@ export const UserDataSchema = new mongoose.Schema(
       type: Array,
     },
     store_image: {
-        type: String
+        type: Array
     },
     adharcard_no: {
       type: String,
@@ -155,7 +155,7 @@ export interface UserData extends mongoose.Document {
   gender: string;
   dob: Date;
   fullName: string;
-  store_image: string;
+  store_image: [];
   shop_name: string;
   shop_address: string;
   sell_items: [];

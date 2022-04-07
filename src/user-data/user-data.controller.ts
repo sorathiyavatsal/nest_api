@@ -53,7 +53,7 @@ export class UserDataController {
       [
         { name: 'profile_photo', maxCount: 1 },
         { name: 'store_license_image', maxCount: 5 },
-        { name: 'store_image', maxCount: 5 },
+        { name: 'store_image', maxCount: 2 },
         { name: 'vehicle_image', maxCount: 5 },
         { name: 'aadhar_card_image', maxCount: 2 },
         { name: 'gst_image', maxCount: 2 },
@@ -133,11 +133,11 @@ export class UserDataController {
         },
         job_type: {
           type: 'string',
-          description: "you can pass any one the id",
+          description: 'you can pass any one the id',
         },
         store_comission: {
           type: 'string',
-          description: "you can pass any one the id",
+          description: 'you can pass any one the id',
         },
         store_license: {
           type: 'string',
@@ -216,6 +216,9 @@ export class UserDataController {
           type: 'string',
           description: 'user collection Id and required only DA profile',
         },
+        store_timing: {
+          type: 'array',
+        },
       },
     },
   })
@@ -285,7 +288,7 @@ export class UserDataController {
       request.user,
     );
   }
-  
+
   @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'id', required: true })
   @Put('/update/:id')
