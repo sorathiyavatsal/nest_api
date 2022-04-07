@@ -119,6 +119,8 @@ export class UserDataService {
       data.gst_no = profileDto.gst_no;
       data.gst_image = profileDto.gst_image;
       data.food_license = profileDto.food_license;
+      if (files?.store_image)
+        data.store_image = files.store_image;
       if (files?.food_license_image)
         data.food_license_image = files.food_license_image;
       if (files?.profile_photo) data.profile_photo = files.profile_photo[0];
