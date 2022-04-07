@@ -125,6 +125,7 @@ export class CatalogueService {
           shopName: { $first: '$stores.shop_name' },
           loc: { $first: '$stores.shop_Lat_Long' },
           keywords: { $first: '$product.keywords' },
+          productImage: '$product.productImage',
           price: { $first: '$variants.metaValue.salepprice' },
           productName: { $first: '$product.name' },
           productSecondaryName: { $first: '$product.secondary_name' },
