@@ -73,7 +73,7 @@ export class CategoryService {
           store: category[i]._id,
         }).count();
       }
-      if (category[i].categoryType == 'Porduct') {
+      if (category[i].categoryType == 'Product') {
         category[i]['products'] = await this.ProductsModel.find({
           category: category[i]._id,
         }).count();
