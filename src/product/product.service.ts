@@ -149,20 +149,21 @@ export class ProductService {
           },
         },
       },
-    //   {
-    //     $match: {
-    //       'collections.categoryName': {
-    //         $regex: filter.collection ? filter.collection : '',
-    //         $options: 'i',
-    //       },
-    //     },
-    //   },
+      //   {
+      //     $match: {
+      //       'collections.categoryName': {
+      //         $regex: filter.collection ? filter.collection : '',
+      //         $options: 'i',
+      //       },
+      //     },
+      //   },
     ]);
   }
 
   async getFilterProducts(filter: any) {
-    let condition = []
-    condition.push({
+    let condition = [];
+    condition.push(
+      {
         $lookup: {
           from: 'metadatas',
           localField: 'metaOptions',
@@ -294,37 +295,38 @@ export class ProductService {
           },
         },
       },
-      { $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0 },
-      { $limit: filter.limit ? parseInt(filter.limit) : 20 })
+      {
+        $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
+      },
+      { $limit: filter.limit ? parseInt(filter.limit) : 20 },
+    );
 
-      if (filter.sort) {
-        if (filter.sort == 'DATE') {
-          condition.push({
-            $sort: {
-              createdAt: filter.sort_order == 'AESC' ? 1 : -1,
-            },
-          });
-        }
-        if (filter.sort == 'NAME') {
-          condition.push({
-            $sort: {
-              name: filter.sort_order == 'AESC' ? 1 : -1,
-            },
-          });
-        }
-        // if (filter.sort == 'PRICE') {
-        //   condition.push({
-        //     $sort: {
-        //       name: filter.sort_order == 'AESC' ? 1 : -1,
-        //     },
-        //   });
-        // }
+    if (filter.sort) {
+      if (filter.sort == 'DATE') {
+        condition.push({
+          $sort: {
+            createdAt: filter.sort_order == 'AESC' ? 1 : -1,
+          },
+        });
       }
+      if (filter.sort == 'NAME') {
+        condition.push({
+          $sort: {
+            name: filter.sort_order == 'AESC' ? 1 : -1,
+          },
+        });
+      }
+      // if (filter.sort == 'PRICE') {
+      //   condition.push({
+      //     $sort: {
+      //       name: filter.sort_order == 'AESC' ? 1 : -1,
+      //     },
+      //   });
+      // }
+    }
 
     var products = JSON.parse(
-      JSON.stringify(
-        await this.ProductsModel.aggregate(condition),
-      ),
+      JSON.stringify(await this.ProductsModel.aggregate(condition)),
     );
 
     let storeCategory = [],
@@ -382,9 +384,7 @@ export class ProductService {
         category: [...new Set(category)],
         brand: [...new Set(brand)],
       },
-      pages:
-        Math.ceil(products.length / filter.limit ? filter.limit: 20) -
-        1,
+      pages: Math.ceil(products.length / filter.limit ? filter.limit : 20) - 1,
     };
   }
 
@@ -495,8 +495,11 @@ export class ProductService {
 
     products[0]['options'] = products[0]['metaOptions']['metaValue'];
 
+    console.log(products[0]['metaOptions']);
+
     const variants = await this.metaDataModel.find({
-      _id: ObjectId(products[0]['metaOptions']['parentMetaId']),
+      productId: ObjectId(products[0]['metaOptions']['productId']),
+      metaKey: 'product_variants',
     });
 
     products[0]['variants'] = variants[0]['metaValue'];
