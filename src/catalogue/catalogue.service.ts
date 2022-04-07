@@ -543,7 +543,7 @@ export class CatalogueService {
             metaValue: {
               optionName: metaDto.optionName,
               optionValue: metaDto.optionValue,
-              optionImage: metaDto.image,
+              optionImage: metaDto.metaImage,
             },
           },
         },
@@ -561,7 +561,7 @@ export class CatalogueService {
           {
             optionName: metaDto.optionName,
             optionValue: metaDto.optionValue,
-            optionImage: metaDto.image,
+            optionImage: metaDto.metaImage,
           },
         ],
         status: true,
