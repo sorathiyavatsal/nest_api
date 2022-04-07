@@ -164,7 +164,7 @@ export class SettingsController {
   // }
 
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
+  //@Roles(Role.ADMIN)
   @ApiOperation({summary:"update or add fuel charges"})
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
@@ -203,7 +203,7 @@ export class SettingsController {
   // }
 
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
+  //@Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({
     summary: "add or update setting, those have metaValue type is string or object"
@@ -246,7 +246,7 @@ export class SettingsController {
   // }
 
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
+  //@Roles(Role.ADMIN)
   @ApiConsumes('multipart/form-data', 'application/json')
   @Get('/')
   @ApiQuery({ name: 'metaKey', required: false })
