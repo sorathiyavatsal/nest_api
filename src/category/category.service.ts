@@ -23,6 +23,14 @@ export class CategoryService {
       });
     }
 
+    if (categoryDto.type) {
+      condition.push({
+        $match: {
+          categoryType: categoryDto.type ?? '',
+        },
+      });
+    }
+
     if (categoryDto.sort) {
       if (categoryDto.sort == 'DATE') {
         condition.push({
@@ -38,6 +46,12 @@ export class CategoryService {
           },
         });
       }
+    } else {
+      condition.push({
+        $sort: {
+          _id: -1,
+        },
+      });
     }
 
     condition.push(
@@ -86,9 +100,10 @@ export class CategoryService {
 
     return {
       category: category,
-      pages: Math.ceil(
-        category.length / (categoryDto.limit ? categoryDto.limit : 20),
-      ) - 1,
+      pages:
+        Math.ceil(
+          category.length / (categoryDto.limit ? categoryDto.limit : 20),
+        ) - 1,
     };
   }
 

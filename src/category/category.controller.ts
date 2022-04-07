@@ -39,6 +39,7 @@ export class CategoryController {
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
   @ApiQuery({ name: 'status', type: 'boolean', required: false })
+  @ApiQuery({ name: 'type', type: 'string', required: false, enum: ['Collection', 'Store', 'Product'] })
   @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
   @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE'] })
   @ApiQuery({ name: 'limit', type: 'string', required: false })
