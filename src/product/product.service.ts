@@ -17,8 +17,52 @@ export class ProductService {
     };
   }
 
+  async patchVariantOptions(id: String, updatedto: any) {
+    const updateData = {};
+    if (updatedto.productId) {
+      updateData['productId'] = updatedto.productId;
+    }
+    if (updatedto.parentMetaId) {
+      updateData['parentMetaId'] = updatedto.parentMetaId;
+    }
+    if (updatedto.options) {
+      updateData['options'] = updatedto.options;
+    }
+    if (updatedto.optionsImage) {
+      updateData['optionsImage'] = updatedto.optionsImage;
+    }
+
+    return await this.metaDataModel.findOneAndUpdate(
+      {
+        _id: ObjectId(id),
+        metaKey: 'product_options',
+      },
+      { $set: updateData },
+      { $upsert: true },
+    );
+  }
+
+  async patchVariant(id: String, updateDto: any) {
+    const updateData = {};
+    if (updateDto.productId) {
+      updateData['productId'] = updateDto.productId;
+    }
+    if (updateDto.parentMetaId) {
+      updateData['parentMetaId'] = updateDto.parentMetaId;
+    }
+
+    return await this.metaDataModel.findOneAndUpdate(
+      {
+        _id: ObjectId(id),
+        metaKey: 'product_variants',
+      },
+      { $set: updateData },
+      { $upsert: true },
+    );
+  }
+
   async getAllProducts(filter: any) {
-    return await this.ProductsModel.aggregate([
+    const product = await this.ProductsModel.aggregate([
       {
         $lookup: {
           from: 'metadatas',
@@ -157,7 +201,16 @@ export class ProductService {
       //       },
       //     },
       //   },
+      {
+        $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
+      },
+      { $limit: filter.limit ? parseInt(filter.limit) : 20 },
     ]);
+    
+    return {
+        products: product,
+        pages: Math.ceil(product.length / (filter.limit ? filter.limit : 20) - 1),
+    }
   }
 
   async getFilterProducts(filter: any) {
@@ -493,16 +546,18 @@ export class ProductService {
       ),
     );
 
-    products[0]['options'] = products[0]['metaOptions']['metaValue'];
+    if (products[0]['metaOptions']) {
+      products[0]['options'] = products[0]['metaOptions']['metaValue'];
 
-    console.log(products[0]['metaOptions']);
+      const variants = await this.metaDataModel.find({
+        productId: ObjectId(products[0]['metaOptions']['productId']),
+        metaKey: 'product_variants',
+      });
 
-    const variants = await this.metaDataModel.find({
-      productId: ObjectId(products[0]['metaOptions']['productId']),
-      metaKey: 'product_variants',
-    });
-
-    products[0]['variants'] = variants[0]['metaValue'];
+      if (variants) {
+        products[0]['variants'] = variants[0]['metaValue'];
+      }
+    }
 
     delete products[0]['metaOptions'];
 

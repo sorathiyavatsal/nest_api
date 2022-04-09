@@ -18,6 +18,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiParam,
+  ApiQuery,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -33,6 +34,25 @@ export class StoreController {
   constructor(private StoreService: StoreService) {}
 
   @Get('/all')
+//   @ApiQuery({ name: 'status', type: 'boolean', required: false })
+//   @ApiQuery({ name: 'parent_id', type: 'string', required: false })
+//   @ApiQuery({ name: 'type', type: 'string', required: false, enum: ['Collection', 'Store', 'Product'] })
+//   @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
+//   @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE'] })
+//   @ApiQuery({ name: 'limit', type: 'string', required: false })
+//   @ApiQuery({ name: 'page', type: 'string', required: false })
+
+//   phone no, 
+//   store location zipcode, 
+//   store near by lat long with distance amunt, 
+//   reviews, 
+//   pagination, 
+//   order by created date, 
+//   order by nearest, 
+//   order by catelogue volume, 
+//   order by sales, 
+//   order by reviews
+
   @UseGuards(AuthGuard('jwt'))
   async getAllStore(@Response() response) {
     response.json(await this.StoreService.getAllStore());

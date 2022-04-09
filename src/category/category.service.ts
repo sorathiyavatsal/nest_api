@@ -31,6 +31,14 @@ export class CategoryService {
       });
     }
 
+    if (categoryDto.parent_id) {
+      condition.push({
+        $match: {
+          parent: ObjectId(categoryDto.parent_id),
+        },
+      });
+    }
+
     if (categoryDto.sort) {
       if (categoryDto.sort == 'DATE') {
         condition.push({

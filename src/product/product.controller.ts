@@ -11,6 +11,7 @@ import {
   Param,
   Delete,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -27,6 +28,7 @@ import { ProductService } from './product.service';
 import { diskStorage } from 'multer';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from 'src/delivery_fleet/deliveryfleet.controller';
+import { query } from 'express';
 @Controller('product')
 @ApiTags('Product')
 @ApiBearerAuth()
@@ -41,6 +43,8 @@ export class ProductController {
   @ApiQuery({ name: 'collection', type: 'string', required: false })
   @ApiQuery({ name: 'name', type: 'string', required: false })
   @ApiQuery({ name: 'title', type: 'string', required: false })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
   async getAllProducts(
     @Request() request,
     @Response() response,
@@ -59,8 +63,18 @@ export class ProductController {
   @ApiQuery({ name: 'keywords', type: 'string', required: false })
   @ApiQuery({ name: 'page', type: 'number', required: false })
   @ApiQuery({ name: 'limit', type: 'number', required: false })
-  @ApiQuery({ name: 'sort_order', type: 'string', required: false, enum: ['AESC', 'DESC'] })
-  @ApiQuery({ name: 'sort', type: 'string', required: false, enum: ['NAME','DATE','PRICE'] })
+  @ApiQuery({
+    name: 'sort_order',
+    type: 'string',
+    required: false,
+    enum: ['AESC', 'DESC'],
+  })
+  @ApiQuery({
+    name: 'sort',
+    type: 'string',
+    required: false,
+    enum: ['NAME', 'DATE', 'PRICE'],
+  })
   async getFilterProducts(
     @Request() request,
     @Response() response,
@@ -129,6 +143,47 @@ export class ProductController {
     return await this.ProductService.postVariant(request.body);
   }
 
+  @Patch('/options')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FilesInterceptor('image', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product/variants',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+          type: 'string',
+        },
+        parentMetaId: {
+          type: 'string',
+        },
+        metaValue: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiQuery({ name: 'id', type: 'string', required: false })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async patchVariant(
+    @Query() query,
+    @Request() request,
+    @UploadedFiles() files,
+  ) {
+    return await this.ProductService.patchVariant(query.id, request.body);
+  }
+
   @Post('/variants')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
@@ -179,6 +234,66 @@ export class ProductController {
     request.body.optionsImage = response;
 
     return await this.ProductService.postVariantOptions(request.body);
+  }
+
+  @Patch('/variants')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FilesInterceptor('optionsImage', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product/variants',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+          type: 'string',
+        },
+        parentMetaId: {
+          type: 'string',
+        },
+        options: {
+          type: 'object',
+        },
+        optionsImage: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiQuery({ name: 'id', type: 'string', required: false })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async patchVariantOptions(
+    @Query() query,
+    @Request() request,
+    @UploadedFiles() files,
+  ) {
+    const response = [];
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        const fileReponse = file.path;
+        response.push(fileReponse);
+      });
+    }
+    request.body.optionsImage = response;
+
+    return await this.ProductService.patchVariantOptions(
+      query.id,
+      request.body,
+    );
   }
 
   @Post('/add')
