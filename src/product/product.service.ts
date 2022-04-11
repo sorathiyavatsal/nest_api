@@ -206,11 +206,11 @@ export class ProductService {
       },
       { $limit: filter.limit ? parseInt(filter.limit) : 20 },
     ]);
-    
+
     return {
-        products: product,
-        pages: Math.ceil(product.length / (filter.limit ? filter.limit : 20) - 1),
-    }
+      products: product,
+      pages: Math.ceil(product.length / (filter.limit ? filter.limit : 20) - 1),
+    };
   }
 
   async getFilterProducts(filter: any) {
@@ -742,12 +742,10 @@ export class ProductService {
         },
         {
           $push: {
-            metaValue: [
-              {
-                options: JSON.parse(JSON.stringify(optionsDto.options)),
-                optionsImage: optionsDto.optionsImage,
-              },
-            ],
+            metaValue: {
+              options: JSON.parse(JSON.stringify(optionsDto.options)),
+              optionsImage: optionsDto.optionsImage,
+            },
           },
         },
       );
