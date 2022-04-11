@@ -202,6 +202,11 @@ export class ProductService {
       //     },
       //   },
       {
+        $sort: {
+          _id: -1,
+        },
+      },
+      {
         $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
       },
       { $limit: filter.limit ? parseInt(filter.limit) : 20 },
