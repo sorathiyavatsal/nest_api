@@ -18,45 +18,31 @@ export class ProductService {
   }
 
   async patchVariantOptions(id: String, updatedto: any) {
-    const updateData = {};
-    if (updatedto.productId) {
-      updateData['productId'] = updatedto.productId;
-    }
-    if (updatedto.parentMetaId) {
-      updateData['parentMetaId'] = updatedto.parentMetaId;
-    }
-    if (updatedto.options) {
-      updateData['options'] = updatedto.options;
-    }
-    if (updatedto.optionsImage) {
-      updateData['optionsImage'] = updatedto.optionsImage;
-    }
-
-    return await this.metaDataModel.findOneAndUpdate(
+    return await this.metaDataModel.updateOne(
       {
-        _id: ObjectId(id),
+        productId: ObjectId(id),
         metaKey: 'product_options',
       },
-      { $set: updateData },
+      {
+        $set: {
+          metaValue: updatedto.options,
+        },
+      },
       { $upsert: true },
     );
   }
 
   async patchVariant(id: String, updateDto: any) {
-    const updateData = {};
-    if (updateDto.productId) {
-      updateData['productId'] = updateDto.productId;
-    }
-    if (updateDto.parentMetaId) {
-      updateData['parentMetaId'] = updateDto.parentMetaId;
-    }
-
-    return await this.metaDataModel.findOneAndUpdate(
+    return await this.metaDataModel.updateOne(
       {
-        _id: ObjectId(id),
+        productId: ObjectId(id),
         metaKey: 'product_variants',
       },
-      { $set: updateData },
+      {
+        $set: {
+          metaValue: updateDto.variants,
+        },
+      },
       { $upsert: true },
     );
   }

@@ -122,6 +122,9 @@ export class ProductController {
         },
         optionValue: {
           type: 'array',
+          items: {
+            type: 'string',
+          },
         },
         image: {
           type: 'string',
@@ -162,26 +165,26 @@ export class ProductController {
     schema: {
       type: 'object',
       properties: {
-        productId: {
-          type: 'string',
-        },
-        parentMetaId: {
-          type: 'string',
-        },
-        metaValue: {
-          type: 'string',
+        options: {
+          type: 'array',
+          items: {
+            type: 'object',
+          },
         },
       },
     },
   })
-  @ApiQuery({ name: 'id', type: 'string', required: false })
+  @ApiQuery({ name: 'productId', type: 'string', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async patchVariant(
+  async patchVariantOptions(
     @Query() query,
     @Request() request,
     @UploadedFiles() files,
   ) {
-    return await this.ProductService.patchVariant(query.id, request.body);
+    return await this.ProductService.patchVariantOptions(
+      query.productId,
+      request.body,
+    );
   }
 
   @Post('/variants')
@@ -238,60 +241,28 @@ export class ProductController {
 
   @Patch('/variants')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FilesInterceptor('optionsImage', 20, {
-      storage: diskStorage({
-        destination: './public/uploads/product/variants',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        productId: {
-          type: 'string',
-        },
-        parentMetaId: {
-          type: 'string',
-        },
-        options: {
-          type: 'object',
-        },
-        optionsImage: {
+        variants: {
           type: 'array',
           items: {
-            type: 'string',
-            format: 'binary',
+            type: 'object',
           },
         },
       },
     },
   })
-  @ApiQuery({ name: 'id', type: 'string', required: false })
+  @ApiQuery({ name: 'productId', type: 'string', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async patchVariantOptions(
+  async patchVariant(
     @Query() query,
     @Request() request,
     @UploadedFiles() files,
   ) {
-    const response = [];
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        const fileReponse = file.path;
-        response.push(fileReponse);
-      });
-    }
-    request.body.optionsImage = response;
-
-    return await this.ProductService.patchVariantOptions(
-      query.id,
+    return await this.ProductService.patchVariant(
+      query.productId,
       request.body,
     );
   }
