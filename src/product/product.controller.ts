@@ -335,12 +335,11 @@ export class ProductController {
         menu: {
           type: 'string',
         },
-        type: {
-          type: 'string',
-          enum: ['product', 'addon'],
-        },
-        parentId: {
-          type: 'string',
+        addon: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
         },
         status: {
           type: 'boolean',

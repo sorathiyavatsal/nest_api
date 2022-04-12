@@ -508,6 +508,14 @@ export class ProductService {
           },
           {
             $lookup: {
+              from: 'products',
+              localField: 'addon',
+              foreignField: '_id',
+              as: 'addons',
+            },
+          },
+          {
+            $lookup: {
               from: 'brands',
               localField: 'brand',
               foreignField: '_id',
@@ -537,7 +545,8 @@ export class ProductService {
       ),
     );
 
-    if (products[0]['metaOptions']) {
+    if (products && products[0] && products[0]['metaOptions']) {
+      products[0]['parentMetaId'] = products[0]['metaOptions']['parentMetaId'];
       products[0]['options'] = products[0]['metaOptions']['metaValue'];
 
       const variants = await this.metaDataModel.find({
@@ -548,11 +557,11 @@ export class ProductService {
       if (variants) {
         products[0]['variants'] = variants[0]['metaValue'];
       }
+
+      delete products[0]['metaOptions'];
     }
 
-    delete products[0]['metaOptions'];
-
-    return products[0];
+    return products.isEmpty ? {} : products[0];
   }
 
   async postProduct(productDto: any) {
@@ -571,29 +580,19 @@ export class ProductService {
       collections: productDto.collection,
       brand: productDto.brand,
       keywords: productDto.keywords,
-      type: productDto.type,
+      type: 'products',
       status: productDto.status,
     };
-
-    if (productDto.parentId) {
-      productCollection['parentId'] = productDto.parentId;
-    }
 
     if (productDto.menu) {
       productCollection['menu'] = productDto.menu;
     }
 
-    const product = await new this.ProductsModel(productCollection);
-
-    if (productDto.type == 'addon') {
-      await this.ProductsModel.findOneAndUpdate(
-        { _id: productDto.parentId },
-        {
-          addon: product._id,
-        },
-        { upsert: true },
-      );
+    if (productDto.addon) {
+      productCollection['addon'] = productDto.addon;
     }
+
+    const product = await new this.ProductsModel(productCollection);
 
     return await product.save();
   }

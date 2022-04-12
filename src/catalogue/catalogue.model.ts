@@ -19,6 +19,12 @@ export const catalogueSchema = new mongoose.Schema(
       type: ObjectId,
       $ref: 'metadatas',
     },
+    catalogueImages: {
+        type: Array
+    },
+    addon: {
+        type: Array
+    },
   },
   { timestamps: true },
 );
@@ -29,6 +35,8 @@ export interface catalogue extends mongoose.Document {
   storeId: mongoose.ObjectId;
   catalogueStatus: Boolean;
   variants: mongoose.ObjectId;
+  catalogueImages: [];
+  addon: [];
   updatedAt: Date;
   createdAt: Date;
 }

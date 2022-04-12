@@ -4,6 +4,7 @@ import { catalogue } from './catalogue.model';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { metaData } from 'src/product/metaData.model';
 import { Product } from 'src/product/product.model';
+import { ConstraintMetadata } from 'class-validator/types/metadata/ConstraintMetadata';
 let ObjectId = require('mongodb').ObjectId;
 
 @Injectable()
@@ -472,6 +473,14 @@ export class CatalogueService {
             },
           },
           {
+            $lookup: {
+              from: 'products',
+              localField: 'addon',
+              foreignField: '_id',
+              as: 'addon',
+            },
+          },
+          {
             $unwind: {
               path: '$options',
               preserveNullAndEmptyArrays: true,
@@ -498,7 +507,7 @@ export class CatalogueService {
       catalogue[i]['options'] = variants[0]['metaValue'];
     }
 
-    return catalogue; //await this.catalogueModel.find(condition);
+    return catalogue;
   }
 
   async addNewcatalogue(dto: any) {
@@ -508,24 +517,32 @@ export class CatalogueService {
       storeId: ObjectId(dto.storeId),
       catalogueStatus: dto.catalogueStatus ? dto.catalogueStatus : true,
       variants: ObjectId(dto.variants),
+      catalogueImages: dto.catalogueImages,
+      addon: dto.addon.map((addon) => ObjectId(addon)),
     };
 
     return await new this.catalogueModel(newcatalogue).save();
   }
 
   async updatecatalogue(id: string, dto: any) {
-    return await this.catalogueModel
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: dto }, { new: true })
-      .then(
-        (data: any) => {
-          return data.toObject({ versionKey: false });
-        },
-        (error) => {
-          let msg = 'Something went wrong!';
-          if (error.errmsg) msg = error.errmsg;
-          return new BadRequestException(msg);
-        },
-      );
+    var updateData = {};
+    if (dto.catalogueStatus == true || dto.catalogueStatus == false) {
+      updateData['catalogueStatus'] = dto.catalogueStatus;
+    }
+
+    if (dto.catalogueImages) {
+      updateData['catalogueImages'] = dto.catalogueImages;
+    }
+
+    if (dto.addon) {
+      updateData['addon'] = dto.addon.map((addon) => ObjectId(addon));
+    }
+
+    return await this.catalogueModel.updateOne(
+      { _id: ObjectId(id) },
+      { $set: updateData },
+      { upsert: true },
+    );
   }
 
   async postVariant(metaDto: any) {
@@ -544,16 +561,25 @@ export class CatalogueService {
             metaValue: {
               optionName: metaDto.optionName,
               optionValue: metaDto.optionValue,
-              optionImage: metaDto.metaImage,
+              optionImage: metaDto.image,
             },
           },
         },
       );
 
-      return await this.metaDataModel.findOne({
-        productId: ObjectId(metaDto.catalogueId),
-        metaKey: 'catalogue_options',
-      });
+      var catelogue = JSON.parse(
+        JSON.stringify(
+          await this.metaDataModel.findOne({
+            productId: ObjectId(metaDto.catalogueId),
+            metaKey: 'catalogue_options',
+          }),
+        ),
+      );
+      catelogue['catalogueId'] = catelogue['productId'];
+
+      delete catelogue['productId'];
+
+      return catelogue;
     } else {
       const metaData = await new this.metaDataModel({
         productId: ObjectId(metaDto.catalogueId),
@@ -562,17 +588,25 @@ export class CatalogueService {
           {
             optionName: metaDto.optionName,
             optionValue: metaDto.optionValue,
-            optionImage: metaDto.metaImage,
+            optionImage:
+              metaDto.image && metaDto.image != 'string' && metaDto.image != ''
+                ? metaDto.image
+                : '',
           },
         ],
         status: true,
       });
 
-      return await metaData.save();
+      var catelogue = JSON.parse(JSON.stringify(await metaData.save()));
+      catelogue['catalogueId'] = catelogue['productId'];
+
+      delete catelogue['productId'];
+
+      return catelogue;
     }
   }
 
-  async postVariantOptions(optionsDto: any) {
+  async postVariantOption(optionsDto: any) {
     const metaDataResult = await this.metaDataModel.findOne({
       productId: ObjectId(optionsDto.catalogueId),
       metaKey: 'catalogue_variants',
@@ -588,7 +622,7 @@ export class CatalogueService {
           $push: {
             metaValue: [
               {
-                variants: JSON.parse(JSON.stringify(optionsDto.variants)),
+                options: JSON.parse(JSON.stringify(optionsDto.options)),
                 optionsImage: optionsDto.optionsImage,
                 mrpprice: optionsDto.mrpprice,
                 salepprice: optionsDto.salepprice,
@@ -602,29 +636,78 @@ export class CatalogueService {
         },
       );
 
-      return await this.metaDataModel.findOne({
-        productId: ObjectId(optionsDto.catalogueId),
-        metaKey: 'catalogue_variants',
-      });
+      var catelogue = JSON.parse(
+        JSON.stringify(
+          await this.metaDataModel.findOne({
+            productId: ObjectId(optionsDto.catalogueId),
+            metaKey: 'catalogue_variants',
+            parentMetaId: ObjectId(optionsDto.parentMetaId),
+          }),
+        ),
+      );
+      catelogue['catalogueId'] = catelogue['productId'];
+
+      delete catelogue['productId'];
+
+      return catelogue;
     } else {
-      return await new this.metaDataModel({
-        productId: ObjectId(optionsDto.catalogueId),
-        metaKey: 'catalogue_variants',
-        parentMetaId: ObjectId(optionsDto.parentMetaId),
-        metaValue: [
-          {
-            options: JSON.parse(JSON.stringify(optionsDto.options)),
-            optionsImage: optionsDto.optionsImage,
-            mrpprice: optionsDto.mrpprice,
-            salepprice: optionsDto.salepprice,
-            qty: optionsDto.qty,
-            discount: JSON.parse(JSON.stringify(optionsDto.discount)),
-            unitWight: optionsDto.unitWight,
-            pics: optionsDto.pics,
-          },
-        ],
-        status: true,
-      }).save();
+      var catelogue = JSON.parse(
+        JSON.stringify(
+          await new this.metaDataModel({
+            productId: ObjectId(optionsDto.catalogueId),
+            metaKey: 'catalogue_variants',
+            parentMetaId: ObjectId(optionsDto.parentMetaId),
+            metaValue: [
+              {
+                options: JSON.parse(JSON.stringify(optionsDto.options)),
+                optionsImage: optionsDto.optionsImage,
+                mrpprice: optionsDto.mrpprice,
+                salepprice: optionsDto.salepprice,
+                qty: optionsDto.qty,
+                discount: JSON.parse(JSON.stringify(optionsDto.discount)),
+                unitWight: optionsDto.unitWight,
+                pics: optionsDto.pics,
+              },
+            ],
+            status: true,
+          }).save(),
+        ),
+      );
+      catelogue['catalogueId'] = catelogue['productId'];
+
+      delete catelogue['productId'];
+
+      return catelogue;
     }
+  }
+
+  async patchVariantOptions(id: String, dto: any) {
+    return await this.metaDataModel.updateOne(
+        {
+          productId: ObjectId(id),
+          metaKey: 'catalogue_options',
+        },
+        {
+          $set: {
+            metaValue: dto.options,
+          },
+        },
+        { $upsert: true },
+      );
+  }
+
+  async patchVariant(id: String, dto: any) {
+    return await this.metaDataModel.updateOne(
+      {
+        productId: ObjectId(id),
+        metaKey: 'catalogue_variants',
+      },
+      {
+        $set: {
+          metaValue: dto.variants,
+        },
+      },
+      { $upsert: true },
+    );
   }
 }

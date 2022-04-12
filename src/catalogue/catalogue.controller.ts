@@ -13,6 +13,7 @@ import {
   UploadedFile,
   UploadedFiles,
   Query,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -31,6 +32,7 @@ import { catalogueDto } from './dto/catalogue.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from 'src/delivery_fleet/deliveryfleet.controller';
 import { diskStorage } from 'multer';
+import { updateCatalogueDto } from './dto/update-catalogue.dto';
 
 @Controller('catalogue')
 @ApiTags('Catalogue')
@@ -46,19 +48,6 @@ export class CatalogueController {
 
   @Post('/options')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FilesInterceptor('image', 20, {
-      storage: diskStorage({
-        destination: './public/uploads/product/variants',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
   @ApiBody({
     schema: {
       type: 'object',
@@ -74,40 +63,17 @@ export class CatalogueController {
         },
         image: {
           type: 'string',
-          format: 'binary',
         },
       },
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async postVariant(@Request() request, @UploadedFiles() files) {
-    const response = [];
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        const fileReponse = file.path;
-        response.push(fileReponse);
-      });
-    }
-    request.body.metaImage = response[0];
-
+  async postVariant(@Request() request) {
     return await this.catalogueService.postVariant(request.body);
   }
 
   @Post('/variants')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FilesInterceptor('optionsImage', 20, {
-      storage: diskStorage({
-        destination: './public/uploads/product/variants',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
   @ApiBody({
     schema: {
       type: 'object',
@@ -125,7 +91,6 @@ export class CatalogueController {
           type: 'array',
           items: {
             type: 'string',
-            format: 'binary',
           },
         },
         mrpprice: {
@@ -150,16 +115,8 @@ export class CatalogueController {
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async postVariantOptions(@Request() request, @UploadedFiles() files) {
-    const response = [];
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        const fileReponse = file.path;
-        response.push(fileReponse);
-      });
-    }
-    request.body.optionsImage = response;
-    return await this.catalogueService.postVariantOptions(request.body);
+  async postVariantOption(@Request() request) {
+    return await this.catalogueService.postVariantOption(request.body);
   }
 
   @ApiOperation({ summary: 'Get All Catalgoue' })
@@ -233,9 +190,63 @@ export class CatalogueController {
   @Put('/:id')
   async updatecatalogue(
     @Param() params,
-    @Body() catalogue: catalogueDto,
+    @Body() updatecatalogue: updateCatalogueDto,
     @Request() req,
   ) {
-    return await this.catalogueService.updatecatalogue(params.id, catalogue);
+    return await this.catalogueService.updatecatalogue(params.id, updatecatalogue);
+  }
+
+  @Patch('/options')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        options: {
+          type: 'array',
+          items: {
+            type: 'object',
+          },
+        },
+      },
+    },
+  })
+  @ApiQuery({ name: 'catalogueId', type: 'string', required: false })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async patchVariantOptions(
+    @Query() query,
+    @Request() request
+  ) {
+    return await this.catalogueService.patchVariantOptions(
+      query.catalogueId,
+      request.body,
+    );
+  }
+
+  @Patch('/variants')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        variants: {
+          type: 'array',
+          items: {
+            type: 'object',
+          },
+        },
+      },
+    },
+  })
+  @ApiQuery({ name: 'catalogueId', type: 'string', required: false })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async patchVariant(
+    @Query() query,
+    @Request() request
+  ) {
+    return await this.catalogueService.patchVariant(
+      query.catalogueId,
+      request.body,
+    );
   }
 }
