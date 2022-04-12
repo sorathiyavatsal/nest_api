@@ -633,7 +633,11 @@ export class AuthService {
             message: 'Welcome Back!',
           };
         } else {
-          return { user: data, message: 'Set up your byecom account!' };
+          return {
+            user: data,
+            token: userToken,
+            message: 'Set up your byecom account!',
+          };
         }
       } else {
         return new BadRequestException('Verification code is invalid!');
@@ -645,6 +649,7 @@ export class AuthService {
   async verifyTokenByEmail(emailVerifyCredentialsDto: any) {
     try {
       let userToAttempt, errorMsgNotFound, successMsg: any;
+
       if (emailVerifyCredentialsDto.email) {
         userToAttempt = await this.userModel.findOne({
           email: emailVerifyCredentialsDto.email,
@@ -658,6 +663,7 @@ export class AuthService {
         errorMsgNotFound = 'Phone number not found !';
         successMsg = 'Phone verification is successfully!';
       }
+
       if (!userToAttempt) throw new BadRequestException(errorMsgNotFound);
 
       return this.userVerificationModel
