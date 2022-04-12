@@ -439,6 +439,69 @@ export class CatalogueService {
     return catalogue;
   }
 
+  async getcatalogue(dto: any) {
+    var catalogue = JSON.parse(
+      JSON.stringify(
+        await this.catalogueModel.aggregate([
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'products',
+            },
+          },
+          {
+            $lookup: {
+              from: 'userdatas',
+              localField: 'storeId',
+              foreignField: '_id',
+              as: 'stores',
+            },
+          },
+          {
+            $lookup: {
+              from: 'metadatas',
+              localField: 'variants',
+              foreignField: '_id',
+              as: 'options',
+            },
+          },
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'addon',
+              foreignField: '_id',
+              as: 'addon',
+            },
+          },
+          {
+            $unwind: {
+              path: '$options',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $match: {
+              _id: ObjectId(dto.id),
+            },
+          },
+        ]),
+      ),
+    );
+
+    for (let i = 0; i < catalogue.length; i++) {
+      const variants = await this.metaDataModel.find({
+        _id: ObjectId(catalogue[i]['options']['parentMetaId']),
+      });
+
+      catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
+      catalogue[i]['options'] = variants[0]['metaValue'];
+    }
+
+    return catalogue;
+  }
+
   async getcatalogueById(product: any) {
     let condition = {};
     if (product.productid) {

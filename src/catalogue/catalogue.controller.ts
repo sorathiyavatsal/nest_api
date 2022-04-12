@@ -175,6 +175,15 @@ export class CatalogueController {
     return await this.catalogueService.getcatalogueById(query);
   }
 
+  @ApiOperation({ summary: 'Get Catalogue By Id' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiQuery({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @Get('/id')
+  async getcatalogue(@Query() query, @Request() req) {
+    return await this.catalogueService.getcatalogue(query);
+  }
+
   @ApiOperation({ summary: 'Add Catalogue' })
   @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data', 'application/json')

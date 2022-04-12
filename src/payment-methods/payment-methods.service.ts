@@ -17,15 +17,14 @@ export class PaymentMethodsService {
         @InjectModel('PaymentMethods') private PaymentModel: Model<PaymentMethods>
     ) { }
 
-
     async createRazorPayOrder(orderData: any) {
-        console.log(orderData.amount);
         var options = {
-            amount: orderData.amount * 100,  // amount in the smallest currency unit
+            amount: orderData.amount * 100,
             currency: "INR"
         };
         var orderRes = {};
-        await this.razorpayClient.orders.create(options, async (err, order) => {
+
+        this.razorpayClient.orders.create(options, async (err, order) => {
             if (err) {
                 console.log(err);
             } else {
@@ -39,7 +38,6 @@ export class PaymentMethodsService {
     }
 
     async verifyPaymentAndSave(req) {
-
         let body = req.razorpay_order_id + "|" + req.razorpay_payment_id;
         var crypto = require("crypto");
         var expectedSignature = crypto.createHmac('sha256', 'AFpsju7mn5moZPQKljRqVDAp')
@@ -47,12 +45,10 @@ export class PaymentMethodsService {
             .digest('hex');
 
         if (expectedSignature === req.razorpay_signature) {
-            console.log("Payment Success");
             await new this.PaymentModel(req).save();
             return { meta: { status: true, msg: 'Your payment successful!' } };
         } else {
             console.log("Payment Fail");
         }
     }
-
 }
