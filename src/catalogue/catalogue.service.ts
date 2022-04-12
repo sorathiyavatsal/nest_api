@@ -574,15 +574,18 @@ export class CatalogueService {
   }
 
   async addNewcatalogue(dto: any) {
-    const newcatalogue = {
+    var newcatalogue = {
       _id: ObjectId(dto.catalogueId),
       productId: ObjectId(dto.productId),
       storeId: ObjectId(dto.storeId),
       catalogueStatus: dto.catalogueStatus ? dto.catalogueStatus : true,
       variants: ObjectId(dto.variants),
       catalogueImages: dto.catalogueImages,
-      addon: dto.addon.map((addon) => ObjectId(addon)),
     };
+
+    if (dto.addon) {
+      newcatalogue['addon'] = dto.addon.map((addon) => ObjectId(addon));
+    }
 
     return await new this.catalogueModel(newcatalogue).save();
   }
@@ -746,17 +749,17 @@ export class CatalogueService {
 
   async patchVariantOptions(id: String, dto: any) {
     return await this.metaDataModel.updateOne(
-        {
-          productId: ObjectId(id),
-          metaKey: 'catalogue_options',
+      {
+        productId: ObjectId(id),
+        metaKey: 'catalogue_options',
+      },
+      {
+        $set: {
+          metaValue: dto.options,
         },
-        {
-          $set: {
-            metaValue: dto.options,
-          },
-        },
-        { $upsert: true },
-      );
+      },
+      { $upsert: true },
+    );
   }
 
   async patchVariant(id: String, dto: any) {

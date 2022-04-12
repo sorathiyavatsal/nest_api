@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsBoolean, IsArray } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class catalogueDto {
   @IsString()
@@ -32,7 +32,7 @@ export class catalogueDto {
   catalogueImages: []
 
   @IsArray()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsNotEmpty()
   addon: []
 }
