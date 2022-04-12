@@ -122,6 +122,8 @@ export class DeliveryFleetService {
       let radiusmeter: any = radius.metaValue;
       let deliveryBoy = await this.UserModel.find({
         role: 'DELIVERY',
+        verifyStatus: true,
+        liveStatus: true,
         loc: {
           $geoWithin: {
             $centerSphere: [

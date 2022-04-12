@@ -15,7 +15,7 @@ export class SocketGateway {
   server: Server;
   private logger: Logger = new Logger('AppGateway');
   private ObjectId = require('mongodb').ObjectId;
-  private WEB_URL = "http://3.142.255.179:5000"
+  private WEB_URL = "http://localhost:5000"
 
   @SubscribeMessage('deliveryNotification')
   async handleDeliveryNotification(client: Socket, payload: any) {
@@ -201,16 +201,20 @@ export class SocketGateway {
   @SubscribeMessage('getDelievryAssociates')
   async getDeliveyBoyNear(client: Socket, payload: any): Promise<Object> {
     try {
-      return await axios.post(
+        console.log("inside")
+      const data = await axios.post(
         `${this.WEB_URL}/api/delivery-fleet/find-near-delivery-boy`,
         payload.params,
         {
           headers: {
+            api_key: 'A107115104A121',
             Authorization: `Bearer ${payload.token}`,
           },
         },
       );
+      return data.data;
     } catch (e) {
+        console.log(e);
       return e;
     }
   }
