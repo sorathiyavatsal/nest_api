@@ -4,12 +4,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FleetCommissionService } from './fleet-commission.service';
 import { FleetCommissionSchema } from './fleet-commission.model';
 import { ConfigModule } from '../core/config/config.module';
+import { UserDataSchema } from 'src/user-data/user-data.model';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'FleetCommission', schema: FleetCommissionSchema },
     ]),
+    MongooseModule.forFeature([{ name: 'UserData', schema: UserDataSchema }]),
     ConfigModule,
   ],
   providers: [FleetCommissionService],

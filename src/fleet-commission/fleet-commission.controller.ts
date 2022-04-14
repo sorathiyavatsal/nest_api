@@ -19,6 +19,7 @@ import {
   ApiParam,
   ApiConsumes,
   ApiOperation,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { FleetCommissionService } from './fleet-commission.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -37,6 +38,16 @@ export class FleetCommissionController {
   @Get('/')
   async getAllFleetCommission(@Query() filter: filterDto, @Req() req) {
     return await this.FleetCommissionService.getAllFleetCommission(filter);
+  }
+
+  @ApiOperation({ summary: 'Get All Fleet Commissions' })
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/earnings')
+  @ApiQuery({ name: 'deliveryBoyId', required: true })
+  @ApiQuery({ name: 'hours', required: true })
+  @ApiQuery({ name: 'km', required: true })
+  async getAllFleetCommissionEarning(@Query() filter, @Req() req) {
+    return await this.FleetCommissionService.getAllFleetCommissionEarning(filter);
   }
 
   @ApiOperation({ summary: 'Get Fleet Commission By Id' })

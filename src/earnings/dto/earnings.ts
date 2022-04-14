@@ -6,7 +6,7 @@ import {
     IsObject,
     IsString,
   } from 'class-validator';
-  import { ApiProperty, ApiParam } from '@nestjs/swagger';
+  import { ApiProperty, ApiParam, ApiPropertyOptional } from '@nestjs/swagger';
   import { ObjectId } from 'mongoose';
   
   export class EarningDto {
@@ -30,11 +30,6 @@ import {
     @ApiProperty()
     travelledKMs: Number
 
-    @IsNumber()
-    @IsNotEmpty()
-    @ApiProperty()
-    amount: Number
-
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -48,7 +43,7 @@ import {
 
     @IsString()
     @IsNotEmpty()
-    @ApiProperty()
+    @ApiPropertyOptional()
     settlmentId: String;
   }
   

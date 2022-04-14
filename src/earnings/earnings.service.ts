@@ -1,13 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { FleetCommission } from 'src/fleet-commission/fleet-commission.model';
+import { UserData } from 'src/user-data/user-data.model';
 import { Earning } from './earnings.model';
 let ObjectId = require('mongodb').ObjectId;
 var _ = require('underscore');
 
 @Injectable()
 export class EarningsService {
-  constructor(@InjectModel('Earning') private EarningModel: Model<Earning>) {}
+  constructor(
+    @InjectModel('Earning') private EarningModel: Model<Earning>,
+    @InjectModel('UserData') private UserDataModel: Model<UserData>,
+    @InjectModel('FleetCommission')
+    private fleetCommissionModel: Model<FleetCommission>,
+  ) {}
 
   async getAllEarning(EarningDto: any) {
     var earningResult = await this.EarningModel.aggregate([
@@ -69,11 +76,11 @@ export class EarningsService {
       );
     }
 
-    if(EarningDto.id) {
-        earningResult = _.filter(
-            earningResult,
-            (e) => e.deliveryBoyId == EarningDto.userId,
-          );
+    if (EarningDto.id) {
+      earningResult = _.filter(
+        earningResult,
+        (e) => e.deliveryBoyId == EarningDto.userId,
+      );
     }
 
     return earningResult;
@@ -133,11 +140,32 @@ export class EarningsService {
       deliveryBoyId: EarningDto.deliveryBoyId,
       workedHours: EarningDto.workedHours,
       travelledKMs: EarningDto.travelledKMs,
-      amount: EarningDto.amount,
       startDateTime: EarningDto.startDateTime,
       endDateTime: EarningDto.endDateTime,
-      settlmentId: EarningDto.settlmentId,
     };
+
+    if (EarningDto.settlmentId) {
+      Earning['settlmentId'] = EarningDto.settlmentId;
+    }
+
+    
+
+    const userData = await this.UserDataModel.findOne({
+      userId: ObjectId(EarningDto.deliveryBoyId),
+    });
+
+    console.log(userData);
+
+    const fleetCommission = await this.fleetCommissionModel.findOne({
+      name: userData['job_type'],
+    });
+
+    if (userData['job_type'] == 'Flat') {
+      Earning['amount'] = fleetCommission.fix;
+    } else {
+      Earning['amount'] =
+        EarningDto.workedHours * fleetCommission.additionalPerHour;
+    }
 
     return await new this.EarningModel(Earning).save();
   }
