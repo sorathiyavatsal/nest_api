@@ -25,7 +25,7 @@ export class ProductService {
       },
       {
         $set: {
-          metaValue: updatedto.options,
+          metaValue: JSON.parse(JSON.stringify(updatedto.options)),
         },
       },
       { $upsert: true },
@@ -40,7 +40,7 @@ export class ProductService {
       },
       {
         $set: {
-          metaValue: updateDto.variants,
+          metaValue: JSON.parse(JSON.stringify(updateDto.variants)),
         },
       },
       { $upsert: true },

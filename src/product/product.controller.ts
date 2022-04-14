@@ -148,19 +148,6 @@ export class ProductController {
 
   @Patch('/options')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FilesInterceptor('image', 20, {
-      storage: diskStorage({
-        destination: './public/uploads/product/variants',
-        filename: function (req, file, cb) {
-          let extArray = file.mimetype.split('/');
-          let extension = extArray[extArray.length - 1];
-          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
-        },
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
   @ApiBody({
     schema: {
       type: 'object',
@@ -169,6 +156,12 @@ export class ProductController {
           type: 'array',
           items: {
             type: 'object',
+            examples: {
+              optionName: 'size',
+              optionValue: ['small', 'medium'],
+              optionImage:
+                'public/uploads/product/variants/image-1648417148751.jpeg',
+            },
           },
         },
       },
