@@ -53,6 +53,7 @@ export class FleetCommissionController {
   @ApiConsumes('multipart/form-data', 'application/json')
   @Post('/')
   async addNewFleetCommission(@Body() fleetCommission: fleetCommissionDto, @Req() req) {
+      console.log(fleetCommission)
     return await this.FleetCommissionService.addNewFleetCommission(fleetCommission);
   }
 

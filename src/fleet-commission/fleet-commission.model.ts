@@ -20,14 +20,15 @@ export const FleetCommissionSchema = new mongoose.Schema(
     additionalPerHour: { type: Number, default: 0 },
     incentive: {
       isPercantage: { type: Boolean, default: true },
-      value: { type: Number, required: true }
+      value: { type: Number, required: true },
     },
     surcharge: {
       isPercantage: { type: Boolean, default: true },
-      value: { type: Number, required: true }
+      value: { type: Number, required: true },
     },
+    fix: { type: Number },
     isRegional: { type: Boolean, default: false },
-    zipcodes: [{ type: String }]
+    zipcodes: [{ type: String }],
   },
   { timestamps: true },
 );
@@ -36,24 +37,25 @@ export interface FleetCommission extends mongoose.Document {
   _id: string;
   name: string;
   wages: {
-    hoursPerMonth: number,
-    dayPerMonth: number,
-    amount: number,
+    hoursPerMonth: number;
+    dayPerMonth: number;
+    amount: number;
   };
   fuel: {
-    price: number,
-    kmPerMOnth: number,
+    price: number;
+    kmPerMOnth: number;
   };
   additionalPerKm: number;
   additionalPerHour: number;
   incentive: {
-    isPercantage: Boolean,
-    value: number
+    isPercantage: Boolean;
+    value: number;
   };
   surcharge: {
-    isPercantage: Boolean,
-    value: number
+    isPercantage: Boolean;
+    value: number;
   };
+  fix: number;
   isRegional: Boolean;
   zipcodes: [string];
 }

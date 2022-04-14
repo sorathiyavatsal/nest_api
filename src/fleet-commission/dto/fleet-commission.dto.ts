@@ -56,6 +56,10 @@ export class fleetCommissionDto {
   @ApiProperty({ required: false })
   additionalPerHour: number;
 
+  @IsNumber()
+  @ApiProperty({ required: false })
+  fix: number;
+
   @ApiProperty({ type: percentageTypeDto })
   @IsNotEmpty()
   incentive: percentageTypeDto;
