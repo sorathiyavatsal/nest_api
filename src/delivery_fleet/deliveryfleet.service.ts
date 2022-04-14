@@ -402,7 +402,7 @@ export class DeliveryFleetService {
       let verification: any = await this.userVerificationModel.findOne({
         otp: dto.otp,
         createdUser: ObjectId(id),
-        verifiedTemplate: 'deliveryProgress'
+        verifiedTemplate: 'deliveryProgress',
       });
 
       if (verification && !verification.verifiedStatus) {
@@ -459,14 +459,41 @@ export class DeliveryFleetService {
       const mailOptions = {
         name: 'DELIVERY_DELIVERED_OTP',
         type: 'SMS',
-        device: req.headers.OsName || 'ANDROID',
+        device: 'ANDROID',
         phone: data.toPhone,
         otp: code,
       };
-      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
-      // message = message + ' boy delivery delivered otp ' + code;
-      // this.sendEmailMiddleware.sensSMSdelivery(req, data.toPhone, message);
+      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+    } else if (dto.invoiceStatus == 'complete') {
+      let verification: any = await this.userVerificationModel.findOne({
+        otp: dto.otp,
+        createdUser: ObjectId(id),
+        verifiedTemplate: 'deliveryDelivered'
+      });
+
+      if (verification && !verification.verifiedStatus) {
+        const mailOptions = {
+          name: 'DELIVERY_DELIVERED_OTP',
+          type: 'SMS',
+          device: 'ANDROID',
+          phone: data.fromPhone,
+        };
+
+        this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+
+        this.userVerificationModel.update(
+          {
+            otp: dto.otp,
+            createdUser: ObjectId(id),
+            verifiedTemplate: 'deliveryComplete',
+          },
+          { $set: { verifiedStatus: true } },
+          { $upsert: true },
+        );
+      } else {
+        return new BadRequestException('Invalid Otp');
+      }
     } else {
       return new BadRequestException('Invalid Delivery Fleet Request Status');
     }
