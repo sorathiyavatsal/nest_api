@@ -37,13 +37,23 @@ export class StoreCommissionController {
     summary: 'get All Store Commissions',
   })
   @ApiQuery({ name: 'categoryName', type: 'string', required: false })
-  @ApiQuery({ name: 'planCode', type: 'number', required: false })
-  @ApiQuery({ name: 'applicationType', type: 'number', required: false })
-  @ApiQuery({ name: 'comissionType', type: 'string', required: false })
+  @ApiQuery({ name: 'planCode', type: 'string', required: false })
+  @ApiQuery({
+    name: 'applicableType',
+    type: 'string',
+    enum: ['INVOICE', 'CATEGORY'],
+    required: false,
+  })
+  @ApiQuery({
+    name: 'commissionType',
+    type: 'string',
+    enum: ['GENERAL', 'RANGE'],
+    required: false,
+  })
   @ApiQuery({ name: 'limit', type: 'string', required: false })
   @ApiQuery({ name: 'page', type: 'string', required: false })
   async getAllStoreCommissions(@Request() request, @Query() query) {
-    return await this.storeCommissionService.getAllStoreCommissions();
+    return await this.storeCommissionService.getAllStoreCommissions(query);
   }
 
   @ApiParam({ name: 'id', required: true })

@@ -3,31 +3,64 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StoreCommission } from './store-commission.model';
 let ObjectId = require('mongodb').ObjectId;
-import { catalogue } from '../catalogue/catalogue.model';
+import { Categories } from '../category/category.model';
+let _ = require('underscore');
 
 @Injectable()
 export class StoreCommissionService {
   constructor(
     @InjectModel('StoreCommission')
     private StoreCommissionModel: Model<StoreCommission>,
-    @InjectModel('catalogue') private catalogueModel: Model<catalogue>,
+    @InjectModel('categories') private categoriesModel: Model<Categories>,
   ) {}
 
-  async getAllStoreCommissions() {
+  async getAllStoreCommissions(dto: any) {
     var store_commission = await this.StoreCommissionModel.find({});
 
     for (let i = 0; i < store_commission.length; i++) {
       for (let j = 0; j < store_commission[i].values.length; j++) {
         if (store_commission[i].values[j]['categoryId']) {
           store_commission[i].values[j]['category'] =
-            await this.catalogueModel.findOne({
+            await this.categoriesModel.findOne({
               _id: ObjectId(store_commission[i].values[j]['categoryId']),
             });
         }
       }
     }
 
-    return store_commission;
+    if (dto.commissionType) {
+      store_commission = _.filter(
+        store_commission,
+        (e) => e.commissionType == dto.commissionType,
+      );
+    }
+
+    if (dto.applicableType) {
+      store_commission = _.filter(
+        store_commission,
+        (e) => e.applicableType == dto.applicableType,
+      );
+    }
+
+    if (dto.planCode) {
+      store_commission = _.filter(
+        store_commission,
+        (e) => e.planCode == dto.planCode,
+      );
+    }
+
+    if (dto.categoryName) {
+      store_commission = _.filter(
+        store_commission,
+        (e) => e.values.categoryName == dto.categoryName,
+      );
+    }
+
+    return {
+        store_commission: store_commission.slice(dto.page ?? 0, dto.limit ?? 20),
+        count: store_commission.length,
+        page: Math.ceil(store_commission.length / (dto.limit ? dto.limit : 20))
+    };
   }
 
   async getStoreCommissionDetail(id: string) {
