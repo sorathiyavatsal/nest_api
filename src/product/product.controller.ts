@@ -156,7 +156,14 @@ export class ProductController {
           type: 'array',
           items: {
             type: 'object',
-            examples: {
+            properties: {
+              optionName: { type: 'string' },
+              optionValue: {
+                type: 'array',
+              },
+              optionImage: { type: 'string' },
+            },
+            example: {
               optionName: 'size',
               optionValue: ['small', 'medium'],
               optionImage:
@@ -242,6 +249,16 @@ export class ProductController {
           type: 'array',
           items: {
             type: 'object',
+            properties: {
+              options: { type: 'object' },
+              optionImage: { type: 'array' },
+            },
+            example: {
+              options: { size: 'medium', color: 'red' },
+              optionsImage: [
+                'public/uploads/product/variants/optionsImage-1648417933409.jpeg',
+              ],
+            },
           },
         },
       },

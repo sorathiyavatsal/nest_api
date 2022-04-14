@@ -18,6 +18,7 @@ export class ProductService {
   }
 
   async patchVariantOptions(id: String, updatedto: any) {
+    console.log(updatedto.options)
     return await this.metaDataModel.updateOne(
       {
         productId: ObjectId(id),
@@ -25,7 +26,7 @@ export class ProductService {
       },
       {
         $set: {
-          metaValue: JSON.parse(JSON.stringify(updatedto.options)),
+          metaValue: updatedto.options.map(options => JSON.parse(JSON.stringify(options))),
         },
       },
       { $upsert: true },
