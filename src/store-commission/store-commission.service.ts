@@ -15,18 +15,41 @@ export class StoreCommissionService {
   ) {}
 
   async getAllStoreCommissions(dto: any) {
-    var store_commission = await this.StoreCommissionModel.find({});
+    var store_commission = JSON.parse(
+      JSON.stringify(await this.StoreCommissionModel.find({})),
+    );
 
     for (let i = 0; i < store_commission.length; i++) {
       for (let j = 0; j < store_commission[i].values.length; j++) {
         if (store_commission[i].values[j]['categoryId']) {
-          store_commission[i].values[j]['category'] =
-            await this.categoriesModel.findOne({
-              _id: ObjectId(store_commission[i].values[j]['categoryId']),
-            });
+          var category = await this.categoriesModel.findOne({
+            _id: ObjectId(store_commission[i].values[j]['categoryId']),
+          });
+
+          if (category) {
+            store_commission[i].values[j]['category'] = {
+                name: category['categoryName'],
+                image: category['categoryImage']
+            }
+          }
+
+          if (dto.categoryName) {
+            if (
+              store_commission[i].values[j]['category']['name'] !=
+              dto.categoryName
+            ) {
+              delete store_commission[i];
+              break;
+            }
+          }
         }
       }
     }
+
+    store_commission = _.filter(
+        store_commission,
+        (e) => e != null,
+      );
 
     if (dto.commissionType) {
       store_commission = _.filter(
@@ -48,6 +71,8 @@ export class StoreCommissionService {
         (e) => e.planCode == dto.planCode,
       );
     }
+
+
 
     return {
       store_commission: store_commission.slice(dto.page ?? 0, dto.limit ?? 20),
