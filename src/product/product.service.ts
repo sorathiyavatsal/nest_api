@@ -18,7 +18,6 @@ export class ProductService {
   }
 
   async patchVariantOptions(id: String, updatedto: any) {
-    console.log(updatedto.options);
     return await this.metaDataModel.updateOne(
       {
         productId: ObjectId(id),
@@ -551,10 +550,7 @@ export class ProductService {
 
     if (products && products[0] && products[0]['metaOptions']) {
       products[0]['parentMetaId'] = products[0]['metaOptions']['parentMetaId'];
-      products[0]['variants'] = {
-        _id: products[0]['metaOptions']['_id'],
-        variants: products[0]['metaOptions']['metaValue'],
-      };
+      products[0]['variants'] = products[0]['metaOptions']['metaValue']
 
       const variants = await this.metaDataModel.find({
         productId: ObjectId(products[0]['metaOptions']['productId']),
@@ -562,10 +558,7 @@ export class ProductService {
       });
 
       if (variants) {
-        products[0]['options'] = {
-          _id: variants[0]['_id'],
-          value: variants[0]['metaValue'],
-        };
+        products[0]['options'] = variants[0]['metaValue']
       }
 
       delete products[0]['metaOptions'];
