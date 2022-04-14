@@ -66,26 +66,23 @@ export class StoreCommissionController {
       type: 'object',
       properties: {
         planCode: {type: 'string'},
-        category: { 
+        values: { 
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              categoryId: {type: 'string'},
-              commissionAmount: {type: 'object', description: 'for general return only amount, and for range return array of object like {to: 1, from: 100, value: 20}'},
-
+                categoryId: { type: 'string' },
+                to: { type: 'number'},
+                from: { type: 'number'},
+                amount: { type: 'number'},
+                commissionAmountType: { type: 'boolean'},
             },
-            description: "categoryId, commissionAmount{},commissionAmountType[true = Flat, false = percentage]",
             example: {
                 categoryId: "621837622904011bde645a36",
-                commissionAmount: {
-                    range: {
-                        to: 20,
-                        from: 10
-                    },
-                    amount: 20,
-                    commissionAmountType: "true = Flat, false = Perncetage"
-                },
+                to: 0,
+                from: 20,
+                amount: 15,
+                commissionAmountType: true
             }
           },
         },
@@ -111,25 +108,23 @@ export class StoreCommissionController {
       type: 'object',
       properties: {
         planCode: {type: 'string'},
-        category: { 
+        values: { 
           type: 'array',
           items: {
             type: 'object',
-            properties:{
-              categoryId: {type: 'string'},
-              commissionAmount: {type: 'object', description: 'for general return only amount, and for range return array of object like {from: 1, to: 100, value: 20}'},
+            properties: {
+                categoryId: { type: 'string' },
+                to: { type: 'number'},
+                from: { type: 'number'},
+                amount: { type: 'number'},
+                commissionAmountType: { type: 'boolean'},
             },
-            description: "categoryId, commissionAmount{},commissionAmountType[true = Flat, false = percentage]",
             example: {
                 categoryId: "621837622904011bde645a36",
-                commissionAmount: {
-                    range: {
-                        to: 20,
-                        from: 10
-                    },
-                    amount: 20,
-                    commissionAmountType: "true = Flat, false = Perncetage"
-                },
+                to: 0,
+                from: 20,
+                amount: 15,
+                commissionAmountType: true
             }
           },
         },
