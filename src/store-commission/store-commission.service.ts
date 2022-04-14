@@ -49,17 +49,10 @@ export class StoreCommissionService {
       );
     }
 
-    if (dto.categoryName) {
-      store_commission = _.filter(
-        store_commission,
-        (e) => e.values.categoryName == dto.categoryName,
-      );
-    }
-
     return {
-        store_commission: store_commission.slice(dto.page ?? 0, dto.limit ?? 20),
-        count: store_commission.length,
-        page: Math.ceil(store_commission.length / (dto.limit ? dto.limit : 20))
+      store_commission: store_commission.slice(dto.page ?? 0, dto.limit ?? 20),
+      count: store_commission.length,
+      page: Math.ceil(store_commission.length / (dto.limit ? dto.limit : 20)),
     };
   }
 
