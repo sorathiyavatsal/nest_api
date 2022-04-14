@@ -72,7 +72,7 @@ export class SocketGateway {
       url: `${this.WEB_URL}/api/delivery-fleet/update/${payload.delivery_fleet_id}`,
       data: JSON.parse(
         JSON.stringify({
-          invoiceStatus: 'complete',
+          invoiceStatus: 'accepted',
           deliveryBoy: this.ObjectId(payload.delivery_boy_id)
         }),
       ),
