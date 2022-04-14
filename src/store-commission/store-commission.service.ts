@@ -3,17 +3,38 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StoreCommission } from './store-commission.model';
 let ObjectId = require('mongodb').ObjectId;
+import { catalogue } from '../catalogue/catalogue.model';
 
 @Injectable()
 export class StoreCommissionService {
-  constructor(@InjectModel('StoreCommission') private StoreCommissionModel: Model<StoreCommission>) { }
+  constructor(
+    @InjectModel('StoreCommission')
+    private StoreCommissionModel: Model<StoreCommission>,
+    @InjectModel('catalogue') private catalogueModel: Model<catalogue>,
+  ) {}
 
   async getAllStoreCommissions() {
-    return await this.StoreCommissionModel.find({});
+    var store_commission = await this.StoreCommissionModel.find({});
+
+    for (let i = 0; i < store_commission.length; i++) {
+      for (let j = 0; j < store_commission[i].values.length; j++) {
+        if (store_commission[i].values[j]['categoryId']) {
+          store_commission[i].values[j]['category'] =
+            await this.catalogueModel.findOne({
+              _id: ObjectId(store_commission[i].values[j]['categoryId']),
+            });
+        }
+      }
+    }
+
+    return store_commission;
   }
 
   async getStoreCommissionDetail(id: string) {
-    return await this.StoreCommissionModel.findOne({ _id: ObjectId(id) });
+    var store_commission = await this.StoreCommissionModel.findOne({
+      _id: ObjectId(id),
+    });
+    return store_commission;
   }
 
   async addStoreCommission(storeCommDto: any) {
@@ -36,12 +57,13 @@ export class StoreCommissionService {
       { _id: ObjectId(id) },
       { $set: storeCommDto },
       { new: true, upsert: true },
-    ).then((data) => {
-      return data.toObject({ versionKey: false });
-    }).catch(err => {
+    )
+      .then((data) => {
+        return data.toObject({ versionKey: false });
+      })
+      .catch((err) => {
         console.log(err);
         return new BadRequestException(err);
-    });
+      });
   }
 }
-
