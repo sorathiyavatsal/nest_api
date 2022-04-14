@@ -401,24 +401,24 @@ export class DeliveryFleetService {
     } else if (dto.invoiceStatus == 'dispatched') {
       let verification: any = await this.userVerificationModel.findOne({
         otp: dto.otp,
-        deliveryId: id,
-        verifiedTemplate: 'deliveryDelivered',
+        createdUser: ObjectId(id),
+        verifiedTemplate: 'deliveryProgress'
       });
+
       if (verification && !verification.verifiedStatus) {
         const mailOptions = {
           name: 'DELIVERY_DISPATCHED',
           type: 'SMS',
-          device: req.headers.OsName || 'ANDROID',
-          phone: data.userId.phoneNumber,
+          device: 'ANDROID',
+          phone: data.fromPhone,
         };
+
         this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
 
-        // message = message + ' boy deliver the package to drop location';
-        // this.sendEmailMiddleware.sensSMSdelivery(req, data.userId.phoneNumber, message);
         this.userVerificationModel.update(
           {
             otp: dto.otp,
-            deliveryId: id,
+            createdUser: ObjectId(id),
             verifiedTemplate: 'deliveryDelivered',
           },
           { $set: { verifiedStatus: true } },
