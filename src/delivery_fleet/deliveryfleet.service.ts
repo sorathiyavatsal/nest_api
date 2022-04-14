@@ -451,7 +451,7 @@ export class DeliveryFleetService {
     } else if (dto.invoiceStatus == 'delivered') {
       let code: any = await this.loginVerificationSmsOtp(
         id,
-        data.userId._id,
+        data.userId,
         'deliveryDelivered',
       );
       code = code.otp;

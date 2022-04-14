@@ -29,12 +29,13 @@ import { Roles } from 'src/auth/roles.decorator';
 @ApiBearerAuth()
 @ApiSecurity('api_key')
 export class StoreCommissionController {
-  constructor(private storeCommissionService: StoreCommissionService) {}
+  constructor(private storeCommissionService: StoreCommissionService) { }
 
   @Get('/')
+  
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
-    summary: 'get All Store Commissions',
+    summary: "get All Store Commissions"
   })
   @ApiQuery({ name: 'categoryName', type: 'string', required: false })
   @ApiQuery({ name: 'planCode', type: 'number', required: false })
@@ -50,107 +51,98 @@ export class StoreCommissionController {
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
-    summary: 'get Store Commissions by Id',
+    summary: "get Store Commissions by Id"
   })
   async getStoreCommissionDetail(@Param() params, @Request() request: any) {
-    return await this.storeCommissionService.getStoreCommissionDetail(
-      params.id,
-    );
+    return await this.storeCommissionService.getStoreCommissionDetail(params.id);
   }
 
   @Post('/')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'add Store Commissions' })
+  @ApiOperation({summary:"add Store Commissions"})
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        planCode: { type: 'string' },
-        category: {
+        planCode: {type: 'string'},
+        category: { 
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              categoryId: { type: 'string' },
-              commissionAmount: {
-                type: 'object',
-                description:
-                  'for general return only amount, and for range return array of object like {from: 1, to: 100, value: 20}',
-              },
+              categoryId: {type: 'string'},
+              commissionAmount: {type: 'object', description: 'for general return only amount, and for range return array of object like {to: 1, from: 100, value: 20}'},
+
             },
-            description:
-              'categoryId, commissionAmount{},commissionAmountType[true = Flat, false = percentage]',
+            description: "categoryId, commissionAmount{},commissionAmountType[true = Flat, false = percentage]",
             example: {
-              categoryId: '621837622904011bde645a36',
-              commissionAmount: {
-                range: {
-                  to: 20,
-                  from: 10,
+                categoryId: "621837622904011bde645a36",
+                commissionAmount: {
+                    range: {
+                        to: 20,
+                        from: 10
+                    },
+                    amount: 20,
+                    commissionAmountType: "true = Flat, false = Perncetage"
                 },
-                amount: 20,
-                commissionAmountType: 'true = Flat, false = Perncetage',
-              },
-            },
+            }
           },
         },
         applicableType: { type: 'string', enum: ['INVOICE', 'CATEGORY'] },
         commissionType: { type: 'string', enum: ['GENERAL', 'RANGE'] },
-        description: { type: 'string' },
+        description: {type: 'string'}
       },
     },
   })
-  async addStoreCommission(@Request() req: any) {
+  async addStoreCommission(
+    @Request() req: any,
+  ) {
     return await this.storeCommissionService.addStoreCommission(req.body);
   }
 
   @Put('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'update Store Commissions by Id' })
+  @ApiOperation({summary:"update Store Commissions by Id"})
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', type: 'string', required: true })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        planCode: { type: 'string' },
-        category: {
+        planCode: {type: 'string'},
+        category: { 
           type: 'array',
           items: {
             type: 'object',
-            properties: {
-              categoryId: { type: 'string' },
-              commissionAmount: {
-                type: 'object',
-                description:
-                  'for general return only amount, and for range return array of object like {from: 1, to: 100, value: 20}',
-              },
+            properties:{
+              categoryId: {type: 'string'},
+              commissionAmount: {type: 'object', description: 'for general return only amount, and for range return array of object like {from: 1, to: 100, value: 20}'},
             },
-            description:
-              'categoryId, commissionAmount{},commissionAmountType[true = Flat, false = percentage]',
+            description: "categoryId, commissionAmount{},commissionAmountType[true = Flat, false = percentage]",
             example: {
-              categoryId: '621837622904011bde645a36',
-              commissionAmount: {
-                range: {
-                  to: 20,
-                  from: 10,
+                categoryId: "621837622904011bde645a36",
+                commissionAmount: {
+                    range: {
+                        to: 20,
+                        from: 10
+                    },
+                    amount: 20,
+                    commissionAmountType: "true = Flat, false = Perncetage"
                 },
-                amount: 20,
-                commissionAmountType: 'true = Flat, false = Perncetage',
-              },
-            },
+            }
           },
         },
         applicableType: { type: 'string', enum: ['INVOICE', 'CATEGORY'] },
         commissionType: { type: 'string', enum: ['GENERAL', 'RANGE'] },
-        description: { type: 'string' },
+        description: {type: 'string'}
       },
     },
   })
-  async updateStoreCommission(@Param() params, @Request() req) {
-    return await this.storeCommissionService.updateStoreCommission(
-      params.id,
-      req.body,
-    );
+  async updateStoreCommission(
+    @Param() params,
+    @Request() req,
+  ) {
+    return await this.storeCommissionService.updateStoreCommission(params.id, req.body);
   }
 }
