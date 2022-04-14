@@ -17,7 +17,6 @@ export class StoreCommissionService {
   }
 
   async addStoreCommission(storeCommDto: any) {
-    storeCommDto['status'] = true;
     const newStoreComm = new this.StoreCommissionModel(storeCommDto);
     return await newStoreComm.save().then(
       (s: any) => {
