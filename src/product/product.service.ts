@@ -550,15 +550,16 @@ export class ProductService {
 
     if (products && products[0] && products[0]['metaOptions']) {
       products[0]['parentMetaId'] = products[0]['metaOptions']['parentMetaId'];
-      products[0]['variants'] = products[0]['metaOptions']['metaValue']
+
+      products[0]['options'] = products[0]['metaOptions']['metaValue']
 
       const variants = await this.metaDataModel.find({
         productId: ObjectId(products[0]['metaOptions']['productId']),
-        metaKey: 'product_options',
+        metaKey: 'product_variants',
       });
 
       if (variants) {
-        products[0]['options'] = variants[0]['metaValue']
+        products[0]['variants'] = variants[0]['metaValue']
       }
 
       delete products[0]['metaOptions'];
