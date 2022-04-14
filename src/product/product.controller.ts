@@ -250,10 +250,12 @@ export class ProductController {
           items: {
             type: 'object',
             properties: {
+              _id: { type: 'string' },
               options: { type: 'object' },
               optionImage: { type: 'array' },
             },
             example: {
+              _id: '6254e9c202079c6aa83604c6',
               options: { size: 'medium', color: 'red' },
               optionsImage: [
                 'public/uploads/product/variants/optionsImage-1648417933409.jpeg',

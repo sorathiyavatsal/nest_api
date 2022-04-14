@@ -18,6 +18,7 @@ export class ProductService {
   }
 
   async patchVariantOptions(id: String, updatedto: any) {
+    updatedto.options.map(options => ObjectId(options._id))
     return await this.metaDataModel.updateOne(
       {
         productId: ObjectId(id),
@@ -25,7 +26,7 @@ export class ProductService {
       },
       {
         $set: {
-          metaValue: updatedto.options.map((options) =>
+          metaValue: updatedto.options.map((options) => 
             JSON.parse(JSON.stringify(options)),
           ),
         },
@@ -42,7 +43,7 @@ export class ProductService {
       },
       {
         $set: {
-          metaValue: JSON.parse(JSON.stringify(updateDto.variants)),
+          metaValue: JSON.parse(JSON.stringify(updateDto.variants.map(variants => ObjectId(variants._id)))),
         },
       },
       { $upsert: true },
@@ -551,7 +552,7 @@ export class ProductService {
     if (products && products[0] && products[0]['metaOptions']) {
       products[0]['parentMetaId'] = products[0]['metaOptions']['parentMetaId'];
 
-      products[0]['options'] = products[0]['metaOptions']['metaValue']
+      products[0]['options'] = products[0]['metaOptions']['metaValue'];
 
       const variants = await this.metaDataModel.find({
         productId: ObjectId(products[0]['metaOptions']['productId']),
@@ -559,7 +560,7 @@ export class ProductService {
       });
 
       if (variants) {
-        products[0]['variants'] = variants[0]['metaValue']
+        products[0]['variants'] = variants[0]['metaValue'];
       }
 
       delete products[0]['metaOptions'];
@@ -692,6 +693,7 @@ export class ProductService {
         {
           $push: {
             metaValue: {
+              _id: ObjectId(),
               optionName: metaDto.optionName,
               optionValue: metaDto.optionValue,
               optionImage: metaDto.image,
@@ -710,6 +712,7 @@ export class ProductService {
         metaKey: 'product_options',
         metaValue: [
           {
+            _id: ObjectId(),
             optionName: metaDto.optionName,
             optionValue: metaDto.optionValue,
             optionImage: metaDto.image,
@@ -737,6 +740,7 @@ export class ProductService {
         {
           $push: {
             metaValue: {
+              _id: ObjectId(),
               options: JSON.parse(JSON.stringify(optionsDto.options)),
               optionsImage: optionsDto.optionsImage,
             },
@@ -755,6 +759,7 @@ export class ProductService {
         parentMetaId: ObjectId(optionsDto.parentMetaId),
         metaValue: [
           {
+            _id: ObjectId(),
             options: JSON.parse(JSON.stringify(optionsDto.options)),
             optionsImage: optionsDto.optionsImage,
           },

@@ -625,6 +625,7 @@ export class CatalogueService {
         {
           $push: {
             metaValue: {
+                _id: ObjectId(),
               optionName: metaDto.optionName,
               optionValue: metaDto.optionValue,
               optionImage: metaDto.image,
@@ -652,6 +653,7 @@ export class CatalogueService {
         metaKey: 'catalogue_options',
         metaValue: [
           {
+            _id: ObjectId(),
             optionName: metaDto.optionName,
             optionValue: metaDto.optionValue,
             optionImage:
@@ -688,6 +690,7 @@ export class CatalogueService {
           $push: {
             metaValue: [
               {
+                _id: ObjectId(),
                 options: JSON.parse(JSON.stringify(optionsDto.options)),
                 optionsImage: optionsDto.optionsImage,
                 mrpprice: optionsDto.mrpprice,
@@ -725,6 +728,7 @@ export class CatalogueService {
             parentMetaId: ObjectId(optionsDto.parentMetaId),
             metaValue: [
               {
+                _id: ObjectId(),
                 options: JSON.parse(JSON.stringify(optionsDto.options)),
                 optionsImage: optionsDto.optionsImage,
                 mrpprice: optionsDto.mrpprice,
@@ -755,7 +759,7 @@ export class CatalogueService {
       },
       {
         $set: {
-          metaValue: dto.options,
+          metaValue: dto.options.map(options => ObjectId(options._id)),
         },
       },
       { $upsert: true },
@@ -770,7 +774,7 @@ export class CatalogueService {
       },
       {
         $set: {
-          metaValue: dto.variants,
+          metaValue: dto.variants.map(variants => ObjectId(variants._id)),
         },
       },
       { $upsert: true },
