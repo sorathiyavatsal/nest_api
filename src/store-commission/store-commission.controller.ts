@@ -34,7 +34,6 @@ export class StoreCommissionController {
   @Get('/')
   
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
   @ApiOperation({
     summary: "get All Store Commissions"
   })
@@ -51,7 +50,6 @@ export class StoreCommissionController {
   @ApiParam({ name: 'id', required: true })
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
   @ApiOperation({
     summary: "get Store Commissions by Id"
   })
@@ -61,7 +59,6 @@ export class StoreCommissionController {
 
   @Post('/')
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
   @ApiOperation({summary:"add Store Commissions"})
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
@@ -94,7 +91,6 @@ export class StoreCommissionController {
 
   @Put('/:id')
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
   @ApiOperation({summary:"update Store Commissions by Id"})
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiParam({ name: 'id', type: 'string', required: true })

@@ -192,15 +192,16 @@ export class ProductService {
           _id: -1,
         },
       },
-      {
-        $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
-      },
-      { $limit: filter.limit ? parseInt(filter.limit) : 20 },
+    //   {
+    //     $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
+    //   },
+    //   { $limit: filter.limit ? parseInt(filter.limit) : 20 },
     ]);
 
     return {
-      products: product,
-      pages: Math.ceil(product.length / (filter.limit ? filter.limit : 20) - 1),
+      products: product.slice(filter.page ?? 0, filter.limit ?? 20),
+      count: product.length,
+      pages: Math.ceil(product.length / (filter.limit ? filter.limit : 20)),
     };
   }
 

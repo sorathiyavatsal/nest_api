@@ -43,7 +43,6 @@ export const UserDataSchema = new mongoose.Schema(
     adharcard_no: {
       type: String,
     },
-
     pancard_no: {
       type: String,
     },

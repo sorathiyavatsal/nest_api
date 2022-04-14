@@ -460,7 +460,7 @@ export class DeliveryFleetService {
         name: 'DELIVERY_DELIVERED_OTP',
         type: 'SMS',
         device: req.headers.OsName || 'ANDROID',
-        phone: data.fromPhone,
+        phone: data.toPhone,
         otp: code,
       };
       this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
