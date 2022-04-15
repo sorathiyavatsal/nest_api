@@ -18,21 +18,28 @@ export class ProductService {
   }
 
   async patchVariantOptions(id: String, updatedto: any) {
-    updatedto.options.map(options => ObjectId(options._id))
-    return await this.metaDataModel.updateOne(
-      {
+    const options = await this.metaDataModel.findOne({
         productId: ObjectId(id),
         metaKey: 'product_options',
-      },
-      {
-        $set: {
-          metaValue: updatedto.options.map((options) => 
-            JSON.parse(JSON.stringify(options)),
-          ),
-        },
-      },
-      { $upsert: true },
-    );
+    });
+
+    console.log(options);
+    
+    // updatedto.options.map(options => ObjectId(options._id))
+    // return await this.metaDataModel.updateOne(
+    //   {
+    //     productId: ObjectId(id),
+    //     metaKey: 'product_options',
+    //   },
+    //   {
+    //     $set: {
+    //       metaValue: updatedto.options.map((options) => 
+    //         JSON.parse(JSON.stringify(options)),
+    //       ),
+    //     },
+    //   },
+    //   { $upsert: true },
+    // );
   }
 
   async patchVariant(id: String, updateDto: any) {
