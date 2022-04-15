@@ -60,92 +60,120 @@ export class AuthService {
     userCredentialsDto: MangerDeliveryCredentialsDto,
     req: any,
   ) {
-    let userToAttempt = await this.findOneByPhone(
-      userCredentialsDto.phoneNumber,
-    );
-    if (userToAttempt) {
-      if (userCredentialsDto.deliveryId) {
-        let updateUser: any = await this.deliveryfleetModel.findOneAndUpdate(
-          { _id: userCredentialsDto.deliveryId },
-          {
-            $set: {
-              userId: userToAttempt._id,
-              createdBy: userToAttempt._id,
-              modifiedBy: userToAttempt._id,
-            },
-          },
-          { upsert: true },
-        );
-      }
-      let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
-      return {
-        user: userToAttempt,
-        loginStatus: true,
-        message: 'Verification sent to mobile',
-      };
+    let userResult = await this.userModel.find({
+        phoneNumber: userCredentialsDto.phoneNumber
+    });
+    
+    let role = [];
+    for(let i = 0; i < userResult.length; i++) {
+        role.push(userResult[i]["role"]);
+    }
+    
+    var roleFlag = true;
+    for(let i = 0; i < role.length; i++) {
+        if(role[i] == "MERCHANT" && userCredentialsDto.role == "DELIVERY") {
+            roleFlag = false;
+        }
+
+        if(role[i] == "DELIVERY" && userCredentialsDto.role == "MERCHANT") {
+            roleFlag = false;
+        }
     }
 
-    let findroles = this.findRole(userCredentialsDto.role);
-    if (!findroles) userCredentialsDto.role = 'USER';
-    let usersCount = (await this.userModel.estimatedDocumentCount()) + 1;
-    let today = new Date().toISOString().substr(0, 10);
-    let todayDate = today.replace(/-/g, '');
-    let reDigit = usersCount;
+    if(roleFlag) {
+        const userToAttempt =  await this.userModel.findOne({
+            phoneNumber: userCredentialsDto.phoneNumber,
+            role: userCredentialsDto.role
+        });
 
-    let userId = todayDate + usersCount;
-    const newUser = new this.userModel({
-      userId: userId,
-      password: Math.floor(Math.random() * 1000000000).toString(),
-      role: userCredentialsDto.role,
-      verifyType: userCredentialsDto.verifyType,
-      phoneNumber: userCredentialsDto.phoneNumber,
-    });
-
-    return await newUser.save().then((user) => {
-      let verifiedTemplate = 'register';
-      if (user.verifyType != 'email') verifiedTemplate = 'registersms';
-      const newTokenVerifyEmail = new this.userVerificationModel({
-        verificationType: user.verifyType,
-        verifiedTemplate: verifiedTemplate,
-        createdBy: user._id,
-        createdUser: user._id,
-        modifiedBy: user._id,
-        otp: Math.floor(1000 + Math.random() * 9000),
-      });
-      newTokenVerifyEmail.save();
-      if (userCredentialsDto.deliveryId) {
-        this.deliveryfleetModel.findOneAndUpdate(
-          { _id: userCredentialsDto.deliveryId },
-          {
-            $set: {
-              userId: user._id,
+        if (userToAttempt) {
+            if (userCredentialsDto.deliveryId) {
+              let updateUser: any = await this.deliveryfleetModel.findOneAndUpdate(
+                { _id: userCredentialsDto.deliveryId },
+                {
+                  $set: {
+                    userId: userToAttempt._id,
+                    createdBy: userToAttempt._id,
+                    modifiedBy: userToAttempt._id,
+                  },
+                },
+                { upsert: true },
+              );
+            }
+            let userotp: any = await this.loginVerificationSmsOtp(req, userToAttempt);
+            return {
+              user: userToAttempt,
+              loginStatus: true,
+              message: 'Verification sent to mobile',
+            };
+          }
+      
+          let findroles = this.findRole(userCredentialsDto.role);
+          if (!findroles) userCredentialsDto.role = 'USER';
+          let usersCount = (await this.userModel.estimatedDocumentCount()) + 1;
+          let today = new Date().toISOString().substr(0, 10);
+          let todayDate = today.replace(/-/g, '');
+          let reDigit = usersCount;
+      
+          let userId = todayDate + usersCount;
+          const newUser = new this.userModel({
+            userId: userId,
+            password: Math.floor(Math.random() * 1000000000).toString(),
+            role: userCredentialsDto.role,
+            verifyType: userCredentialsDto.verifyType,
+            phoneNumber: userCredentialsDto.phoneNumber,
+          });
+      
+          return await newUser.save().then((user) => {
+            let verifiedTemplate = 'register';
+            if (user.verifyType != 'email') verifiedTemplate = 'registersms';
+            const newTokenVerifyEmail = new this.userVerificationModel({
+              verificationType: user.verifyType,
+              verifiedTemplate: verifiedTemplate,
               createdBy: user._id,
+              createdUser: user._id,
               modifiedBy: user._id,
-            },
-          },
-          { upsert: true },
-        );
-      }
-
-      const mailOptions = {
-        name: 'REGISTER',
-        type: 'SMS',
-        device: req.headers.OsName || 'ANDROID',
-        phone: user.phoneNumber,
-        otp: newTokenVerifyEmail.otp,
-        username: user.fullName,
-      };
-      this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
-
-      // this.sendEmailMiddleware.sensSMS(
-      //   req.headers['OsName'],
-      //   user.phoneNumber,
-      //   newTokenVerifyEmail.otp,
-      //   user.role,
-      //   false,
-      // );
-      return { user: user.toObject({ versionKey: false }), loginStaus: false };
-    });
+              otp: Math.floor(1000 + Math.random() * 9000),
+            });
+            newTokenVerifyEmail.save();
+            if (userCredentialsDto.deliveryId) {
+              this.deliveryfleetModel.findOneAndUpdate(
+                { _id: userCredentialsDto.deliveryId },
+                {
+                  $set: {
+                    userId: user._id,
+                    createdBy: user._id,
+                    modifiedBy: user._id,
+                  },
+                },
+                { upsert: true },
+              );
+            }
+      
+            const mailOptions = {
+              name: 'REGISTER',
+              type: 'SMS',
+              device: req.headers.OsName || 'ANDROID',
+              phone: user.phoneNumber,
+              otp: newTokenVerifyEmail.otp,
+              username: user.fullName,
+            };
+            this.sendEmailMiddleware.sendEmailOrSms(mailOptions);
+      
+            // this.sendEmailMiddleware.sensSMS(
+            //   req.headers['OsName'],
+            //   user.phoneNumber,
+            //   newTokenVerifyEmail.otp,
+            //   user.role,
+            //   false,
+            // );
+            return { user: user.toObject({ versionKey: false }), loginStaus: false };
+          });
+    } else {
+        return {
+            message:  `${userCredentialsDto.phoneNumber} is not register as ${userCredentialsDto.role}`
+        }
+    }
   }
 
   async loginVerificationSmsOtp(req: any, user: any) {
