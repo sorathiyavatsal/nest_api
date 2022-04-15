@@ -171,7 +171,8 @@ export class AuthService {
           });
     } else {
         return {
-            message:  `${userCredentialsDto.phoneNumber} is not register as ${userCredentialsDto.role}`
+            loginStatus: false,
+            message: `${userCredentialsDto.phoneNumber} is not register as ${userCredentialsDto.role}`
         }
     }
   }
