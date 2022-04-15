@@ -591,8 +591,9 @@ export class AuthService {
       let userToAttempt, errorMsgNotFound, successMsg: any;
 
       userToAttempt = await this.userModel.findOne({
-        phoneNumber: emailVerifyCredentialsDto.phone,
+        _id: ObjectId(emailVerifyCredentialsDto.userId),
       });
+
       errorMsgNotFound = 'Phone number not found !';
       successMsg = 'Phone verification is successfully!';
 
@@ -600,10 +601,12 @@ export class AuthService {
       let userToken: any = await this.userLoginToken(userToAttempt, res);
 
       let data = await this.userVerificationModel.findOne({
-        createdUser: userToAttempt._id,
+        createdUser: ObjectId(emailVerifyCredentialsDto.userId),
         otp: emailVerifyCredentialsDto.code,
         verifiedStatus: false,
       });
+
+      console.log(data)
 
       if (data) {
         const savedAddress =
