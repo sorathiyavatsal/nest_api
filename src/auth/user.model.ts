@@ -14,7 +14,6 @@ export const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
       index: {
-        unique: true,
         partialFilterExpression: { email: { $type: 'string' } },
       },
     },
@@ -65,7 +64,6 @@ export const UserSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      unique: true,
     },
     fullName: {
       type: String,

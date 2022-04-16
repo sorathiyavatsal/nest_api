@@ -194,6 +194,7 @@ export class SocketGateway {
     });
     this.server.emit('Location', {
       loc: data.data.loc,
+      delivery_boy_id: payload.delivery_boy_id,
       extraData: payload.extraData,
     });
   }

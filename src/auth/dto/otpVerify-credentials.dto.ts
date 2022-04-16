@@ -12,7 +12,7 @@ export class OtpVerifyCredentialsDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  phone: string;
+  userId: string;
 
   @IsString()
   @IsNotEmpty()
