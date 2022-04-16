@@ -218,6 +218,25 @@ export class UserDataController {
         },
         store_timing: {
           type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              day: {
+                type: 'string',
+              },
+              toTiming: {
+                type: 'string',
+              },
+              fromTiming: {
+                type: 'string',
+              },
+            },
+            example: {
+              day: 'Monday',
+              toTiming: '9:00',
+              fromTiming: '20:00',
+            },
+          },
         },
       },
     },

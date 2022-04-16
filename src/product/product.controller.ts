@@ -157,6 +157,7 @@ export class ProductController {
           items: {
             type: 'object',
             properties: {
+              _id: { type: 'string' },
               optionName: { type: 'string' },
               optionValue: {
                 type: 'array',
@@ -164,6 +165,7 @@ export class ProductController {
               optionImage: { type: 'string' },
             },
             example: {
+              _id: '6254e9c202079c6aa83604c6',
               optionName: 'size',
               optionValue: ['small', 'medium'],
               optionImage:
@@ -181,6 +183,7 @@ export class ProductController {
     @Request() request,
     @UploadedFiles() files,
   ) {
+      console.log("yre")
     return await this.ProductService.patchVariantOptions(
       query.productId,
       request.body,
@@ -194,7 +197,7 @@ export class ProductController {
       type: 'object',
       properties: {
         productId: {
-            type: 'string'
+          type: 'string',
         },
         optionId: {
           type: 'string',
@@ -203,12 +206,8 @@ export class ProductController {
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async removeVariantOptions(
-    @Request() request,
-  ) {
-    return await this.ProductService.removeVariantOptions(
-      request.body,
-    );
+  async removeVariantOptions(@Request() request) {
+    return await this.ProductService.removeVariantOptions(request.body);
   }
 
   @Post('/variants')
@@ -310,7 +309,7 @@ export class ProductController {
       type: 'object',
       properties: {
         productId: {
-            type: 'string'
+          type: 'string',
         },
         variantId: {
           type: 'string',
@@ -319,12 +318,8 @@ export class ProductController {
     },
   })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async removeVariant(
-    @Request() request,
-  ) {
-    return await this.ProductService.removeVariant(
-      request.body,
-    );
+  async removeVariant(@Request() request) {
+    return await this.ProductService.removeVariant(request.body);
   }
 
   @Post('/add')
