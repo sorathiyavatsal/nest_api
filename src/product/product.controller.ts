@@ -187,6 +187,30 @@ export class ProductController {
     );
   }
 
+  @Delete('/options')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+            type: 'string'
+        },
+        optionId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async removeVariantOptions(
+    @Request() request,
+  ) {
+    return await this.ProductService.removeVariantOptions(
+      request.body,
+    );
+  }
+
   @Post('/variants')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
@@ -275,6 +299,30 @@ export class ProductController {
   ) {
     return await this.ProductService.patchVariant(
       query.productId,
+      request.body,
+    );
+  }
+
+  @Delete('/variants')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+            type: 'string'
+        },
+        variantId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async removeVariant(
+    @Request() request,
+  ) {
+    return await this.ProductService.removeVariant(
       request.body,
     );
   }
