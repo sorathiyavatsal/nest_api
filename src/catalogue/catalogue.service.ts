@@ -491,7 +491,7 @@ export class CatalogueService {
     );
 
     for (let i = 0; i < catalogue.length; i++) {
-        console.log(catalogue[i]["_id"])
+      console.log(catalogue[i]['_id']);
       const variants = await this.metaDataModel.find({
         _id: ObjectId(catalogue[i]['options']['parentMetaId']),
       });
@@ -562,6 +562,8 @@ export class CatalogueService {
       ),
     );
 
+    var response = [];
+
     for (let i = 0; i < catalogue.length; i++) {
       const variants = await this.metaDataModel.find({
         _id: ObjectId(catalogue[i]['options']['parentMetaId']),
@@ -569,9 +571,59 @@ export class CatalogueService {
 
       catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
       catalogue[i]['options'] = variants[0]['metaValue'];
+
+      var catalogueDetails = {
+        _id: catalogue[i]['_id'],
+        productId: catalogue[i]['productId'],
+        catalogueStatus: catalogue[i]['catalogueStatus'],
+        variants: catalogue[i]['variants'],
+        name: catalogue[i]['products'][0]['name'],
+        secondary_name: catalogue[i]['products'][0]['secondary_name'],
+        description: catalogue[i]['products'][0]['description'],
+        pageTitle: catalogue[i]['products'][0]['pageTitle'],
+        metaOptions: catalogue[i]['products'][0]['metaOptions'],
+        metaDescription: catalogue[i]['products'][0]['metaDescription'],
+        urlHandle: catalogue[i]['products'][0]['urlHandle'],
+        productImage: catalogue[i]['products'][0]['productImage'],
+        storeCategory: catalogue[i]['products'][0]['storeCategory'],
+        category: catalogue[i]['products'][0]['category'],
+        collections: catalogue[i]['products'][0]['collections'],
+        brand: catalogue[i]['products'][0]['brand'],
+        review: catalogue[i]['products'][0]['review'],
+        keywords: catalogue[i]['products'][0]['keywords'],
+        stores: {
+          _id: catalogue[i]['stores'][0]['_id'],
+          userId: catalogue[i]['stores'][0]['userId'],
+          fullName: catalogue[i]['stores'][0]['fullName'],
+          gender: catalogue[i]['stores'][0]['gender'],
+          dob: catalogue[i]['stores'][0]['dob'],
+          shop_name: catalogue[i]['stores'][0]['shop_name'],
+          shop_address: catalogue[i]['stores'][0]['shop_address'],
+          sell_items: catalogue[i]['stores'][0]['sell_items'],
+          store_image: catalogue[i]['stores'][0]['store_image'],
+          adharcard_no: catalogue[i]['stores'][0]['adharcard_no'],
+          pancard_no: catalogue[i]['stores'][0]['pancard_no'],
+          gst_no: catalogue[i]['stores'][0]['gst_no'],
+          license_image: catalogue[i]['stores'][0]['license_image'],
+          vehicle_image: catalogue[i]['stores'][0]['vehicle_image'],
+          store_no_image: catalogue[i]['stores'][0]['store_no_image'],
+          aadhar_card_image: catalogue[i]['stores'][0]['aadhar_card_image'],
+          driving_card_image: catalogue[i]['stores'][0]['driving_card_image'],
+          pan_card_image: catalogue[i]['stores'][0]['pan_card_image'],
+          services_area: catalogue[i]['stores'][0]['services_area'],
+          shop_located_at: catalogue[i]['stores'][0]['shop_located_at'],
+          delegate_access: catalogue[i]['stores'][0]['delegate_access'],
+          store_timing: catalogue[i]['stores'][0]['store_timing'],
+          review: catalogue[i]['stores'][0]['review'],
+        },
+        options: catalogue[i]['options'],
+        addon: catalogue[i]['addon'],
+      }
+
+      response.push(catalogueDetails);
     }
 
-    return catalogue;
+    return response;
   }
 
   async addNewcatalogue(dto: any) {
@@ -626,9 +678,9 @@ export class CatalogueService {
         {
           $push: {
             metaValue: {
-                _id: ObjectId(),
+              _id: ObjectId(),
               optionName: metaDto.optionName,
-              optionValue: metaDto.optionValue.split(","),
+              optionValue: metaDto.optionValue.split(','),
               optionImage: metaDto.image,
             },
           },
@@ -656,7 +708,7 @@ export class CatalogueService {
           {
             _id: ObjectId(),
             optionName: metaDto.optionName,
-            optionValue: metaDto.optionValue.split(","),
+            optionValue: metaDto.optionValue.split(','),
             optionImage:
               metaDto.image && metaDto.image != 'string' && metaDto.image != ''
                 ? metaDto.image
@@ -754,107 +806,107 @@ export class CatalogueService {
 
   async patchVariantOptions(id: String, updatedto: any) {
     for (let i = 0; i < updatedto.options.length; i++) {
-        var metaOptions = JSON.parse(
-          JSON.stringify(
-            await this.metaDataModel.findOne({
-              productId: ObjectId(id),
-              metaKey: 'catalogue_options',
-            }),
-          ),
-        );
-  
-        if (metaOptions && metaOptions.metaValue) {
-          for (let j = 0; j < metaOptions.metaValue.length; j++) {
-            if (metaOptions.metaValue[j]['_id'] == updatedto.options[i]['_id']) {
-              if (updatedto.options[i]['optionName']) {
-                metaOptions.metaValue[j]['optionName'] =
-                  updatedto.options[i]['optionName'];
-              }
-  
-              if (updatedto.options[i]['optionValue']) {
-                metaOptions.metaValue[j]['optionValue'] =
-                  updatedto.options[i]['optionValue'];
-              }
-  
-              if (updatedto.options[i]['optionImage']) {
-                metaOptions.metaValue[j]['optionImage'] =
-                  updatedto.options[i]['optionImage'];
-              }
+      var metaOptions = JSON.parse(
+        JSON.stringify(
+          await this.metaDataModel.findOne({
+            productId: ObjectId(id),
+            metaKey: 'catalogue_options',
+          }),
+        ),
+      );
+
+      if (metaOptions && metaOptions.metaValue) {
+        for (let j = 0; j < metaOptions.metaValue.length; j++) {
+          if (metaOptions.metaValue[j]['_id'] == updatedto.options[i]['_id']) {
+            if (updatedto.options[i]['optionName']) {
+              metaOptions.metaValue[j]['optionName'] =
+                updatedto.options[i]['optionName'];
+            }
+
+            if (updatedto.options[i]['optionValue']) {
+              metaOptions.metaValue[j]['optionValue'] =
+                updatedto.options[i]['optionValue'];
+            }
+
+            if (updatedto.options[i]['optionImage']) {
+              metaOptions.metaValue[j]['optionImage'] =
+                updatedto.options[i]['optionImage'];
             }
           }
-  
-          await this.metaDataModel.update(
-            {
-              productId: ObjectId(id),
-              metaKey: 'catalogue_options',
-            },
-            {
-              $set: {
-                metaValue: metaOptions.metaValue,
-              },
-            },
-            {
-              $upsert: true,
-            },
-          );
         }
+
+        await this.metaDataModel.update(
+          {
+            productId: ObjectId(id),
+            metaKey: 'catalogue_options',
+          },
+          {
+            $set: {
+              metaValue: metaOptions.metaValue,
+            },
+          },
+          {
+            $upsert: true,
+          },
+        );
       }
-  
-      return await this.metaDataModel.findOne({
-        productId: ObjectId(id),
-        metaKey: 'catalogue_options',
-      });
+    }
+
+    return await this.metaDataModel.findOne({
+      productId: ObjectId(id),
+      metaKey: 'catalogue_options',
+    });
   }
 
   async patchVariant(id: String, updateDto: any) {
     for (let i = 0; i < updateDto.variants.length; i++) {
-        const metaVariants = JSON.parse(
-          JSON.stringify(
-            await this.metaDataModel.findOne({
-              productId: ObjectId(id),
-              metaKey: 'catalogue_variants',
-            }),
-          ),
-        );
-  
-        if (metaVariants && metaVariants.metaValue) {
-          for (let j = 0; j < metaVariants.metaValue.length; j++) {
-            if (
-              metaVariants.metaValue[j]['_id'] == updateDto.variants[i]['_id']
-            ) {
-              if (updateDto.variants[i]['options']) {
-                metaVariants.metaValue[j]['options'] =
-                  updateDto.variants[i]['options'];
-              }
-  
-              if (updateDto.variants[i]['optionImage']) {
-                metaVariants.metaValue[j]['optionImage'] =
-                  updateDto.variants[i]['optionImage'];
-              }
+      const metaVariants = JSON.parse(
+        JSON.stringify(
+          await this.metaDataModel.findOne({
+            productId: ObjectId(id),
+            metaKey: 'catalogue_variants',
+          }),
+        ),
+      );
+
+      if (metaVariants && metaVariants.metaValue) {
+        for (let j = 0; j < metaVariants.metaValue.length; j++) {
+          if (
+            metaVariants.metaValue[j]['_id'] == updateDto.variants[i]['_id']
+          ) {
+            if (updateDto.variants[i]['options']) {
+              metaVariants.metaValue[j]['options'] =
+                updateDto.variants[i]['options'];
+            }
+
+            if (updateDto.variants[i]['optionImage']) {
+              metaVariants.metaValue[j]['optionImage'] =
+                updateDto.variants[i]['optionImage'];
             }
           }
-  
-          await this.metaDataModel.update(
-            {
-              productId: ObjectId(id),
-              metaKey: 'catalogue_variants',
-            },
-            {
-              $set: {
-                metaValue: metaVariants.metaValue,
-              },
-            },
-            {
-              $upsert: true,
-            },
-          );
         }
+
+        await this.metaDataModel.update(
+          {
+            productId: ObjectId(id),
+            metaKey: 'catalogue_variants',
+          },
+          {
+            $set: {
+              metaValue: metaVariants.metaValue,
+            },
+          },
+          {
+            $upsert: true,
+          },
+        );
       }
-  
-      return await this.metaDataModel.findOne({
-        productId: ObjectId(id),
-        metaKey: 'catalogue_variants',
-      });
+    }
+
+    return await this.metaDataModel.findOne({
+      productId: ObjectId(id),
+      metaKey: 'catalogue_variants',
+    });
   }
 
   async removeVariantOptions(removedto: any) {
