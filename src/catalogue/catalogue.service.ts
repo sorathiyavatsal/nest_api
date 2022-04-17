@@ -491,6 +491,7 @@ export class CatalogueService {
     );
 
     for (let i = 0; i < catalogue.length; i++) {
+        console.log(catalogue[i]["_id"])
       const variants = await this.metaDataModel.find({
         _id: ObjectId(catalogue[i]['options']['parentMetaId']),
       });
@@ -627,7 +628,7 @@ export class CatalogueService {
             metaValue: {
                 _id: ObjectId(),
               optionName: metaDto.optionName,
-              optionValue: metaDto.optionValue,
+              optionValue: metaDto.optionValue.split(","),
               optionImage: metaDto.image,
             },
           },
@@ -655,7 +656,7 @@ export class CatalogueService {
           {
             _id: ObjectId(),
             optionName: metaDto.optionName,
-            optionValue: metaDto.optionValue,
+            optionValue: metaDto.optionValue.split(","),
             optionImage:
               metaDto.image && metaDto.image != 'string' && metaDto.image != ''
                 ? metaDto.image
