@@ -202,7 +202,10 @@ export class CatalogueController {
     @Body() updatecatalogue: updateCatalogueDto,
     @Request() req,
   ) {
-    return await this.catalogueService.updatecatalogue(params.id, updatecatalogue);
+    return await this.catalogueService.updatecatalogue(
+      params.id,
+      updatecatalogue,
+    );
   }
 
   @Patch('/options')
@@ -215,6 +218,21 @@ export class CatalogueController {
           type: 'array',
           items: {
             type: 'object',
+            properties: {
+              _id: { type: 'string' },
+              optionName: { type: 'string' },
+              optionValue: {
+                type: 'array',
+              },
+              optionImage: { type: 'string' },
+            },
+            example: {
+              _id: '6254e9c202079c6aa83604c6',
+              optionName: 'size',
+              optionValue: ['small', 'medium'],
+              optionImage:
+                'public/uploads/product/variants/image-1648417148751.jpeg',
+            },
           },
         },
       },
@@ -222,14 +240,31 @@ export class CatalogueController {
   })
   @ApiQuery({ name: 'catalogueId', type: 'string', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async patchVariantOptions(
-    @Query() query,
-    @Request() request
-  ) {
+  async patchVariantOptions(@Query() query, @Request() request) {
     return await this.catalogueService.patchVariantOptions(
       query.catalogueId,
       request.body,
     );
+  }
+
+  @Delete('/options')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+          type: 'string',
+        },
+        optionId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async removeVariantOptions(@Request() request) {
+    return await this.catalogueService.removeVariantOptions(request.body);
   }
 
   @Patch('/variants')
@@ -242,6 +277,18 @@ export class CatalogueController {
           type: 'array',
           items: {
             type: 'object',
+            properties: {
+              _id: { type: 'string' },
+              options: { type: 'object' },
+              optionImage: { type: 'array' },
+            },
+            example: {
+              _id: '6254e9c202079c6aa83604c6',
+              options: { size: 'medium', color: 'red' },
+              optionsImage: [
+                'public/uploads/product/variants/optionsImage-1648417933409.jpeg',
+              ],
+            },
           },
         },
       },
@@ -249,13 +296,30 @@ export class CatalogueController {
   })
   @ApiQuery({ name: 'catalogueId', type: 'string', required: false })
   @ApiConsumes('multipart/form-data', 'application/json')
-  async patchVariant(
-    @Query() query,
-    @Request() request
-  ) {
+  async patchVariant(@Query() query, @Request() request) {
     return await this.catalogueService.patchVariant(
       query.catalogueId,
       request.body,
     );
+  }
+
+  @Delete('/variants')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: {
+          type: 'string',
+        },
+        variantId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async removeVariant(@Request() request) {
+    return await this.catalogueService.removeVariant(request.body);
   }
 }

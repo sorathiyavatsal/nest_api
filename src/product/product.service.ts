@@ -18,7 +18,6 @@ export class ProductService {
   }
 
   async patchVariantOptions(id: String, updatedto: any) {
-      console.log("test")
     for (let i = 0; i < updatedto.options.length; i++) {
       var metaOptions = JSON.parse(
         JSON.stringify(
