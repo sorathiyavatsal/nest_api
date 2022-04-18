@@ -127,12 +127,13 @@ export class DeliveryFleetService {
         loc: {
           $geoWithin: {
             $centerSphere: [
-              [parseFloat(order.fromLat), parseFloat(order.fromLng)],
-              radiusmeter / 1000 / 6378.1,
+              [order.fromLat, order.fromLng],
+              (radiusmeter * 0.000621371) / 3963.2,
             ],
           },
         },
       });
+
       return { boys: deliveryBoy, dto: order, radius };
     }
   }

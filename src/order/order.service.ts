@@ -215,6 +215,10 @@ export class OrderService {
     //     },
     //   });
 
-    return await new this.OrderModel(order).save();
+    const orderResult = await new this.OrderModel(order).save();
+
+    console.log(orderResult)
+
+    return orderResult;
   }
 }

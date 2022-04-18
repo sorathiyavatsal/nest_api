@@ -202,7 +202,6 @@ export class SocketGateway {
   @SubscribeMessage('getDelievryAssociates')
   async getDeliveyBoyNear(client: Socket, payload: any): Promise<Object> {
     try {
-        console.log("inside")
       const data = await axios.post(
         `${this.WEB_URL}/api/delivery-fleet/find-near-delivery-boy`,
         payload.params,
