@@ -171,6 +171,7 @@ export class OrderService {
       orderDate: orderDto.orderDate,
       orders: orders_details,
       subTotal: orderDto.subTotal,
+      status: orderDto.status ? orderDto.status : 'Pendding',
       shipingAddress: orderDto.shipingAddress,
       billingAddress: orderDto.billingAddress,
       paymentTransactionId: ObjectId(orderDto.paymentTransactionId),

@@ -123,6 +123,13 @@ export class OrderDto {
   })
   shippingId: String;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiPropertyOptional({
+      enum: ["Pendding", "Ordering", "Prepering", "Complete"]
+  })
+  status: String;
+
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ required: false })
