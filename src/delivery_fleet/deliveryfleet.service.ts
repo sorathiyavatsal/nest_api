@@ -81,7 +81,7 @@ export class DeliveryFleetService {
     //   type: 'Point',
     //   coordinates: [dto.fromLat, dto.fromLng],
     // };
-    delete dto.pickupTime
+    delete dto.pickupTime;
     const invoiceData = new this.deliveryfleetModel(dto);
 
     return await invoiceData.save().then((newInvoice: any) => {
@@ -471,7 +471,7 @@ export class DeliveryFleetService {
       let verification: any = await this.userVerificationModel.findOne({
         otp: dto.otp,
         createdUser: ObjectId(id),
-        verifiedTemplate: 'deliveryDelivered'
+        verifiedTemplate: 'deliveryDelivered',
       });
 
       if (verification && !verification.verifiedStatus) {
@@ -585,7 +585,9 @@ export class DeliveryFleetService {
 
     return {
       fleet: fleet,
-      pages: filter.page ? Math.ceil(fleet.length / filter.limit ? filter.limit : 20) - 1 : 0,
+      pages: filter.page
+        ? Math.ceil(fleet.length / filter.limit ? filter.limit : 20) - 1
+        : 0,
     };
   }
 
@@ -648,9 +650,7 @@ export class DeliveryFleetService {
         activeStatus: true,
       });
 
-      console.log(packages_collection)
-
-      let packages_price = packages_collection.rate;
+      let packages_price = packages_collection ? packages_collection.rate : 0;
 
       let default_km_charge = zipSettings['fuelCharged'].default_km_charge;
       let default_km = zipSettings['fuelCharged'].default_km;
