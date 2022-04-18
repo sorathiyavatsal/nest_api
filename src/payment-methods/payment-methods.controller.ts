@@ -33,6 +33,12 @@ export class PaymentMethodsController {
             schema: {
                 type: 'object',
                 properties: {
+                    razorpay_id: {
+                        type: 'string'
+                    },
+                    razorpay_secret_id: {
+                        type: 'string'
+                    },
                     orderId: {
                         type: 'string'
                     },
@@ -46,7 +52,6 @@ export class PaymentMethodsController {
     @UseGuards(AuthGuard('jwt'))
     @ApiConsumes('multipart/form-data', 'application/json')
     async createRazorPayOrder(@Body() orderData: any, @Request() request: any) {
-        console.log(orderData)
         return await this.paymentMethodsService.createRazorPayOrder(orderData);
     }
 

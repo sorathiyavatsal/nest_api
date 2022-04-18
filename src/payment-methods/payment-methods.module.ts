@@ -8,8 +8,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports: [
     RazorpayModule.forRoot({
-      key_id: 'rzp_test_VF8nzkfCPp8Rr7',
-      key_secret: 'AFpsju7mn5moZPQKljRqVDAp',
+      key_id: 'rzp_test_4aoBIKoJPtVSGw',
+      key_secret: 'DBVQ2ENouLXhUvgzSEMpp4qw',
     }),
     MongooseModule.forFeature([{ name: 'PaymentMethods', schema: PaymentMethodsSchema }])
   ],

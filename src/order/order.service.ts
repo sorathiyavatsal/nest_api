@@ -171,13 +171,22 @@ export class OrderService {
       orderDate: orderDto.orderDate,
       orders: orders_details,
       subTotal: orderDto.subTotal,
-      tax: orderDto.tax,
-      copouns: copouns,
       shipingAddress: orderDto.shipingAddress,
       billingAddress: orderDto.billingAddress,
-      shippingId: ObjectId(orderDto.shippingId),
       paymentTransactionId: ObjectId(orderDto.paymentTransactionId),
     };
+
+    if (orderDto.tax) {
+      order['tax'] = orderDto.tax;
+    }
+
+    if (orderDto.shippingId) {
+      order['shippingId'] = ObjectId(orderDto.shippingId);
+    }
+
+    if (copouns) {
+      order['copouns'] = copouns;
+    }
 
     // await axios({
     //     method: 'POST',

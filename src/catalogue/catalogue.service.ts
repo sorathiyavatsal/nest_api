@@ -120,6 +120,7 @@ export class CatalogueService {
         $project: {
           _id: 1,
           catalogueStatus: 1,
+          productId: 1,
           variants: '$variants.metaValue',
           product: { $first: '$product' },
           stores: { $first: '$stores' },
@@ -252,27 +253,17 @@ export class CatalogueService {
       });
     }
 
-    if (filter.productName) {
-      let productName = [];
-      filter.productName.split(',').forEach((element) => {
-        productName.push({
-          productName: {
-            $regex: element,
-            $options: 'i',
-          },
-        });
-
-        productName.push({
-          productSecondaryName: {
-            $regex: element,
-            $options: 'i',
-          },
+    if (filter.productId) {
+      let productId = [];
+      filter.productId.split(',').forEach((element) => {
+        productId.push({
+          productId: ObjectId(element),
         });
       });
 
       condition.push({
         $match: {
-          $or: productName,
+          $or: productId,
         },
       });
     }
@@ -315,20 +306,25 @@ export class CatalogueService {
         _id: 1,
         catalogueStatus: 1,
         variants: 1,
-        product: {
-          _id: '$product._id',
-          name: '$product.name',
-          secondary_name: '$product.secondary_name',
-          productImage: '$product.productImage',
-          type: '$product.type',
-          review: '$product.review',
-          status: '$product.status',
-          collection: '$product.collection.categoryName',
-          storeCategory: '$product.storeCategory.categoryName',
-          category: '$product.category.categoryName',
-          brand: '$product.brand.brandName',
+        productId: '$product._id',
+        name: '$product.name',
+        secondary_name: '$product.secondary_name',
+        productImage: '$product.productImage',
+        type: '$product.type',
+        review: '$product.review',
+        status: '$product.status',
+        collection: '$product.collection.categoryName',
+        storeCategory: '$product.storeCategory.categoryName',
+        category: '$product.category.categoryName',
+        brand: '$product.brand.brandName',
+        stores: {
+            _id: '$stores._id',
+            store_image: '$stores.store_image',
+            shop_name: '$stores.shop_name',
+            shop_address: '$stores.shop_address',
+            sell_items: '$stores.sell_items',
+            review: '$stores.review'
         },
-        stores: 1,
       },
     });
 
@@ -383,7 +379,7 @@ export class CatalogueService {
 
   async getFiltercatalogue(filter: any) {
     const condition = await this.filterCondition(filter);
-    
+
     let catalogue = await this.catalogueModel
       .aggregate(condition)
       .skip(filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0)

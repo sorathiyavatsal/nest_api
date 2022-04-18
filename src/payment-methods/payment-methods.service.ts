@@ -22,19 +22,10 @@ export class PaymentMethodsService {
             amount: orderData.amount * 100,
             currency: "INR"
         };
-        var orderRes = {};
 
-        this.razorpayClient.orders.create(options, async (err, order) => {
-            if (err) {
-                console.log(err);
-            } else {
-                orderRes = {
-                    amount: order.amount, order_id: order.id, method: orderData.paymentMethod
-                }
-                this.orderResponse = orderRes;
-            }
-        });
-        return orderRes;
+        const order = await this.razorpayClient.orders.create(options);
+
+        return order;
     }
 
     async verifyPaymentAndSave(req) {

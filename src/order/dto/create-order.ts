@@ -6,7 +6,7 @@ import {
   IsObject,
   IsString,
 } from 'class-validator';
-import { ApiProperty, ApiParam, ApiExtraModels } from '@nestjs/swagger';
+import { ApiProperty, ApiParam, ApiExtraModels, ApiPropertyOptional } from '@nestjs/swagger';
 import { ObjectId } from 'mongoose';
 
 export class discount {
@@ -25,7 +25,12 @@ export class OrdersTest {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  id: String;
+  productId: String;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  variantId: String;
 
   @ApiProperty()
   @IsString()
@@ -93,12 +98,12 @@ export class OrderDto {
 
   @IsObject()
   @IsNotEmpty()
-  @ApiProperty({ type: tax })
+  @ApiPropertyOptional({ type: tax })
   tax: Object;
 
   @IsArray()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiPropertyOptional()
   copouns: [];
 
   @IsObject()
@@ -113,7 +118,7 @@ export class OrderDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Delivery Fleet Id',
   })
   shippingId: String;
