@@ -73,14 +73,15 @@ export class DeliveryFleetService {
     if (dto.loc && dto.loc.type != 'Point') {
       delete req.body.loc;
     }
-    dto.toLoc = {
-      type: 'Point',
-      coordinates: [dto.toLat, dto.toLng],
-    };
-    dto.FromLoc = {
-      type: 'Point',
-      coordinates: [dto.fromLat, dto.fromLng],
-    };
+    // dto.toLoc = {
+    //   type: 'Point',
+    //   coordinates: [dto.toLat, dto.toLng],
+    // };
+    // dto.FromLoc = {
+    //   type: 'Point',
+    //   coordinates: [dto.fromLat, dto.fromLng],
+    // };
+    delete dto.pickupTime
     const invoiceData = new this.deliveryfleetModel(dto);
 
     return await invoiceData.save().then((newInvoice: any) => {
@@ -615,12 +616,7 @@ export class DeliveryFleetService {
       let distenance = Dto.distenance;
       let weather = Dto.weather;
       let traffic = Dto.traffic;
-      console.log(category);
-      console.log(weight);
-      console.log(packages);
-      console.log(distenance);
-      console.log(weather);
-      console.log(traffic);
+
       let fleet_tax = await this.SettingsModel.findOne({
         metaKey: 'fleet_tax',
       });
@@ -628,7 +624,6 @@ export class DeliveryFleetService {
         metaKey: 'fuel_charge',
         'metaValue.zipcode': { $in: [Dto.zipcode] },
       });
-      console.log(settings);
       let zipSettings = settings['metaValue'].find((s) =>
         s['zipcode'].includes(Dto.zipcode),
       );
@@ -637,7 +632,6 @@ export class DeliveryFleetService {
           s['zipcode'].filter((zip) => zip == 0),
         );
       }
-      console.log(zipSettings);
 
       let weight_collection = await this.WeightsModel.findOne({
         from_weight: { $lte: weight },
@@ -654,7 +648,8 @@ export class DeliveryFleetService {
         activeStatus: true,
       });
 
-      console.log(packages_collection, 'collection');
+      console.log(packages_collection)
+
       let packages_price = packages_collection.rate;
 
       let default_km_charge = zipSettings['fuelCharged'].default_km_charge;
@@ -672,7 +667,8 @@ export class DeliveryFleetService {
       let packaging = await this.PackagingsModel.findOne({
         category: category,
       });
-      let packaging_price = packaging.rate;
+
+      let packaging_price = packaging ? packaging.rate : 0;
       let response = {
         default_km_price: default_km_charge,
         weight_price: weight_price,
@@ -685,21 +681,13 @@ export class DeliveryFleetService {
         total: 0,
       };
 
-      console.log(
-        default_km_charge,
-        additional_km_charge,
-        weight_price,
-        packages_price,
-        packaging_price,
-      );
-      console.log(default_km_charge);
       let price =
         default_km_charge +
         additional_km_charge +
         weight_price +
         packages_price +
         packaging_price;
-      console.log(price);
+
       if (weather) {
         let km_m =
           (distenance * 1000) / zipSettings['weather_charge'].default_m;
