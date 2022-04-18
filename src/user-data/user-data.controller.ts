@@ -102,6 +102,9 @@ export class UserDataController {
         },
         sell_items: {
           type: 'array',
+          items: {
+            type: 'string'
+          },
           description: 'required items that sell buy shop',
         },
         adharcard_no: { type: 'string' },
@@ -365,6 +368,9 @@ export class UserDataController {
         },
         sell_items: {
           type: 'array',
+          items: {
+            type: 'string'
+          },
           description: 'required items that sell buy shop',
         },
         adharcard_no: { type: 'string' },
