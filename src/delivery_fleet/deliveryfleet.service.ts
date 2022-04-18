@@ -563,10 +563,10 @@ export class DeliveryFleetService {
 
   async getDeliveryFleet(user: any, filter: any) {
     let where = [];
-    if (filter.merchant_id) {
+    if (filter.merchantid) {
       where.push({
         $match: {
-          createdBy: ObjectId(filter.merchant_id),
+          createdBy: ObjectId(filter.merchantid),
         },
       });
     }
@@ -584,7 +584,7 @@ export class DeliveryFleetService {
 
     return {
       fleet: fleet,
-      pages: Math.ceil(fleet.length / filter.limit ? filter.limit : 20) - 1,
+      pages: filter.page ? Math.ceil(fleet.length / filter.limit ? filter.limit : 20) - 1 : 0,
     };
   }
 
