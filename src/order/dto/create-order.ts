@@ -35,6 +35,11 @@ export class OrdersTest {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  storeId: String;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   quantity: Number;
 
   @ApiProperty()
