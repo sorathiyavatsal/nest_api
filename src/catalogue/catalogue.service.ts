@@ -169,10 +169,7 @@ export class CatalogueService {
       let storeId = [];
       filter.storeId.split(',').forEach((element) => {
         storeId.push({
-          storeId: {
-            $regex: element,
-            $options: 'i',
-          },
+          storeId: ObjectId(element),
         });
       });
 
@@ -386,7 +383,7 @@ export class CatalogueService {
 
   async getFiltercatalogue(filter: any) {
     const condition = await this.filterCondition(filter);
-
+    
     let catalogue = await this.catalogueModel
       .aggregate(condition)
       .skip(filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0)
