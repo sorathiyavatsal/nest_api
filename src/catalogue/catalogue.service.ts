@@ -491,7 +491,6 @@ export class CatalogueService {
     );
 
     for (let i = 0; i < catalogue.length; i++) {
-      console.log(catalogue[i]['_id']);
       const variants = await this.metaDataModel.find({
         _id: ObjectId(catalogue[i]['options']['parentMetaId']),
       });
@@ -504,126 +503,133 @@ export class CatalogueService {
   }
 
   async getcatalogueById(product: any) {
-    let condition = {};
-    if (product.productid) {
-      condition['productId'] = ObjectId(product.productid);
-    }
-
-    var catalogue = JSON.parse(
-      JSON.stringify(
-        await this.catalogueModel.aggregate([
-          {
-            $lookup: {
-              from: 'products',
-              localField: 'productId',
-              foreignField: '_id',
-              as: 'products',
-            },
-          },
-          {
-            $lookup: {
-              from: 'userdatas',
-              localField: 'storeId',
-              foreignField: '_id',
-              as: 'stores',
-            },
-          },
-          {
-            $lookup: {
-              from: 'metadatas',
-              localField: 'variants',
-              foreignField: '_id',
-              as: 'options',
-            },
-          },
-          {
-            $lookup: {
-              from: 'products',
-              localField: 'addon',
-              foreignField: '_id',
-              as: 'addon',
-            },
-          },
-          {
-            $unwind: {
-              path: '$options',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $match: {
-              storeId: ObjectId(product.storeid),
-            },
-          },
-          {
-            $match: condition,
-          },
-        ]),
-      ),
-    );
-
-    var response = [];
-
-    for (let i = 0; i < catalogue.length; i++) {
-      const variants = await this.metaDataModel.find({
-        _id: ObjectId(catalogue[i]['options']['parentMetaId']),
-      });
-
-      catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
-      catalogue[i]['options'] = variants[0]['metaValue'];
-
-      var catalogueDetails = {
-        _id: catalogue[i]['_id'],
-        productId: catalogue[i]['productId'],
-        catalogueStatus: catalogue[i]['catalogueStatus'],
-        variants: catalogue[i]['variants'],
-        name: catalogue[i]['products'][0]['name'],
-        secondary_name: catalogue[i]['products'][0]['secondary_name'],
-        description: catalogue[i]['products'][0]['description'],
-        pageTitle: catalogue[i]['products'][0]['pageTitle'],
-        metaOptions: catalogue[i]['products'][0]['metaOptions'],
-        metaDescription: catalogue[i]['products'][0]['metaDescription'],
-        urlHandle: catalogue[i]['products'][0]['urlHandle'],
-        productImage: catalogue[i]['products'][0]['productImage'],
-        storeCategory: catalogue[i]['products'][0]['storeCategory'],
-        category: catalogue[i]['products'][0]['category'],
-        collections: catalogue[i]['products'][0]['collections'],
-        brand: catalogue[i]['products'][0]['brand'],
-        review: catalogue[i]['products'][0]['review'],
-        keywords: catalogue[i]['products'][0]['keywords'],
-        stores: {
-          _id: catalogue[i]['stores'][0]['_id'],
-          userId: catalogue[i]['stores'][0]['userId'],
-          fullName: catalogue[i]['stores'][0]['fullName'],
-          gender: catalogue[i]['stores'][0]['gender'],
-          dob: catalogue[i]['stores'][0]['dob'],
-          shop_name: catalogue[i]['stores'][0]['shop_name'],
-          shop_address: catalogue[i]['stores'][0]['shop_address'],
-          sell_items: catalogue[i]['stores'][0]['sell_items'],
-          store_image: catalogue[i]['stores'][0]['store_image'],
-          adharcard_no: catalogue[i]['stores'][0]['adharcard_no'],
-          pancard_no: catalogue[i]['stores'][0]['pancard_no'],
-          gst_no: catalogue[i]['stores'][0]['gst_no'],
-          license_image: catalogue[i]['stores'][0]['license_image'],
-          vehicle_image: catalogue[i]['stores'][0]['vehicle_image'],
-          store_no_image: catalogue[i]['stores'][0]['store_no_image'],
-          aadhar_card_image: catalogue[i]['stores'][0]['aadhar_card_image'],
-          driving_card_image: catalogue[i]['stores'][0]['driving_card_image'],
-          pan_card_image: catalogue[i]['stores'][0]['pan_card_image'],
-          services_area: catalogue[i]['stores'][0]['services_area'],
-          shop_located_at: catalogue[i]['stores'][0]['shop_located_at'],
-          delegate_access: catalogue[i]['stores'][0]['delegate_access'],
-          store_timing: catalogue[i]['stores'][0]['store_timing'],
-          review: catalogue[i]['stores'][0]['review'],
-        },
-        options: catalogue[i]['options'],
-        addon: catalogue[i]['addon'],
+    try {
+      let condition = {};
+      if (product.productid) {
+        condition['productId'] = ObjectId(product.productid);
       }
 
-      response.push(catalogueDetails);
-    }
+      var catalogue = JSON.parse(
+        JSON.stringify(
+          await this.catalogueModel.aggregate([
+            {
+              $lookup: {
+                from: 'products',
+                localField: 'productId',
+                foreignField: '_id',
+                as: 'products',
+              },
+            },
+            {
+              $lookup: {
+                from: 'userdatas',
+                localField: 'storeId',
+                foreignField: '_id',
+                as: 'stores',
+              },
+            },
+            {
+              $lookup: {
+                from: 'metadatas',
+                localField: 'variants',
+                foreignField: '_id',
+                as: 'options',
+              },
+            },
+            {
+              $unwind: {
+                path: '$options',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: 'products',
+                localField: 'addon',
+                foreignField: '_id',
+                as: 'addon',
+              },
+            },
+            {
+              $match: {
+                storeId: ObjectId(product.storeid),
+              },
+            },
+            {
+              $match: condition,
+            },
+          ]),
+        ),
+      );
 
-    return response;
+      var response = [];
+
+      for (let i = 0; i < catalogue.length; i++) {
+        var variants = {};
+        if (catalogue[i] && catalogue[i]['options']) {
+          variants = await this.metaDataModel.find({
+            _id: ObjectId(catalogue[i]['options']['parentMetaId']),
+          });
+
+          catalogue[i]['variants'] = catalogue[i]['options']['metaValue'];
+          catalogue[i]['options'] = variants[0]['metaValue'];
+        }
+
+        var catalogueDetails = {
+          _id: catalogue[i]['_id'],
+          productId: catalogue[i]['productId'],
+          catalogueStatus: catalogue[i]['catalogueStatus'],
+          variants: catalogue[i]['variants'],
+          name: catalogue[i]['products'][0]['name'],
+          secondary_name: catalogue[i]['products'][0]['secondary_name'],
+          description: catalogue[i]['products'][0]['description'],
+          pageTitle: catalogue[i]['products'][0]['pageTitle'],
+          metaOptions: catalogue[i]['products'][0]['metaOptions'],
+          metaDescription: catalogue[i]['products'][0]['metaDescription'],
+          urlHandle: catalogue[i]['products'][0]['urlHandle'],
+          productImage: catalogue[i]['products'][0]['productImage'],
+          storeCategory: catalogue[i]['products'][0]['storeCategory'],
+          category: catalogue[i]['products'][0]['category'],
+          collections: catalogue[i]['products'][0]['collections'],
+          brand: catalogue[i]['products'][0]['brand'],
+          review: catalogue[i]['products'][0]['review'],
+          keywords: catalogue[i]['products'][0]['keywords'],
+          stores: {
+            _id: catalogue[i]['stores'][0]['_id'],
+            userId: catalogue[i]['stores'][0]['userId'],
+            fullName: catalogue[i]['stores'][0]['fullName'],
+            gender: catalogue[i]['stores'][0]['gender'],
+            dob: catalogue[i]['stores'][0]['dob'],
+            shop_name: catalogue[i]['stores'][0]['shop_name'],
+            shop_address: catalogue[i]['stores'][0]['shop_address'],
+            sell_items: catalogue[i]['stores'][0]['sell_items'],
+            store_image: catalogue[i]['stores'][0]['store_image'],
+            adharcard_no: catalogue[i]['stores'][0]['adharcard_no'],
+            pancard_no: catalogue[i]['stores'][0]['pancard_no'],
+            gst_no: catalogue[i]['stores'][0]['gst_no'],
+            license_image: catalogue[i]['stores'][0]['license_image'],
+            vehicle_image: catalogue[i]['stores'][0]['vehicle_image'],
+            store_no_image: catalogue[i]['stores'][0]['store_no_image'],
+            aadhar_card_image: catalogue[i]['stores'][0]['aadhar_card_image'],
+            driving_card_image: catalogue[i]['stores'][0]['driving_card_image'],
+            pan_card_image: catalogue[i]['stores'][0]['pan_card_image'],
+            services_area: catalogue[i]['stores'][0]['services_area'],
+            shop_located_at: catalogue[i]['stores'][0]['shop_located_at'],
+            delegate_access: catalogue[i]['stores'][0]['delegate_access'],
+            store_timing: catalogue[i]['stores'][0]['store_timing'],
+            review: catalogue[i]['stores'][0]['review'],
+          },
+          options: catalogue[i]['options'],
+          addon: catalogue[i]['addon'],
+        };
+
+        response.push(catalogueDetails);
+      }
+
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async addNewcatalogue(dto: any) {
