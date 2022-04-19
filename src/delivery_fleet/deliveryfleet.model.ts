@@ -97,7 +97,7 @@ export const DeliveryFleetSchema = new mongoose.Schema(
     },
     pickupTime: {
       type: String,
-      required: true,
+      required: false,
     },
     cor: {
       type: Number,
