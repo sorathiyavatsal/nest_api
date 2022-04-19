@@ -4,6 +4,12 @@ let Schema = mongoose.Types,
   ObjectId = Schema.ObjectId;
 export const PromotionSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+    },
+    status: {
+      type: Boolean,
+    },
     network: {
       type: String,
     },
@@ -32,16 +38,17 @@ export const PromotionSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-​
 export interface Promotion extends mongoose.Document {
   _id: string;
-  name: string,
-  description: string,
-  image: string,
-  target: Array<object>,
-  ads: [],
-  type: string,
-  placement: object,
-  date: object,
-  
+  name: string;
+  status: boolean;
+  description: string;
+  image: string;
+  target: Array<object>;
+  ads: [];
+  type: string;
+  placement: object;
+  date: object;
+  createdBy: string;
+  modifiedBy: string;
 }

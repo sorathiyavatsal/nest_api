@@ -102,6 +102,14 @@ export class DeliveryBoyData {
 //This is the body of API that we will put data into
 export class CreatePromotionDto {
   @IsString()
+  @ApiProperty()
+  name: string;
+
+  @IsBoolean()
+  @ApiProperty()
+  status: boolean;
+
+  @IsString()
   @ApiProperty({ enum: ['MARCHANT', 'CONSUMER', 'DELIVERY BOY'] })
   network: string;
 

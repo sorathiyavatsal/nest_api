@@ -87,6 +87,8 @@ export class PromotionService {
 
   async createPromotion(promotionDto: any) {
     let condition = {
+      name: promotionDto.name,
+      status: promotionDto.status ? promotionDto.status : true,
       network: promotionDto.network,
       type: promotionDto.promotionType,
       target: {
@@ -122,6 +124,14 @@ export class PromotionService {
 
   async updatePromotion(_id: string, promotionDto: any) {
     let condition = {};
+
+    if(promotionDto.name) {
+        condition['name'] = promotionDto.name;
+    }
+
+    if(promotionDto.status) {
+        condition['status'] = promotionDto.status;
+    }
 
     if (promotionDto.network) {
       condition['network'] = promotionDto.network;
