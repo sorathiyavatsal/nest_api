@@ -81,7 +81,9 @@ export class DeliveryFleetService {
     //   type: 'Point',
     //   coordinates: [dto.fromLat, dto.fromLng],
     // };
-    delete dto.pickupTime;
+    if(dto.pickupTime) {
+        delete dto.pickupTime
+    }
     const invoiceData = new this.deliveryfleetModel(dto);
 
     return await invoiceData.save().then((newInvoice: any) => {
