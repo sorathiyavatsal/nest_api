@@ -3,13 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../auth/user.model';
 import { Profile } from 'src/profile/profile.model';
+import { UserData } from 'src/user-data/user-data.model';
 let ObjectId = require('mongodb').ObjectId;
 @Injectable()
 export class UsersService {
   user: any;
   constructor(
     @InjectModel('User') private usersgetModel: Model<User>,
-    @InjectModel('Profile') private ProfileModel: Model<Profile>,
+    @InjectModel('UserData') private UserDataModel: Model<UserData>,
   ) {}
 
   async updateLocation(id: string, dto: any) {
@@ -40,8 +41,15 @@ export class UsersService {
     );
   }
   async findOneId(id: string) {
-    return await this.usersgetModel.findById(id);
+      var userData = await this.UserDataModel.findOne({
+        userId: ObjectId(id)
+      })
+      var user = JSON.parse(JSON.stringify(await this.usersgetModel.findById(id)))
+     user["userData"] = userData;
+
+     return user
   }
+
   async findOneByEmail(email: string) {
     return await this.usersgetModel.findOne({ email: email });
   }

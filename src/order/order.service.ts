@@ -9,15 +9,18 @@ import { PruchaseOrder } from './order.model';
 let ObjectId = require('mongodb').ObjectId;
 var _ = require('underscore');
 import axios from 'axios';
+import { SellOrder } from './sellorder.model';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel('PruchaseOrder') private OrderModel: Model<PruchaseOrder>,
+    @InjectModel('PurchaseOrder') private OrderModel: Model<PruchaseOrder>,
+    @InjectModel('SellOrder') private SellOrderModel: Model<SellOrder>,
     @InjectModel('catalogue') private catalogueModel: Model<catalogue>,
     @InjectModel('Products') private ProductsModel: Model<Product>,
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('UserData') private userDataModel: Model<UserData>,
+    @InjectModel('Notification') private NotificationModel: Model<Notification>,
   ) {}
 
   async getAllOrder(OrderDto: any) {
@@ -146,15 +149,37 @@ export class OrderService {
 
   async postOrder(orderDto: any) {
     let orders_details = [];
+    let order_consumer = {};
     if (orderDto.orders) {
-      orderDto.orders.forEach((order) => {
-        orders_details.push({
-          id: ObjectId(order.id),
-          quantity: order.quantity,
-          sellPrice: order.sellPrice,
-          discount: order.Discount,
-        });
-      });
+      for (var i = 0; i < orderDto.orders.length; i++) {
+        var order_details = {
+          id: ObjectId(),
+          quantity: orderDto.orders[i].quantity,
+          sellPrice: orderDto.orders[i].sellPrice,
+          discount: orderDto.orders[i].Discount,
+        };
+
+        if (orderDto.orders[i].storeId) {
+          order_details['storeId'] = ObjectId(orderDto.orders[i].storeId);
+        }
+
+        if (orderDto.orders[i].variantId) {
+          order_details['variantId'] = ObjectId(orderDto.orders[i].variantId);
+        }
+
+        if (orderDto.orders[i].catalogueId) {
+          order_details['catalogueId'] = ObjectId(
+            orderDto.orders[i].catalogueId,
+          );
+        }
+
+        orders_details.push(order_details);
+        if (order_consumer[orderDto.orders[i].storeId]) {
+          order_consumer[orderDto.orders[i].storeId].push(order_details);
+        } else {
+          order_consumer[orderDto.orders[i].storeId] = [order_details];
+        }
+      }
     }
 
     let copouns = [];
@@ -189,35 +214,56 @@ export class OrderService {
       order['copouns'] = copouns;
     }
 
-    // await axios({
-    //     method: 'POST',
-    //     url: `http://localhost:5000/api/notification/send`,
-    //     headers: JSON.parse(
-    //       JSON.stringify({
-    //         Authorization: token,
-    //       }),
-    //     ),
-    //     data: {
-    //         type: 'GENERAL',
-    //         operation: 'FLEET ASSIGNED',
-    //         deviceId: deliveryBoy.deviceId,
-    //         userId: deliveryBoy._id,
-    //         title: 'Your Fleet Job',
-    //         content: deliveryBoy.fullName + ' delivery boy accepted your delivery and some demons. text goes here and here and here',
-    //         status: 'SEND',
-    //         extraData: {
-    //             notification_details: {
-    //                 id: this.ObjectId(deliveryFleet._id),
-    //                 type: 'FLEET',
-    //                 status: 'Not Accepted'
-    //             }
-    //         }
-    //     },
-    //   });
-
     const orderResult = await new this.OrderModel(order).save();
 
-    console.log(orderResult)
+    for (var key in order_consumer) {
+      var ordersRes = JSON.parse(JSON.stringify(orderResult));
+      ordersRes['orders'] = order_consumer[key];
+      ordersRes['storeId'] = ObjectId(key);
+      delete ordersRes._id;
+      await new this.SellOrderModel(ordersRes).save();
+
+      var amount = 0;
+      for(var i = 0; i < order_consumer[key].length; i++) {
+        amount = amount + order_consumer[key]['sellPrice'] 
+      }
+
+      const store = await this.userDataModel.findOne({
+          _id: ObjectId(key)
+      })
+
+      const notificationDto = {
+        title: 'You got order',
+        body: `you got ₹${amount} order`,
+      };
+
+      const headers = JSON.parse(
+        JSON.stringify({
+          Authorization:
+            'key=AAAArNJ8-t4:APA91bGZqcqwoLz5KbGglrq34TOqeTISkvxbSB0v3v4eI5O6eBXZZGX3qngVaPrfKYN3bIdc6N1N0bW19rofHqhWaQwrR77GZ9z9KhAYNYucckLSOJe9N0iUQuLIyrgwtxBTss5-aQ68',
+          'Content-Type': 'application/json',
+        }),
+      );
+
+      const body = JSON.parse(
+        JSON.stringify({
+          notification: {
+            title: notificationDto.title,
+            body: notificationDto.body,
+          },
+          registration_ids: [store['deviceId']],
+        }),
+      );
+
+      const data = await axios({
+        method: 'POST',
+        url: 'https://fcm.googleapis.com/fcm/send',
+        data: body,
+        headers: headers,
+      });
+
+      new this.NotificationModel(notificationDto).save();
+    }
 
     return orderResult;
   }

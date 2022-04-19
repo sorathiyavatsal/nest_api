@@ -25,7 +25,7 @@ export class OrdersTest {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  productId: String;
+  catalogueId: String;
 
   @ApiProperty()
   @IsString()
