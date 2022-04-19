@@ -41,13 +41,15 @@ export class UsersService {
     );
   }
   async findOneId(id: string) {
-      var userData = await this.UserDataModel.findOne({
-        userId: ObjectId(id)
-      })
-      var user = JSON.parse(JSON.stringify(await this.usersgetModel.findById(id)))
-     user["userData"] = userData;
+    var userData = await this.UserDataModel.findOne({
+      userId: ObjectId(id),
+    });
+    var user = JSON.parse(
+      JSON.stringify(await this.usersgetModel.findById(id)),
+    );
+    user['userData'] = userData;
 
-     return user
+    return user;
   }
 
   async findOneByEmail(email: string) {
@@ -151,5 +153,163 @@ export class UsersService {
     const userdata = await new this.usersgetModel(data).save();
 
     return userdata;
+  }
+
+  async updateProfile(id: string, files: any, profileDto: any) {
+    let updateData = {};
+    let updateUser = {};
+
+    if (profileDto.gender) {
+      updateData['gender'] = profileDto.gender;
+    }
+    if (profileDto.dob) {
+      updateData['dob'] = profileDto.dob;
+      updateUser['dateofbirth'] = profileDto.dob;
+    }
+    if (profileDto.fullName) {
+      updateData['fullName'] = profileDto.fullName;
+      updateUser['fullName'] = profileDto.fullName;
+    }
+    if (profileDto.shop_name) {
+      updateData['shop_name'] = profileDto.shop_name;
+    }
+    if (profileDto.shop_address) {
+      updateData['shop_address'] = profileDto.shop_address;
+    }
+    if (profileDto.shop_located_at) {
+      updateData['shop_located_at'] = profileDto.shop_located_at;
+    }
+    if (profileDto.sell_items) {
+      updateData['sell_items'] = profileDto.sell_items;
+    }
+    if (profileDto.adharcard_no) {
+      updateData['adharcard_no'] = profileDto.adharcard_no;
+    }
+    if (profileDto.pancard_no) {
+      updateData['pancard_no'] = profileDto.pancard_no;
+    }
+    if (profileDto.gst_no) {
+      updateData['gst_no'] = profileDto.gst_no;
+    }
+    if (profileDto.gst_image) {
+      updateData['gst_image'] = profileDto.gst_image;
+    }
+    if (profileDto.bank_details) {
+      updateData['bank_details'] = profileDto.bank_details;
+    }
+    if (profileDto.driving_card) {
+      updateData['driving_card'] = profileDto.driving_card;
+    }
+    if (profileDto.vehicle_no) {
+      updateData['vehicle_no'] = profileDto.vehicle_no;
+    }
+    if (profileDto.vehicle_type) {
+      updateData['vehicle_type'] = profileDto.vehicle_type;
+    }
+    if (profileDto.store_license) {
+      updateData['store_license'] = profileDto.store_license;
+    }
+    if (profileDto.store_license_image) {
+      updateData['store_license_image'] = profileDto.store_license_image;
+    }
+    if (profileDto.food_license) {
+      updateData['food_license'] = profileDto.food_license;
+    }
+    if (profileDto.food_license_image) {
+      updateData['food_license_image'] = profileDto.food_license_image;
+    }
+    if (profileDto.services_area) {
+      updateData['services_area'] = profileDto.services_area;
+    }
+    if (profileDto.profile_photo) {
+      updateData['profile_photo'] = profileDto.profile_photo;
+      updateData['profilePhoto'] = profileDto.profile_photo;
+    }
+    if (profileDto.vehicle_image) {
+      updateData['vehicle_image'] = profileDto.vehicle_image;
+    }
+    if (profileDto.store_image) {
+      updateData['store_image'] = profileDto.store_image;
+    }
+    if (profileDto.aadhar_card_image) {
+      updateData['aadhar_card_image'] = profileDto.aadhar_card_image;
+    }
+    if (profileDto.driving_card_image) {
+      updateData['driving_card_image'] = profileDto.driving_card_image;
+    }
+    if (profileDto.pan_card_image) {
+      updateData['pan_card_image'] = profileDto.pan_card_image;
+    }
+    if (profileDto.partnerId) {
+      updateData['partnerId'] = profileDto.partnerId;
+    }
+
+    await this.UserDataModel.updateOne(
+      {
+        userId: ObjectId(id),
+      },
+      {
+        $set: updateData,
+      },
+      {
+        upsert: true,
+      },
+    );
+
+    if (profileDto.email) {
+      updateUser['email'] = profileDto.email;
+    }
+    if (profileDto.emailVerified) {
+      updateUser['emailVerified'] = profileDto.emailVerified;
+    }
+    if (profileDto.address) {
+      updateUser['address'] = profileDto.address;
+    }
+    if (profileDto.phoneNumber) {
+      updateUser['phoneNumber'] = profileDto.phoneNumber;
+    }
+    if (profileDto.verifyType) {
+      updateUser['verifyType'] = profileDto.verifyType;
+    }
+    if (profileDto.liveStatus) {
+      updateUser['liveStatus'] = profileDto.liveStatus;
+    }
+    if (profileDto.phoneVerified) {
+      updateUser['phoneVerified'] = profileDto.phoneVerified;
+    }
+    if (profileDto.permissions) {
+      updateUser['permissions'] = profileDto.permissions;
+    }
+    if (profileDto.loc) {
+      updateUser['loc'] = profileDto.loc;
+    }
+    if (profileDto.activeStatus) {
+      updateUser['activeStatus'] = profileDto.activeStatus;
+    }
+    if (profileDto.verifyStatus) {
+      updateUser['verifyStatus'] = profileDto.verifyStatus;
+    }
+    console.log(id)
+    console.log(await this.UserDataModel.updateOne(
+      {
+        _id: ObjectId(id),
+      },
+      {
+        $set: updateData,
+      },
+      {
+        upsert: true,
+      },
+    ));
+
+    var userData = await this.UserDataModel.findOne({
+      userId: ObjectId(id),
+    });
+    var user = JSON.parse(
+      JSON.stringify(await this.usersgetModel.findById(id)),
+    );
+    user['userData'] = userData;
+
+    return user;
   }
 }
