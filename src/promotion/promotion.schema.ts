@@ -23,7 +23,7 @@ export const PromotionSchema = new mongoose.Schema(
       type: Object,
     },
     ads: {
-      type: String,
+      type: Array,
     },
     placement: { type: Object },
     date: { type: Object },

@@ -15,8 +15,29 @@ export class PromotionService {
     @InjectModel('AdsView') private AdsViewSchema: Model<AdsView>,
   ) {}
 
-  async getPromitionall() {
-    return await this.PromotionSchema.find({});
+  async getPromitionall(filter: any) {
+    var promotion = JSON.parse(
+      JSON.stringify(await this.PromotionSchema.find({})),
+    );
+
+    for (var i = 0; i < promotion.length; i++) {
+      promotion[i]['ads'] = promotion[i]['ads'].length;
+      promotion[i]['device_based'] = promotion[i]['target']['device_based'];
+      delete promotion[i]['target'];
+    }
+
+    var page = parseInt(filter.page) || 1,
+      per_page = parseInt(filter.limit) || 20,
+      offset = (page - 1) * per_page,
+      paginatedItems = promotion.slice(offset).slice(0, per_page),
+      total_pages = Math.ceil(promotion.length / per_page);
+
+    return {
+      currentPage: page,
+      pages: total_pages,
+      count: promotion.length,
+      promotion: paginatedItems,
+    };
   }
 
   async getPromitionById(_id: string) {
@@ -103,7 +124,6 @@ export class PromotionService {
         start_date: promotionDto.start_date,
         end_date: promotionDto.end_date,
       },
-      user_based: {},
     };
 
     if (promotionDto.network == 'MARCHANT' && promotionDto.merchant) {
@@ -125,12 +145,12 @@ export class PromotionService {
   async updatePromotion(_id: string, promotionDto: any) {
     let condition = {};
 
-    if(promotionDto.name) {
-        condition['name'] = promotionDto.name;
+    if (promotionDto.name) {
+      condition['name'] = promotionDto.name;
     }
 
-    if(promotionDto.status) {
-        condition['status'] = promotionDto.status;
+    if (promotionDto.status) {
+      condition['status'] = promotionDto.status;
     }
 
     if (promotionDto.network) {

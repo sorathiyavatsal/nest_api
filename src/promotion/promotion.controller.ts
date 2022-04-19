@@ -40,8 +40,10 @@ export class PromotionController {
   @Get('/all')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  async getPromitionall(@Request() req) {
-    return await this.PromotionService.getPromitionall(); 
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  async getPromitionall(@Query() query) {
+    return await this.PromotionService.getPromitionall(query); 
   }
 
   @Get('/')

@@ -38,13 +38,26 @@ export class ProductController {
 
   @Get('/all')
   @UseGuards(AuthGuard('jwt'))
-  @ApiQuery({ name: 'category', type: 'string', required: false })
-  @ApiQuery({ name: 'store', type: 'string', required: false })
+  @ApiQuery({ name: 'storeCategory', type: 'string', required: false })
   @ApiQuery({ name: 'collection', type: 'string', required: false })
+  @ApiQuery({ name: 'category', type: 'string', required: false })
+  @ApiQuery({ name: 'brand', type: 'string', required: false })
   @ApiQuery({ name: 'name', type: 'string', required: false })
-  @ApiQuery({ name: 'title', type: 'string', required: false })
+  @ApiQuery({ name: 'keywords', type: 'string', required: false })
   @ApiQuery({ name: 'page', type: 'number', required: false })
   @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({
+    name: 'sort_order',
+    type: 'string',
+    required: false,
+    enum: ['AESC', 'DESC'],
+  })
+  @ApiQuery({
+    name: 'sort',
+    type: 'string',
+    required: false,
+    enum: ['NAME', 'DATE', 'PRICE'],
+  })
   async getAllProducts(
     @Request() request,
     @Response() response,

@@ -194,165 +194,7 @@ export class ProductService {
     });
   }
 
-  async getAllProducts(filter: any) {
-    const product = await this.ProductsModel.aggregate([
-      {
-        $lookup: {
-          from: 'metadatas',
-          localField: 'metaOptions',
-          foreignField: '_id',
-          as: 'metaOptions',
-        },
-      },
-      {
-        $unwind: {
-          path: '$metaOptions',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'storeCategory',
-          foreignField: '_id',
-          as: 'storeCategories',
-        },
-      },
-      {
-        $unwind: {
-          path: '$storeCategories',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category',
-        },
-      },
-      {
-        $unwind: {
-          path: '$category',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'collections',
-          foreignField: '_id',
-          as: 'collections',
-        },
-      },
-      {
-        $unwind: {
-          path: '$collections',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'menus',
-          localField: 'menu',
-          foreignField: '_id',
-          as: 'menu',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menu',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'brands',
-          localField: 'brand',
-          foreignField: '_id',
-          as: 'brand',
-        },
-      },
-      {
-        $unwind: {
-          path: '$brand',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'reviews',
-          localField: 'review',
-          foreignField: '_id',
-          as: 'reviews',
-        },
-      },
-      {
-        $unwind: {
-          path: '$reviews',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $match: {
-          name: {
-            $regex: filter.name ? filter.name : '',
-            $options: 'i',
-          },
-        },
-      },
-      {
-        $match: {
-          pageTitle: {
-            $regex: filter.title ? filter.title : '',
-            $options: 'i',
-          },
-        },
-      },
-      {
-        $match: {
-          'storeCategories.categoryName': {
-            $regex: filter.store ? filter.store : '',
-            $options: 'i',
-          },
-        },
-      },
-      {
-        $match: {
-          'category.categoryName': {
-            $regex: filter.category ? filter.category : '',
-            $options: 'i',
-          },
-        },
-      },
-      //   {
-      //     $match: {
-      //       'collections.categoryName': {
-      //         $regex: filter.collection ? filter.collection : '',
-      //         $options: 'i',
-      //       },
-      //     },
-      //   },
-      {
-        $sort: {
-          _id: -1,
-        },
-      },
-      //   {
-      //     $skip: filter.page ? parseInt(filter.page) * parseInt(filter.limit) : 0,
-      //   },
-      //   { $limit: filter.limit ? parseInt(filter.limit) : 20 },
-    ]);
-
-    return {
-      products: product.slice(filter.page ?? 0, filter.limit ?? 20),
-      count: product.length,
-      pages: Math.ceil(product.length / (filter.limit ? filter.limit : 20)),
-    };
-  }
-
-  async getFilterProducts(filter: any) {
+  async filterCondition(filter: any) {
     let condition = [];
     condition.push(
       {
@@ -508,14 +350,39 @@ export class ProductService {
           },
         });
       }
-      // if (filter.sort == 'PRICE') {
-      //   condition.push({
-      //     $sort: {
-      //       name: filter.sort_order == 'AESC' ? 1 : -1,
-      //     },
-      //   });
-      // }
+      if (filter.sort == 'PRICE') {
+        condition.push({
+          $sort: {
+            name: filter.sort_order == 'AESC' ? 1 : -1,
+          },
+        });
+      }
     }
+
+    return condition;
+  }
+
+  async getAllProducts(filter: any) {
+    const condition = await this.filterCondition(filter);
+
+    const product = await this.ProductsModel.aggregate(condition);
+
+    var page = parseInt(filter.page) || 1,
+      per_page = parseInt(filter.limit) || 20,
+      offset = (page - 1) * per_page,
+      paginatedItems = product.slice(offset).slice(0, per_page),
+      total_pages = Math.ceil(product.length / per_page);
+
+    return {
+      currentPage: page,
+      pages: total_pages,
+      count: product.length,
+      products: paginatedItems,
+    };
+  }
+
+  async getFilterProducts(filter: any) {
+    const condition = await this.filterCondition(filter);
 
     var products = JSON.parse(
       JSON.stringify(await this.ProductsModel.aggregate(condition)),
@@ -568,7 +435,6 @@ export class ProductService {
     }
 
     return {
-      products: products,
       filters: {
         store: [...new Set(store)],
         collection: [...new Set(collection)],
@@ -576,7 +442,6 @@ export class ProductService {
         category: [...new Set(category)],
         brand: [...new Set(brand)],
       },
-      pages: Math.ceil(products.length / filter.limit ? filter.limit : 20) - 1,
     };
   }
 
@@ -839,7 +704,7 @@ export class ProductService {
             metaValue: {
               _id: ObjectId(),
               optionName: metaDto.optionName,
-              optionValue: metaDto.optionValue.split(","),
+              optionValue: metaDto.optionValue.split(','),
               optionImage: metaDto.image,
             },
           },
@@ -858,7 +723,7 @@ export class ProductService {
           {
             _id: ObjectId(),
             optionName: metaDto.optionName,
-            optionValue: metaDto.optionValue.split(","),
+            optionValue: metaDto.optionValue.split(','),
             optionImage: metaDto.image,
           },
         ],
