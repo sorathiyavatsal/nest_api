@@ -40,6 +40,8 @@ import {
 } from '@nestjs/swagger';
 import { error } from 'console';
 import { identity } from 'rxjs';
+import { diskStorage } from 'multer';
+import { imageFileFilter } from 'src/delivery_fleet/deliveryfleet.controller';
 
 @Controller('coupons')
 @ApiTags('Coupons')
@@ -87,6 +89,19 @@ export class CouponsController {
   @Roles(Role.ADMIN)
   @Post('/')
   @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FilesInterceptor('image', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product/variants',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   @ApiBody({
     schema: {
       type: 'object',
@@ -101,29 +116,31 @@ export class CouponsController {
         discount_amount: {
           type: 'number',
         },
-        coupon_conditional: { type: 'boolean'},
-        
-        min_cart_value:{type: 'number'}, 
-        max_discount_limit: { type: 'number'},
-        min_cart_value_flat:{type: 'number'}, 
-        
-
+        coupon_conditional: { type: 'boolean' },
+        min_cart_value: { type: 'number' },
+        max_discount_limit: { type: 'number' },
+        min_cart_value_flat: { type: 'number' },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
       },
     },
   })
-
-
-
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiOperation({
     summary:
       'please try here https://documenter.getpostman.com/view/811020/UVC9hkcP',
   })
-  async addCategories(@UploadedFile() file, @Request() request) {
-    if (file) {
-      request.body.image = await toBase64(file);
+  async addCategories(@UploadedFile() files, @Request() request) {
+    const response = [];
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        const fileReponse = file.path;
+        response.push(fileReponse);
+      });
     }
-    console.log('body', request.body);
+    request.body.image = response[0];
 
     return await this.CouponsService.createCoupon(request.body, request.user);
   }

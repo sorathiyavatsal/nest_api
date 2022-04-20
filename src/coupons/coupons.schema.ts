@@ -37,6 +37,9 @@ export const CouponsSchema = new mongoose.Schema(
       type: ObjectId,
       ref: 'Users',
     },
+    image: {
+        type: String
+    }
   },
 
   { timestamps: true },
@@ -52,4 +55,5 @@ export interface Coupons extends mongoose.Document {
   coupon_conditional:boolean;
   coupon_condition_percent: object;
   coupon_condition_flat: object;
+  image: string;
 }

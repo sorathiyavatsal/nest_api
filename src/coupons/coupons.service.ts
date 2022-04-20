@@ -19,8 +19,6 @@ export class CouponsService {
   async updateCoupon(_id: string, couponDto: any, user: any) {
     let uniqueId = { _id };
     let updateBody = couponDto;
-    console.log(uniqueId);
-    console.log(updateBody);
     return await this.CouponsSchema.updateOne(uniqueId, updateBody);
   }
 
@@ -37,16 +35,15 @@ export class CouponsService {
       coupon_condition_percent:  securityDto.coupon_conditional && securityDto.discount_type?{
         min_cart_value: securityDto.min_cart_value,
         max_discount_limit: securityDto.max_discount_limit,
-
       }:null,
       coupon_condition_flat:  securityDto.coupon_conditional && (securityDto.discount_type==false)?{
         min_cart_value_flat: securityDto.min_cart_value_flat,
       }:null,
+      image: securityDto.image
     }
-    console.log(coupon_details)
+
     const newPromo = new this.CouponsSchema(coupon_details);
 
-    console.log(newPromo);
     return await newPromo.save().then(
       (user: any) => {
         return user.toObject({ versionKey: false });
@@ -54,7 +51,6 @@ export class CouponsService {
       (error) => {
         let msg = 'Invalid Request!';
         if (error.errmsg) msg = error.errmsg;
-        console.log(error);
         return new BadRequestException(msg);
       },
     );
@@ -62,9 +58,6 @@ export class CouponsService {
 
   async deleteCoupon(_id: string) {
     let uniqueId = { _id };
-
-    console.log(uniqueId);
-
     return await this.CouponsSchema.deleteOne(uniqueId);
   }
 }

@@ -17,18 +17,18 @@ import { ObjectId } from 'mongoose';
 export class UpdateOrderDto {
   @IsObject()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiPropertyOptional()
   shipingAddress: Object;
 
   @IsObject()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiPropertyOptional()
   billingAddress: Object;
 
   @IsString()
   @IsNotEmpty()
   @ApiPropertyOptional({
-    enum: ['Pendding', 'Ordering', 'Prepering', 'Complete'],
+    enum: ['PENDING', 'PROCESSING', 'DISPATCH', 'COMPLETE'],
   })
   status: String;
 }

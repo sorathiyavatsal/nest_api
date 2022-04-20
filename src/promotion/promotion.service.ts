@@ -24,6 +24,7 @@ export class PromotionService {
       promotion[i]['ads'] = promotion[i]['ads'].length;
       promotion[i]['device_based'] = promotion[i]['target']['device_based'];
       delete promotion[i]['target'];
+      delete promotion[i]['placement'];
     }
 
     var page = parseInt(filter.page) || 1,
@@ -41,9 +42,28 @@ export class PromotionService {
   }
 
   async getPromitionById(_id: string) {
-    return await this.PromotionSchema.find({
-      _id: ObjectId(_id),
-    });
+    var promotion = JSON.parse(
+      JSON.stringify(
+        await this.PromotionSchema.findOne({
+          _id: ObjectId(_id),
+        }),
+      ),
+    );
+
+    let ads = []
+    if (promotion.ads) {
+      for (var i = 0; i < promotion.ads.length; i++) {
+        var adsResult = await this.AdsSchema.findOne({
+          _id: ObjectId(promotion.ads[i]),
+        });
+
+        ads.push(adsResult)
+      }
+    }
+
+    promotion.ads = ads
+
+    return promotion;
   }
 
   async getPromitionFilter(filterDto: any) {

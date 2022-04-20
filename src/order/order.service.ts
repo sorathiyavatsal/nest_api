@@ -274,56 +274,108 @@ export class OrderService {
 
       return orderResult;
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
   }
 
   async patchOrder(id: String, orderDto: any) {
-    const order = await this.OrderModel.find({
+    const order = await this.OrderModel.findOne({
       _id: ObjectId(id),
     });
 
-    // if (order) {
-    //   if (orderDto.status) {
-    //     const notificationDto = {
-    //       userId: ObjectId(order.consumerId),
-    //       type: 'GENERAL',
-    //       operation: 'FLEET PROCESSED',
-    //       title: 'You order is going to process',
-    //       content: `order process start`,
-    //       status: 'SEND',
-    //       extraData: {},
-    //     };
+    if (order) {
+      let updateData = {};
 
-    //     const headers = JSON.parse(
-    //       JSON.stringify({
-    //         Authorization:
-    //           'key=AAAArNJ8-t4:APA91bGZqcqwoLz5KbGglrq34TOqeTISkvxbSB0v3v4eI5O6eBXZZGX3qngVaPrfKYN3bIdc6N1N0bW19rofHqhWaQwrR77GZ9z9KhAYNYucckLSOJe9N0iUQuLIyrgwtxBTss5-aQ68',
-    //         'Content-Type': 'application/json',
-    //       }),
-    //     );
+      if (orderDto.status) {
+        var notificationDto = {};
 
-    //     const body = JSON.parse(
-    //       JSON.stringify({
-    //         notification: {
-    //           title: notificationDto.title,
-    //           body: notificationDto.content,
-    //         },
-    //         registration_ids: [store['deviceId']],
-    //       }),
-    //     );
+        const consumerResult = await this.userModel.find({
+          _id: ObjectId(order['consumerId']),
+        });
 
-    //     axios({
-    //       method: 'POST',
-    //       url: 'https://fcm.googleapis.com/fcm/send',
-    //       data: body,
-    //       headers: headers,
-    //     });
+        if (orderDto.status == 'PROCESSING') {
+          notificationDto = {
+            userId: ObjectId(order['consumerId']),
+            type: 'GENERAL',
+            operation: 'FLEET PROCESSED',
+            title: 'You order is going to process',
+            content: `order process start`,
+            status: 'SEND',
+            extraData: {},
+          };
+        } else if (orderDto.status == 'DISPATCH') {
+          notificationDto = {
+            userId: ObjectId(order['consumerId']),
+            type: 'GENERAL',
+            operation: 'FLEET DISPATCH',
+            title: 'You order is dispatch',
+            content: `order dispatch from the store`,
+            status: 'SEND',
+            extraData: {},
+          };
+        } else {
+          notificationDto = {
+            userId: ObjectId(order['consumerId']),
+            type: 'GENERAL',
+            operation: 'FLEET COMPELETE',
+            title: 'You order is delivered',
+            content: `order delivered to you`,
+            status: 'SEND',
+            extraData: {},
+          };
+        }
+        const headers = JSON.parse(
+          JSON.stringify({
+            Authorization:
+              'key=AAAArNJ8-t4:APA91bGZqcqwoLz5KbGglrq34TOqeTISkvxbSB0v3v4eI5O6eBXZZGX3qngVaPrfKYN3bIdc6N1N0bW19rofHqhWaQwrR77GZ9z9KhAYNYucckLSOJe9N0iUQuLIyrgwtxBTss5-aQ68',
+            'Content-Type': 'application/json',
+          }),
+        );
 
-    //     new this.NotificationModel(notificationDto).save();
-    //   }
-    // } else {
-    //   return 'order not found';
-    // }
+        const body = JSON.parse(
+          JSON.stringify({
+            notification: {
+              title: notificationDto['title'],
+              body: notificationDto['content'],
+            },
+            registration_ids: [
+              consumerResult['deviceId'] ? consumerResult['deviceId'] : '',
+            ],
+          }),
+        );
+
+        axios({
+          method: 'POST',
+          url: 'https://fcm.googleapis.com/fcm/send',
+          data: body,
+          headers: headers,
+        });
+
+        new this.NotificationModel(notificationDto).save();
+        updateData['status'] = orderDto.status;
+      }
+
+      if (orderDto.shipingAddress) {
+        updateData['shipingAddress'] = orderDto.shipingAddress;
+      }
+
+      if (orderDto.billingAddress) {
+        updateData['billingAddress'] = orderDto.billingAddress;
+      }
+
+      return await this.OrderModel.updateOne(
+        {
+          _id: ObjectId(id),
+        },
+        {
+          $set: updateData,
+        },
+        {
+          $upsert: true,
+        },
+      );
+    } else {
+      return 'order not found';
+    }
   }
 }
