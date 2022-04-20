@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -21,6 +22,8 @@ import {
 import { Roles } from 'src/auth/roles.decorator';
 import { OrderService } from './order.service';
 import { OrderDto } from './dto/create-order';
+import { UpdateOrderDto } from './dto/update-order';
+import { query } from 'express';
 let ObjectId = require('mongodb').ObjectId;
 
 @Controller('order')
@@ -49,9 +52,9 @@ export class OrderController {
 
   @Get('/orderId')
   async getOrderId(@Request() request: any) {
-      console.log("test")
+    console.log('test');
     return {
-        orderId: ObjectId(),
+      orderId: ObjectId(),
     };
   }
 
@@ -60,5 +63,17 @@ export class OrderController {
   @ApiConsumes('multipart/form-data', 'application/json')
   async postOrder(@Body() orderDto: OrderDto, @Request() request) {
     return await this.OrderService.postOrder(orderDto);
+  }
+
+  @Patch('/')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiQuery({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  async patchpostOrder(
+    @Body() updateOrderDto: UpdateOrderDto,
+    @Query() query,
+    @Request() request,
+  ) {
+    return await this.OrderService.patchOrder(query.id, updateOrderDto);
   }
 }

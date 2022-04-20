@@ -148,123 +148,182 @@ export class OrderService {
   }
 
   async postOrder(orderDto: any) {
-    let orders_details = [];
-    let order_consumer = {};
-    if (orderDto.orders) {
-      for (var i = 0; i < orderDto.orders.length; i++) {
-        var order_details = {
-          id: ObjectId(),
-          quantity: orderDto.orders[i].quantity,
-          sellPrice: orderDto.orders[i].sellPrice,
-          discount: orderDto.orders[i].Discount,
-        };
+    try {
+      let orders_details = [];
+      let order_consumer = {};
+      if (orderDto.orders) {
+        for (var i = 0; i < orderDto.orders.length; i++) {
+          var order_details = {
+            id: ObjectId(),
+            quantity: orderDto.orders[i].quantity,
+            sellPrice: orderDto.orders[i].sellPrice,
+            discount: orderDto.orders[i].Discount,
+          };
 
-        if (orderDto.orders[i].storeId) {
-          order_details['storeId'] = ObjectId(orderDto.orders[i].storeId);
-        }
+          if (orderDto.orders[i].storeId) {
+            order_details['storeId'] = ObjectId(orderDto.orders[i].storeId);
+          }
 
-        if (orderDto.orders[i].variantId) {
-          order_details['variantId'] = ObjectId(orderDto.orders[i].variantId);
-        }
+          if (orderDto.orders[i].variantId) {
+            order_details['variantId'] = ObjectId(orderDto.orders[i].variantId);
+          }
 
-        if (orderDto.orders[i].catalogueId) {
-          order_details['catalogueId'] = ObjectId(
-            orderDto.orders[i].catalogueId,
-          );
-        }
+          if (orderDto.orders[i].catalogueId) {
+            order_details['catalogueId'] = ObjectId(
+              orderDto.orders[i].catalogueId,
+            );
+          }
 
-        orders_details.push(order_details);
-        if (order_consumer[orderDto.orders[i].storeId]) {
-          order_consumer[orderDto.orders[i].storeId].push(order_details);
-        } else {
-          order_consumer[orderDto.orders[i].storeId] = [order_details];
+          orders_details.push(order_details);
+          if (order_consumer[orderDto.orders[i].storeId]) {
+            order_consumer[orderDto.orders[i].storeId].push(order_details);
+          } else {
+            order_consumer[orderDto.orders[i].storeId] = [order_details];
+          }
         }
       }
-    }
 
-    let copouns = [];
-    if (orderDto.copouns) {
-      orderDto.copouns.forEach((copoun) => {
-        copouns.push(ObjectId(copoun));
-      });
-    }
-
-    let order = {
-      _id: ObjectId(orderDto.orderId),
-      consumerId: ObjectId(orderDto.consumerId),
-      orderType: orderDto.orderType,
-      orderDate: orderDto.orderDate,
-      orders: orders_details,
-      subTotal: orderDto.subTotal,
-      status: orderDto.status ? orderDto.status : 'Pendding',
-      shipingAddress: orderDto.shipingAddress,
-      billingAddress: orderDto.billingAddress,
-      paymentTransactionId: ObjectId(orderDto.paymentTransactionId),
-    };
-
-    if (orderDto.tax) {
-      order['tax'] = orderDto.tax;
-    }
-
-    if (orderDto.shippingId) {
-      order['shippingId'] = ObjectId(orderDto.shippingId);
-    }
-
-    if (copouns) {
-      order['copouns'] = copouns;
-    }
-
-    const orderResult = await new this.OrderModel(order).save();
-
-    for (var key in order_consumer) {
-      var ordersRes = JSON.parse(JSON.stringify(orderResult));
-      ordersRes['orders'] = order_consumer[key];
-      ordersRes['storeId'] = ObjectId(key);
-      delete ordersRes._id;
-      await new this.SellOrderModel(ordersRes).save();
-
-      var amount = 0;
-      for(var i = 0; i < order_consumer[key].length; i++) {
-        amount = amount + order_consumer[key]['sellPrice'] 
+      let copouns = [];
+      if (orderDto.copouns) {
+        orderDto.copouns.forEach((copoun) => {
+          copouns.push(ObjectId(copoun));
+        });
       }
 
-      const store = await this.userDataModel.findOne({
-          _id: ObjectId(key)
-      })
-
-      const notificationDto = {
-        title: 'You got order',
-        body: `you got ₹${amount} order`,
+      let order = {
+        _id: ObjectId(orderDto.orderId),
+        consumerId: ObjectId(orderDto.consumerId),
+        orderType: orderDto.orderType,
+        orderDate: orderDto.orderDate,
+        orders: orders_details,
+        subTotal: orderDto.subTotal,
+        status: 'Pendding',
+        shipingAddress: orderDto.shipingAddress,
+        billingAddress: orderDto.billingAddress,
+        paymentTransactionId: orderDto.paymentTransactionId,
       };
 
-      const headers = JSON.parse(
-        JSON.stringify({
-          Authorization:
-            'key=AAAArNJ8-t4:APA91bGZqcqwoLz5KbGglrq34TOqeTISkvxbSB0v3v4eI5O6eBXZZGX3qngVaPrfKYN3bIdc6N1N0bW19rofHqhWaQwrR77GZ9z9KhAYNYucckLSOJe9N0iUQuLIyrgwtxBTss5-aQ68',
-          'Content-Type': 'application/json',
-        }),
-      );
+      if (orderDto.tax) {
+        order['tax'] = orderDto.tax;
+      }
 
-      const body = JSON.parse(
-        JSON.stringify({
-          notification: {
-            title: notificationDto.title,
-            body: notificationDto.body,
-          },
-          registration_ids: [store['deviceId']],
-        }),
-      );
+      if (orderDto.shippingId) {
+        order['shippingId'] = ObjectId(orderDto.shippingId);
+      }
 
-      const data = await axios({
-        method: 'POST',
-        url: 'https://fcm.googleapis.com/fcm/send',
-        data: body,
-        headers: headers,
-      });
+      if (copouns) {
+        order['copouns'] = copouns;
+      }
 
-      new this.NotificationModel(notificationDto).save();
+      const orderResult = await new this.OrderModel(order).save();
+
+      for (var key in order_consumer) {
+        var ordersRes = JSON.parse(JSON.stringify(orderResult));
+        ordersRes['orders'] = order_consumer[key];
+        ordersRes['storeId'] = ObjectId(key);
+        ordersRes['purchaseOrderId'] = ObjectId(ordersRes._id);
+        delete ordersRes._id;
+        await new this.SellOrderModel(ordersRes).save();
+
+        var amount = 0;
+        for (var i = 0; i < order_consumer[key].length; i++) {
+          amount = amount + order_consumer[key]['sellPrice'];
+        }
+
+        const store = await this.userDataModel.findOne({
+          _id: ObjectId(key),
+        });
+
+        const notificationDto = {
+          userId: ObjectId(orderDto.consumerId),
+          type: 'GENERAL',
+          operation: 'NEW FLEET REQUEST',
+          title: 'You got order',
+          content: `you got ₹${amount} order`,
+          status: 'SEND',
+          extraData: {},
+        };
+
+        const headers = JSON.parse(
+          JSON.stringify({
+            Authorization:
+              'key=AAAArNJ8-t4:APA91bGZqcqwoLz5KbGglrq34TOqeTISkvxbSB0v3v4eI5O6eBXZZGX3qngVaPrfKYN3bIdc6N1N0bW19rofHqhWaQwrR77GZ9z9KhAYNYucckLSOJe9N0iUQuLIyrgwtxBTss5-aQ68',
+            'Content-Type': 'application/json',
+          }),
+        );
+
+        const body = JSON.parse(
+          JSON.stringify({
+            notification: {
+              title: notificationDto.title,
+              body: notificationDto.content,
+            },
+            registration_ids: [store['deviceId']],
+          }),
+        );
+
+        axios({
+          method: 'POST',
+          url: 'https://fcm.googleapis.com/fcm/send',
+          data: body,
+          headers: headers,
+        });
+
+        new this.NotificationModel(notificationDto).save();
+      }
+
+      return orderResult;
+    } catch (error) {
+        console.log(error)
     }
+  }
 
-    return orderResult;
+  async patchOrder(id: String, orderDto: any) {
+    const order = await this.OrderModel.find({
+      _id: ObjectId(id),
+    });
+
+    // if (order) {
+    //   if (orderDto.status) {
+    //     const notificationDto = {
+    //       userId: ObjectId(order.consumerId),
+    //       type: 'GENERAL',
+    //       operation: 'FLEET PROCESSED',
+    //       title: 'You order is going to process',
+    //       content: `order process start`,
+    //       status: 'SEND',
+    //       extraData: {},
+    //     };
+
+    //     const headers = JSON.parse(
+    //       JSON.stringify({
+    //         Authorization:
+    //           'key=AAAArNJ8-t4:APA91bGZqcqwoLz5KbGglrq34TOqeTISkvxbSB0v3v4eI5O6eBXZZGX3qngVaPrfKYN3bIdc6N1N0bW19rofHqhWaQwrR77GZ9z9KhAYNYucckLSOJe9N0iUQuLIyrgwtxBTss5-aQ68',
+    //         'Content-Type': 'application/json',
+    //       }),
+    //     );
+
+    //     const body = JSON.parse(
+    //       JSON.stringify({
+    //         notification: {
+    //           title: notificationDto.title,
+    //           body: notificationDto.content,
+    //         },
+    //         registration_ids: [store['deviceId']],
+    //       }),
+    //     );
+
+    //     axios({
+    //       method: 'POST',
+    //       url: 'https://fcm.googleapis.com/fcm/send',
+    //       data: body,
+    //       headers: headers,
+    //     });
+
+    //     new this.NotificationModel(notificationDto).save();
+    //   }
+    // } else {
+    //   return 'order not found';
+    // }
   }
 }

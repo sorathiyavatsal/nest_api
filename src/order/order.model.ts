@@ -39,7 +39,7 @@ export const PruchaseOrderSchema = new mongoose.Schema(
       type: Number,
     },
     paymentTransactionId: {
-        type: ObjectId,
+        type: String,
     }
   },
   { timestamps: true },
@@ -58,5 +58,5 @@ export interface PruchaseOrder extends mongoose.Document {
   billingAddress: object;
   shippingId: mongoose.ObjectId;
   cor: number;
-  paymentTransactionId: mongoose.ObjectId
+  paymentTransactionId: string
 }

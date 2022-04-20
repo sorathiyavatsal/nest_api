@@ -43,7 +43,7 @@ export const SellOrderSchema = new mongoose.Schema(
       type: Number,
     },
     paymentTransactionId: {
-        type: ObjectId,
+        type: String,
     }
   },
   { timestamps: true },
@@ -62,5 +62,5 @@ export interface SellOrder extends mongoose.Document {
   billingAddress: object;
   shippingId: mongoose.ObjectId;
   cor: number;
-  paymentTransactionId: mongoose.ObjectId
+  paymentTransactionId: string
 }
