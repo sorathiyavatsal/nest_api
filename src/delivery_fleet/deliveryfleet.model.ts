@@ -158,6 +158,10 @@ export const DeliveryFleetSchema = new mongoose.Schema(
       type: ObjectId,
       ref: 'Users',
     },
+    orderId: {
+      type: ObjectId,
+      ref: 'purchaseorders',
+    },
     createdBy: {
       type: ObjectId,
       ref: 'Users',

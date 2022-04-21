@@ -65,10 +65,46 @@ export class CouponsController {
   //{update promotion by id here}
   @ApiParam({ name: 'id', required: true })
   @Put('/:id')
-  @ApiConsumes('multipart/form-data', 'application/json')
+  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FilesInterceptor('image', 20, {
+      storage: diskStorage({
+        destination: './public/uploads/product/variants',
+        filename: function (req, file, cb) {
+          let extArray = file.mimetype.split('/');
+          let extension = extArray[extArray.length - 1];
+          cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
+        },
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   @ApiBody({
-    schema: { properties: { coupon_name: { type: 'String' } } },
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        coupon_code: { type: 'string' },
+        coupon_expiration: { type: 'string' },
+        coupon_usablenumber: { type: 'number' },
+        discount_type: {
+          type: 'boolean',
+        },
+        discount_amount: {
+          type: 'number',
+        },
+        coupon_conditional: { type: 'boolean' },
+        min_cart_value: { type: 'number' },
+        max_discount_limit: { type: 'number' },
+        min_cart_value_flat: { type: 'number' },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
   })
+  @ApiConsumes('multipart/form-data', 'application/json')
   async updateCoupon(@Param() params, @Request() request) {
     return await this.CouponsService.updateCoupon(
       params.id,
@@ -86,7 +122,6 @@ export class CouponsController {
 
   //{create promotion}
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.ADMIN)
   @Post('/')
   @UseInterceptors(FileInterceptor('image'))
   @UseInterceptors(

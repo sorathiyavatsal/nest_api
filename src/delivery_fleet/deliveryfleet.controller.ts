@@ -327,6 +327,9 @@ export class DeliveryFleetController {
             format: 'binary',
           },
         },
+        orderId: {
+            type: 'string'
+        }
       },
     },
   })
