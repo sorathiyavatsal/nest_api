@@ -34,8 +34,8 @@ export interface Earning extends mongoose.Document {
   _id: string;
   JobId: mongoose.ObjectId;
   deliveryBoyId: mongoose.ObjectId;
-  workedHours: number;
-  travelledKMs: number;
+  workedHours: string;
+  travelledKMs: string;
   amount: number;
   startDateTime: string;
   endDateTime: string;

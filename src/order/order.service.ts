@@ -200,8 +200,12 @@ export class OrderService {
         status: 'Pendding',
         shipingAddress: orderDto.shipingAddress,
         billingAddress: orderDto.billingAddress,
-        paymentTransactionId: orderDto.paymentTransactionId,
+        purchaseType: orderDto.purchaseType ? orderDto.purchaseType : 'Cash'
       };
+
+      if(orderDto.paymentTransactionId) {
+        order['paymentTransactionId'] = orderDto.paymentTransactionId
+      }
 
       if (orderDto.tax) {
         order['tax'] = orderDto.tax;

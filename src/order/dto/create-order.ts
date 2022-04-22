@@ -135,6 +135,11 @@ export class OrderDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiPropertyOptional()
   paymentTransactionId: String;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiPropertyOptional({ enum: ['Cash', 'Online'] })
+  purchaseType: String;
 }

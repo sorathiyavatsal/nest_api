@@ -148,13 +148,9 @@ export class EarningsService {
       Earning['settlmentId'] = EarningDto.settlmentId;
     }
 
-    
-
     const userData = await this.UserDataModel.findOne({
       userId: ObjectId(EarningDto.deliveryBoyId),
     });
-
-    console.log(userData);
 
     const fleetCommission = await this.fleetCommissionModel.findOne({
       name: userData['job_type'],
@@ -163,8 +159,18 @@ export class EarningsService {
     if (userData['job_type'] == 'Flat') {
       Earning['amount'] = fleetCommission.fix;
     } else {
-      Earning['amount'] =
-        EarningDto.workedHours * fleetCommission.additionalPerHour;
+      if (EarningDto.workedHours) {
+        var hours = EarningDto.workedHours.split(':')[0];
+        var mintues = EarningDto.workedHours.split(':')[1];
+
+        if (mintues >= 60) {
+          hours += 1;
+        } else {
+          hours = hours + ((mintues * 100) / 60);
+        }
+
+        Earning['amount'] = hours * fleetCommission.additionalPerHour;
+      }
     }
 
     return await new this.EarningModel(Earning).save();
